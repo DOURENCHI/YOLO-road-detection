@@ -511,5 +511,10 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
       （现在目录里那个是合成片段，只能验证链路能跑通，不能当效果演示）
 - [ ] 阶段四：ONNX 导出与 TensorRT 推理优化 —— **本次暂缓**，是下一步计划
 
-详细的代码逐行解析、面试问答、项目原理说明见解析文档
-`YOLO_Road_Detection_代码解析.html`（与仓库同级，不随仓库提交）。
+详细的代码逐行解析、面试问答、项目原理说明见解析文档（**不在本仓库内**，2026-10-14 起统一放在）：
+
+```
+D:\工程\方向与规划\项目\YOLO_Road_Detection\
+├── YOLO_Road_Detection_代码解析.html    # 主文档（自带图表，单文件可离线打开）
+└── YOLO_Road_Detection_代码解析.pdf     # 同内容 PDF，便于打印或发给别人
+```
