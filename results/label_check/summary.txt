@@ -1,0 +1,31 @@
+标签可视化抽检记录
+配置文件：D:\VC Code\YOLO_Road_Detection\datasets\road-traffic-detect\data.yaml
+类别数：12
+类别名：bicycles, bridges, buses, chimneys, crosswalks, fire hydrants, motorcycles, stairs, taxis, tractors, traffic lights, vehicles
+随机种子：0    每划分抽样数：8
+
+===== train =====
+图片总数：494
+标签文件为空的：0
+本次抽检张数：8
+抽到的框数：42（该划分共 1804）
+抽检图中的类别分布：vehicles=19, traffic lights=14, crosswalks=4, fire hydrants=2, motorcycles=1, buses=1, chimneys=1
+拼图文件：train_sample.png
+
+===== valid =====
+图片总数：187
+标签文件为空的：1
+本次抽检张数：8
+抽到的框数：40（该划分共 839）
+抽检图中的类别分布：traffic lights=24, vehicles=6, bicycles=5, crosswalks=2, buses=2, stairs=1
+拼图文件：valid_sample.png
+
+===== test =====
+图片总数：133
+标签文件为空的：0
+本次抽检张数：8
+抽到的框数：30（该划分共 522）
+抽检图中的类别分布：motorcycles=10, vehicles=8, crosswalks=6, traffic lights=3, fire hydrants=2, bicycles=1
+拼图文件：test_sample.png
+
+空标签核对图：empty_label_check.png

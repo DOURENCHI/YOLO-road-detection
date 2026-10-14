@@ -1,0 +1,23 @@
+{
+ "输入说明": "视频 _pipeline_check_pan.mp4",
+ "权重": "D:\\VC Code\\YOLO_Road_Detection\\runs\\detect\\runs\\road_baseline\\weights\\best.pt",
+ "跟踪器": "bytetrack.yaml",
+ "参数": {
+  "conf": 0.25,
+  "iou": 0.7,
+  "imgsz": 640,
+  "device": "0"
+ },
+ "处理帧数": 120,
+ "框总数": 373,
+ "帧均目标数": 3.11,
+ "轨迹总数": 4,
+ "只出现1帧的轨迹数": 0,
+ "轨迹寿命_中位帧": 120,
+ "按类别的轨迹数": {
+  "vehicles": 4
+ },
+ "输出视频": "D:\\VC Code\\YOLO_Road_Detection\\results\\track\\pipeline_check\\track.mp4",
+ "总耗时_秒": 5.69,
+ "说明": "轨迹总数不等于真实目标数；遮挡后重现会分配新 ID。"
+}

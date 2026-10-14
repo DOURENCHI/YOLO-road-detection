@@ -1,0 +1,37 @@
+# =====================================================================
+# 依赖清单（版本为本机 yolo_road 环境实测值，2026-10-14 导出）
+#
+# 安装顺序有讲究：先装 PyTorch（要挑和本机 CUDA 对应的构建），再装其余。
+# 一条命令装完（CUDA 12.8 构建）：
+#     pip install torch==2.11.0+cu128 torchvision==0.26.0+cu128 \
+#         --index-url https://download.pytorch.org/whl/cu128
+#     pip install -r requirements.txt
+#
+# 国内下载慢就加镜像：-i https://pypi.tuna.tsinghua.edu.cn/simple
+# =====================================================================
+
+# ---------------------------------------------------------------- 核心（跑训练与推理必需）
+ultralytics==8.4.176        # 检测框架：训练 / 验证 / 推理 / 导出接口
+torch==2.11.0+cu128        # 深度学习框架，+cu128 表示 CUDA 12.8 构建
+torchvision==0.26.0+cu128  # torch 配套的视觉库，ultralytics 依赖它
+numpy==2.4.6
+opencv-python==5.0.0.93    # 读写图片 / 视频，画框写字
+pillow==12.3.0
+pyyaml==6.0.3              # 读 data.yaml
+
+# ---------------------------------------------------------------- 出图（画曲线、拼演示图）
+matplotlib==3.11.2
+
+# ---------------------------------------------------------------- 多目标跟踪
+# ByteTrack 的线性分配求解器。不装的话 ultralytics 会试图自动下载，
+# 网络不通时跟踪会直接失败，所以显式列出来。
+lap==0.5.13
+
+# ---------------------------------------------------------------- 说明
+# 上面没列 tqdm / psutil，它们是 ultralytics 的间接依赖，会自动装上。
+# 没列 pandapower / seaborn 之类，因为本项目用不到。
+#
+# 检查环境是否装对，跑这一条：
+#     python -c "import torch, ultralytics; print(torch.__version__, torch.cuda.is_available(), ultralytics.__version__)"
+# 期望输出形如：2.11.0+cu128 True 8.4.176
+# 如果 cuda.is_available() 是 False，说明装成了 CPU 版，卸载重装 CUDA 版（见 README 第 2 节）。

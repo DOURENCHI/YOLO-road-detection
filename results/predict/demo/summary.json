@@ -1,0 +1,95 @@
+{
+ "输入说明": "未指定输入，默认跑 valid 划分前 8 张",
+ "权重": "D:\\VC Code\\YOLO_Road_Detection\\runs\\detect\\runs\\road_baseline\\weights\\best.pt",
+ "参数": {
+  "conf": 0.25,
+  "iou": 0.7,
+  "imgsz": 640,
+  "device": "0"
+ },
+ "项数": 8,
+ "框总数": 30,
+ "类别分布": {
+  "traffic lights": 10,
+  "vehicles": 18,
+  "chimneys": 2
+ },
+ "平均每项耗时_ms": 9.29,
+ "流程总耗时_秒": 1.99,
+ "逐项": [
+  {
+   "file": "1653344879953_jpg.rf.981fba40a0df77b35721afc1c4ce69dc.jpg",
+   "boxes": 8,
+   "classes": {
+    "traffic lights": 5,
+    "vehicles": 3
+   },
+   "mean_conf": 0.6761,
+   "ms": 9.29
+  },
+  {
+   "file": "1653344983450_jpg.rf.1cc746ba0d7ccf40b5e6e0be4f19751d.jpg",
+   "boxes": 2,
+   "classes": {
+    "traffic lights": 2
+   },
+   "mean_conf": 0.4933,
+   "ms": 9.29
+  },
+  {
+   "file": "1653345012928_jpg.rf.1d25f9bb245263239071777d0dcb5581.jpg",
+   "boxes": 4,
+   "classes": {
+    "vehicles": 4
+   },
+   "mean_conf": 0.8307,
+   "ms": 9.29
+  },
+  {
+   "file": "1653345265965_jpg.rf.8533151d9659af6bac9184da7f743b64.jpg",
+   "boxes": 5,
+   "classes": {
+    "vehicles": 5
+   },
+   "mean_conf": 0.8204,
+   "ms": 9.29
+  },
+  {
+   "file": "1653345326013_jpg.rf.f707332f8df4ca8b320f0976ca3784aa.jpg",
+   "boxes": 1,
+   "classes": {
+    "traffic lights": 1
+   },
+   "mean_conf": 0.9459,
+   "ms": 9.29
+  },
+  {
+   "file": "1653345733065_jpg.rf.07886b204c3bd962d3f7f8ee587df359.jpg",
+   "boxes": 2,
+   "classes": {
+    "chimneys": 2
+   },
+   "mean_conf": 0.5606,
+   "ms": 9.29
+  },
+  {
+   "file": "1653345752691_jpg.rf.d31adcc925dac999336b44a4c63e8af7.jpg",
+   "boxes": 7,
+   "classes": {
+    "vehicles": 5,
+    "traffic lights": 2
+   },
+   "mean_conf": 0.7155,
+   "ms": 9.29
+  },
+  {
+   "file": "1653385191647_jpg.rf.780693d7dfbcc663c6d9c86a4bbed5e0.jpg",
+   "boxes": 1,
+   "classes": {
+    "vehicles": 1
+   },
+   "mean_conf": 0.8342,
+   "ms": 9.29
+  }
+ ]
+}

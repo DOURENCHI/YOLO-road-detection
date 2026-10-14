@@ -1,0 +1,42 @@
+MIT License
+
+Copyright (c) 2026 窦仁驰
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=======================================================================
+本仓库里的代码采用上面的 MIT 许可。
+但**数据集与预训练权重的许可和代码不同**，单独说明如下：
+
+1. 数据集 datasets/road-traffic/
+   来源：Roboflow Universe，项目 road-traffic（RF100 基准的一部分）
+   地址：https://universe.roboflow.com/roboflow-100/road-traffic
+   原始作者：Muntaser Al Abdulla Aljouma
+   许可：CC BY 4.0 —— 允许使用与再分发，但**必须署名**。
+   完整说明见 datasets/road-traffic/README.dataset.txt（Roboflow 原始文件，请勿删除）。
+
+   使用本仓库的数据集或基于它训练的模型时，请保留上面的来源与署名。
+
+2. 预训练权重 weights/yolo26n.pt
+   来源：Ultralytics 官方发布。软件本体为 AGPL-3.0，权重另受 Ultralytics
+   Enterprise License 约束。如用于商业用途，请先确认其许可条款。
+
+3. 经本仓库脚本处理得到的数据集 datasets/road-traffic-detect/
+   是上面第 1 项的衍生作品，因此仍受 CC BY 4.0 约束，同样需要署名。
+=======================================================================

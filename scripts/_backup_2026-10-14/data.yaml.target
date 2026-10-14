@@ -1,0 +1,19 @@
+path: D:/VC Code/YOLO_Road_Detection/datasets/road-traffic-detect
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 12
+names:
+  - bicycles
+  - bridges
+  - buses
+  - chimneys
+  - crosswalks
+  - fire hydrants
+  - motorcycles
+  - stairs
+  - taxis
+  - tractors
+  - traffic lights
+  - vehicles

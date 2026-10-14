@@ -1,0 +1,67 @@
+{
+ "数据集": "D:\\VC Code\\YOLO_Road_Detection\\datasets\\road-traffic-detect\\data.yaml",
+ "阈值": 5,
+ "图片数": {
+  "train": 494,
+  "valid": 187,
+  "test": 133
+ },
+ "内容完全相同": {
+  "划分内": {
+   "train": 0,
+   "valid": 0,
+   "test": 0
+  },
+  "跨划分": {
+   "train-valid": 0,
+   "train-test": 0,
+   "valid-test": 0
+  },
+  "跨划分明细": {
+   "train-valid": [],
+   "train-test": [],
+   "valid-test": []
+  }
+ },
+ "dhash_最接近距离": 15,
+ "画面近似": {
+  "跨划分": {
+   "train-valid": 0,
+   "train-test": 0,
+   "valid-test": 0
+  },
+  "划分内": {
+   "train": 0,
+   "valid": 0,
+   "test": 0
+  },
+  "跨划分明细": {
+   "train-valid": [],
+   "train-test": [],
+   "valid-test": []
+  }
+ },
+ "时间戳邻域": {
+  "train-valid": {
+   "<=1 秒": 0,
+   "<=5 秒": 2,
+   "<=1 分钟": 158,
+   "<=5 分钟": 679,
+   "最小间隔_ms": 4862
+  },
+  "train-test": {
+   "<=1 秒": 0,
+   "<=5 秒": 0,
+   "<=1 分钟": 94,
+   "<=5 分钟": 527,
+   "最小间隔_ms": 5565
+  },
+  "valid-test": {
+   "<=1 秒": 0,
+   "<=5 秒": 0,
+   "<=1 分钟": 143,
+   "<=5 分钟": 677,
+   "最小间隔_ms": 5327
+  }
+ }
+}
