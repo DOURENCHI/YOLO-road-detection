@@ -5,7 +5,7 @@
 
 这个项目的目的不只是"把模型训出来"，而是把一条**可复现、可追溯、别人能接手**的
 数据处理链路走通。每一步都有对应脚本，每个脚本都会打印可核对的数字；
-所有结论性的数字都会**连同它的测量条件**一起记录下来（这一点比数字本身更重要）。
+所有结论性的数字都会**连同它的测量条件**一起记录下来。
 
 ---
 
@@ -32,16 +32,16 @@ YOLO_Road_Detection/
 │   ├── road-traffic/                 # 原始数据集（Roboflow 导出）
 │   │   ├── train/ valid/ test/       # 各自含 images/ 与 labels/
 │   │   ├── data.yaml                 # 源头配置：names / nc / path
-│   │   └── README*.txt               # 来源与许可说明（不要删）
+│   │   └── README*.txt               # 来源与许可说明
 │   └── road-traffic-detect/          # 04 号脚本生成的检测框数据集
 │       ├── train/ valid/ test/
 │       └── data.yaml                 # 训练实际使用的配置
 ├── docs/                             # 各类记录
-│   ├── RESUME_PROJECT.md                  # 简历条目与面试材料（自己看的底稿）
+│   ├── RESUME_PROJECT.md                  # 简历条目与面试材料
 │   ├── label_conversion_report.txt        # 04 号脚本生成的转换报告（审计日志）
 │   ├── inference_benchmark.json           # 性能测试原始统计量 + 完整测量条件
 │   ├── data_leakage_report.json           # 数据泄漏检查的完整结果
-│   └── args_failed_run_2026-10-13.yaml    # 那次失败运行的参数快照（留着当证据）
+│   └── args_failed_run_2026-10-13.yaml    # 那次失败运行的参数快照（证据）
 ├── runs/detect/runs/road_baseline/   # 正式训练产物（曲线、混淆矩阵、权重）
 ├── results/
 │   ├── label_check/                  # 人工标注抽检图
