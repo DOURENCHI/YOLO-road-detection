@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>页面没找到 · YOLO 道路场景多类别目标检测</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#fff; --ink:#1a1d21; --ink2:#4b5563; --ink3:#7a8290;
+  --line:#e6e8ec; --blue:#1d4ed8; --blue-bg:#eef3ff; --blue-line:#c7d8ff;
+  --mono:"Cascadia Mono","JetBrains Mono",Consolas,"Courier New",monospace;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.10);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);color:var(--ink);padding:28px;
+  font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
+  line-height:1.75;-webkit-font-smoothing:antialiased;
+}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:38px 40px;max-width:560px;width:100%;box-shadow:var(--shadow);
+}
+.code{
+  font-family:var(--mono);font-size:13px;color:var(--blue);background:var(--blue-bg);
+  border:1px solid var(--blue-line);border-radius:7px;padding:4px 10px;display:inline-block;
+}
+h1{font-size:25px;margin:16px 0 10px;letter-spacing:-.3px}
+p{color:var(--ink2);margin:0 0 8px;font-size:15px}
+.links{margin-top:26px;display:flex;flex-wrap:wrap;gap:10px}
+a.btn{
+  display:inline-flex;align-items:center;padding:10px 18px;border-radius:10px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  text-decoration:none;font-size:14.5px;font-weight:600;box-shadow:var(--shadow);
+  transition:transform .12s;
+}
+a.btn:hover{transform:translateY(-1px)}
+a.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="code">404</span>
+  <h1>这个页面不存在</h1>
+  <p>可能是链接打错了一个字符，或者这个地址本来就不在这个站点里。</p>
+  <p>下面是这个站点里真正有的两页。</p>
+  <div class="links">
+    <a class="btn primary" href="/YOLO-road-detection/">项目演示页</a>
+    <a class="btn" href="/YOLO-road-detection/manual.html">项目说明书</a>
+    <a class="btn" href="https://github.com/DOURENCHI/YOLO-road-detection">GitHub 仓库</a>
+  </div>
+</div>
+</body>
+</html>
