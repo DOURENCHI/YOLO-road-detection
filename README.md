@@ -42,7 +42,6 @@ YOLO_Road_Detection/
 │       ├── train/ valid/ test/
 │       └── data.yaml                 # 训练实际使用的配置
 ├── docs/                             # 各类记录
-│   ├── RESUME_PROJECT.md                  # 简历条目与面试材料
 │   ├── label_conversion_report.txt        # 04 号脚本生成的转换报告（审计日志）
 │   ├── inference_benchmark.json           # 性能测试原始统计量 + 完整测量条件
 │   ├── data_leakage_report.json           # 数据泄漏检查的完整结果
@@ -51,7 +50,7 @@ YOLO_Road_Detection/
 ├── results/
 │   ├── label_check/                  # 人工标注抽检图
 │   ├── predict/                      # 06 号脚本的推理结果（带框的图 / 视频）
-│   ├── demo/demo_grid.png            # 07 号脚本的对照拼图（可直接当简历配图）
+│   ├── demo/demo_grid.png            # 07 号脚本的对照拼图（三档示例）
 │   ├── track/                        # 08 号脚本的跟踪视频与轨迹统计
 │   └── eval_report/                  # 09 号脚本的评估报告与图表
 ├── assets/                           # 演示素材（示例图；自己录的视频放 assets/videos/）
@@ -365,7 +364,7 @@ python scripts/07_make_demo_figure.py
 - 绿框 = 检出正确；黄框 = 漏检（有标注、模型没报）；红框 = 误检（模型报了、没有标注）
 - 挑选规则写在 `results/demo/demo_grid.json` 里，任何人都能复算
 
-这张图**可以直接当简历配图**，也是面试时讲"模型哪里行、哪里不行"最好用的材料。
+这张图把"哪里行、哪里不行"放在同一张画布上，比只看数字直观得多。
 
 ### 第 12 步 · 视频多目标跟踪
 
@@ -515,7 +514,6 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 - [x] 推理与演示脚本 —— `06_predict.py`（图 / 目录 / 视频 / 摄像头）、
       `07_make_demo_figure.py`（对照拼图）、`08_track.py`（视频多目标跟踪）
       均已完成并实跑验证
-- [x] 简历与面试材料 —— `docs/RESUME_PROJECT.md`
 - [x] 工程基线 —— `requirements.txt`（版本已固定）、`LICENSE`（代码 MIT + 数据集 CC BY 4.0）
 - [ ] **录一段 20~30 秒的真实道路视频**放进 `assets/videos/`，跑一次真正的跟踪演示
       （现在目录里那个是合成片段，只能验证链路能跑通，不能当效果演示）
@@ -538,13 +536,12 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 > 站点结构：`site/index.html`（演示页）、`site/manual.html`（说明书）、`site/media/`（图表与视频）。
 > 本地想预览，直接在浏览器里打开 `site/index.html` 即可——全部用相对路径，不需要起服务器。
 
-**《项目说明书》**（零基础版）按「是什么 → 为什么 → 怎么做 → 结果怎样 → 局限在哪 → 面试怎么讲」
+**《项目说明书》**（零基础版）按「是什么 → 为什么 → 怎么做 → 结果怎样 → 局限在哪」
 组织，从零建立八个核心概念（检测框、损失函数、IoU、精确率/召回率、mAP、过拟合……）。
-每个概念都配了生活类比、本项目的真实数字，以及“被问到该怎么答”的说法。
-看完一遍，就能把整个项目从头讲出来。
+每个概念都配了生活类比和本项目的真实数字，读完能把这个项目的来龙去脉讲清楚。
 
 **《代码解析》** 是按文件组织的逐行代码解读，面向“想知道每一行在写什么”的读者。
-它**不在本仓库内**——里面包含大量自我评估和学习痕迹，不适合随仓库公开。
+它**不在本仓库内**，单独维护。
 它和说明书的 PDF 版一起放在：
 
 ```

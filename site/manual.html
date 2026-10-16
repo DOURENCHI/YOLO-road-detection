@@ -101,7 +101,7 @@
   .pur{background:var(--violet-bg);border-color:var(--violet-line);color:#4c1d95}
   .pur .t{color:var(--violet)}
 
-  /* 教学四件套：类比 / 定义 / 我们的数字 / 面试怎么说 */
+  /* 教学四件套：类比 / 定义 / 本项目的数字 / 一句话说清 */
   .analogy{background:var(--amber-bg);border:1px solid var(--amber-line);
     border-radius:11px;padding:15px 19px;margin:18px 0}
   .analogy .t{display:block;font-weight:700;color:var(--amber);margin-bottom:5px}
@@ -186,7 +186,7 @@
 <aside class="sidebar">
   <div class="side-brand">
     <h1>YOLO 道路检测 · 项目说明书</h1>
-    <p>零基础版 · 看完能把这个项目完整讲出来</p>
+    <p>零基础版 · 从数据到评估的完整讲解</p>
     <a href="index.html" style="display:inline-block;margin-top:11px;padding:6px 12px;border-radius:7px;background:#eef3ff;border:1px solid #c7d8ff;color:#1d4ed8;font-size:12.5px;font-weight:600;text-decoration:none">← 返回演示页</a>
   </div>
   <nav id="toc">
@@ -244,14 +244,8 @@
     <a href="#p6-3" class="sub">6.3 多目标跟踪</a>
     <a href="#p6-4" class="sub">6.4 延迟必须带条件</a>
 
-    <div class="grp">第七、八部分</div>
-    <a href="#p7">7 · 诚实清单：不做什么</a>
-    <a href="#p8">8 · 面试重述训练</a>
-    <a href="#p8-1" class="sub">8.1 三十秒逐字稿</a>
-    <a href="#p8-2" class="sub">8.2 三分钟逐字稿</a>
-    <a href="#p8-3" class="sub">8.3 二十个高频追问</a>
-    <a href="#p8-4" class="sub">8.4 被问住时怎么办</a>
-    <a href="#p8-5" class="sub">8.5 面试前一晚自检</a>
+    <div class="grp">第七部分</div>
+    <a href="#p7">7 · 项目边界与已知局限</a>
 
     <div class="grp">附录</div>
     <a href="#a1">A · 数字速查表</a>
@@ -264,72 +258,69 @@
 
 <header class="top">
   <h1>YOLO 道路目标检测 · 项目说明书</h1>
-  <p class="sub">写给零基础的自己：看完这一份，你能把这个项目从头到尾讲清楚</p>
+  <p class="sub">从零讲清：这个项目做了什么、每一步为什么这么做、结果说明了什么</p>
   <div class="meta">
     <span>📖 零基础可读</span>
-    <span>🎯 目标：能在面试里重述整个项目</span>
     <span>🧩 自包含 · 单文件可离线打开</span>
-    <span>📅 2026-10-15</span>
+    <span>📅 2026-10-16</span>
   </div>
 
-  <p><strong>这份说明书解决一个问题：</strong>你手上有一个已经做完了的项目，但面试官不会问你"你跑过什么命令"，
-  他会问"这项目是干什么的""为什么这么做""结果说明了什么""你踩过什么坑"。
-  <strong>这份说明书就是帮你把这些问题一个个准备好。</strong></p>
+  <p><strong>这份文档回答四个问题：</strong>这个项目是干什么的、为什么每一步这么做、
+  结果说明了什么、以及它在哪些地方还不成立。每个结论都配着它在项目里的出处。</p>
 
-  <p>它不假设你懂深度学习。里面每一个专业词，第一次出现时都会用生活里的例子讲明白，
-  再给严格定义，再配本项目里的真实数字。<strong>读完之后，你应该能不看稿子讲三分钟。</strong></p>
+  <p>它不假设读者懂深度学习。里面每一个专业词，第一次出现时都会用生活里的例子讲明白，
+  再给严格定义，再配本项目里的真实数字。<strong>读完能把这个项目的来龙去脉讲清楚。</strong></p>
 
   <div class="box note">
-    <span class="t">这份说明书和《代码解析》的分工</span>
+    <span class="t">这份文档和《代码解析》的分工</span>
     项目里还有一份 <code>YOLO_Road_Detection_代码解析.html</code>（约 2.3 MB），那份是<strong>按文件组织的逐行代码解读</strong>，
-    面向"我想读懂这段代码在写什么"。这一份是<strong>按项目本身组织的</strong>，面向"我要理解并讲出这个项目"。
-    两份都自包含，可以单独看；这一份里也会给出关键代码片段，足够你应付面试追问。
+    面向"我想读懂这段代码在写什么"。这一份是<strong>按项目本身组织的</strong>，面向"我要理解这个项目"。
+    两份都自包含，可以单独看；这一份里也会给出关键代码片段，足够说清每个步骤的实现。
   </div>
 </header>
 <!-- ==================== 0 ==================== -->
-<h2 id="p0"><span class="num">0</span>怎么用这份说明书</h2>
+<h2 id="p0"><span class="num">0</span>怎么读这份文档</h2>
 
-<p>这不是一份"从头读到尾"的文档。它是一份<strong>按需要取用</strong>的手册。三种读法，按你的时间和目的选：</p>
+<p>这不是一份"从头读到尾"的文档，而是一份<strong>按需要取用</strong>的手册。三种读法，按时间和目的选：</p>
 
 <table>
   <tr><th style="width:150px">场景</th><th style="width:110px">要多久</th><th>怎么读</th></tr>
   <tr class="hi">
-    <td><strong>速通</strong><br><span class="muted">只想知道这项目是干嘛的</span></td>
+    <td><strong>速通</strong><br><span class="muted">只想了解这是个什么项目</span></td>
     <td class="c">30 分钟</td>
-    <td>读 <a href="#p1">第 1 部分</a>（建立直觉）+ <a href="#p8-1">8.1 三十秒逐字稿</a>。够你在社交场合说清楚这个项目。</td>
+    <td>读 <a href="#p1">第 1 部分</a>（建立直觉）+ <a href="#a1">附录 A 数字速查表</a>。两页就能知道这个项目做了什么、做到什么程度。</td>
   </tr>
   <tr>
-    <td><strong>细读</strong><br><span class="muted">准备投简历 / 第一次面试</span></td>
+    <td><strong>细读</strong><br><span class="muted">想看清方法与细节</span></td>
     <td class="c">2～3 小时</td>
-    <td>从 <a href="#p1">第 1 部分</a>顺序读到 <a href="#p8">第 8 部分</a>。<strong>第 2 部分（八个概念）是地基</strong>，别跳，后面所有数字都建立在这八个词上。</td>
+    <td>从 <a href="#p1">第 1 部分</a>顺序读到 <a href="#p7">第 7 部分</a>。<strong>第 2 部分（八个概念）是地基</strong>，别跳——后面所有数字都建立在这八个词上。</td>
   </tr>
   <tr class="hi">
-    <td><strong>复习</strong><br><span class="muted">面试前一晚</span></td>
-    <td class="c">40 分钟</td>
-    <td>只读 <a href="#p8">第 8 部分</a>（口述稿 + 追问 + 自检清单）+ <a href="#a1">附录 A 数字速查表</a>。<strong>别再看新东西了</strong>，这一晚的任务是把已经会的说顺。</td>
+    <td><strong>查证</strong><br><span class="muted">只想核对某个数字</span></td>
+    <td class="c">5 分钟</td>
+    <td>直接翻 <a href="#a1">附录 A 数字速查表</a>，每个数字都标了它在项目里的出处文件；<a href="#a3">附录 C</a> 是全部脚本与产物的地图。</td>
   </tr>
 </table>
 
 <div class="box tip">
   <span class="t">💡 全书两个反复出现的记号</span>
-  <p><strong>「面试怎么说」</strong>（绿色框）—— 每讲完一个知识点，会给一句可以直接照说的原话。这是全书里最该背的部分。</p>
-  <p><strong>「本项目的真实数字」</strong>—— 所有数字都来自项目里的实测记录文件，不是估的、不是背的。附录 A 有完整清单和出处，被追问时可以直接翻。</p>
+  <p><strong>「一句话说清」</strong>（绿色框）—— 每讲完一个概念，用一句不绕术语的短句把它说清楚。</p>
+  <p><strong>「本项目的真实数字」</strong>—— 所有数字都来自项目里的实测记录文件，不是估的。附录 A 有完整清单和出处，可以逐个核对。</p>
 </div>
 
-<h3>读的时候有个心态要调整</h3>
+<h3>这份文档为什么把这些都写出来</h3>
 
-<p>你可能会觉得"这些术语我还没掌握，讲出来会不会很假"。
-<strong>恰恰相反——面试官最想听到的不是你懂多深，而是你能不能把一件事讲清楚。</strong></p>
+<p>一个检测项目最容易含糊的地方，是<strong>只给一个总分</strong>。分数好看，但看不出它在哪里成立、在哪里不成立。</p>
 
-<p>这个项目里你真正拥有的东西，是下面这三样，它们都不需要你是专家：</p>
+<p>所以这里不只给数字，也给出数字的成立条件：</p>
 
 <ol>
-  <li><strong>一份被认真检查过的数据</strong>：你知道它干净到什么程度、也知道它哪里不干净（有一处漏标）。</li>
-  <li><strong>一组带条件的数字</strong>：mAP50 是 0.680，而且你知道这个数字是在哪个数据集、哪个划分、什么配置下得到的。</li>
-  <li><strong>几条自己踩出来的坑</strong>：目录嵌套、缓存不删、延迟测不准——这些都是别人抄不走的。</li>
+  <li><strong>数据被认真检查过</strong>：干净到什么程度、哪里还不干净（有一处漏标），都写明。</li>
+  <li><strong>每个数字都带条件</strong>：mAP50 是 0.680，并且写清它是在哪个数据集、哪个划分、什么配置下得到的。</li>
+  <li><strong>踩过的坑都留着</strong>：目录嵌套、缓存不删、延迟测不准——这些记录比结论本身更有复用价值。</li>
 </ol>
 
-<p>这份说明书要做的，就是帮你把这三样东西<strong>变成一段流畅的话</strong>。</p>
+<p>看完全文，能得到的不是"这个模型有多好"，而是<strong>这套流程每一步为什么这么做、以及它现在还不够用在哪里</strong>。</p>
 
 <!-- ==================== 1 ==================== -->
 <h2 id="p1"><span class="num">1</span>这个项目到底在做什么</h2>
@@ -354,10 +345,10 @@
 看见前面有车、有行人、有红灯。这一步做不好，后面所有的决策、规划、控制都是空中楼阁。</p>
 
 <p>而"看见"这件事，在工业界有一个非常成熟的叫法：<strong>目标检测（Object Detection）</strong>。
-它也是所有计算机视觉岗位面试里出现频率最高的题目之一。</p>
+它也是计算机视觉里最基础、应用最广的任务之一。</p>
 
 <div class="box tip">
-  <span class="t">💡 这个项目在简历上的位置</span>
+  <span class="t">💡 这个项目的定位</span>
   <p>它不是一篇论文，不是"我发明了某个算法"，而是一个<strong>完整的工程闭环</strong>：
   拿到一份真实、混乱的数据 → 清洗整理 → 训练模型 → 严格评估 → 找出问题 → 做成能演示的东西。</p>
   <p>这条链路正是算法岗位每天在做的事。所以它的价值不在那个 0.680，
@@ -366,7 +357,7 @@
 
 <h3 id="p1-2">1.2 目标检测 ≠ 图像分类 ≠ 语义分割</h3>
 
-<p>这是面试里最容易被问倒的第一个问题，因为三个词听起来很像。用一张图就能分清楚：</p>
+<p>这三个词听起来很像，但做的是三件不同的事。用一张图就能分清楚：</p>
 
 <figure>
 <svg viewBox="0 0 680 306" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Microsoft YaHei, sans-serif">
@@ -427,53 +418,51 @@
 这也是为什么后面评估时会用"框叠得准不准"（IoU）来衡量——<strong>框本来就是粗糙的，我们衡量的是"粗糙到什么程度还能用"</strong>。</p>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"我做的是目标检测，不是分类也不是分割。区别在于：分类只回答'图里有什么'，
-  检测要回答'有什么、有几个、分别在哪'。我的输出是一组矩形框，每个框带一个类别和置信度。
-  所以评估的时候不能只看分类对不对，还要看框的位置准不准——这就是 mAP50-95 存在的意义。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>我做的是目标检测，不是分类也不是分割。区别在于：分类只回答“图里有什么”， 检测要回答“有什么、有几个、分别在哪”。我的输出是一组矩形框，每个框带一个类别和置信度。 所以评估的时候不能只看分类对不对，还要看框的位置准不准——这就是 mAP50-95 存在的意义。</p>
 </div>
 
 <h3 id="p1-3">1.3 它不做什么：先把边界划清楚</h3>
 
-<p>这一节看起来是"自我贬低"，其实是<strong>整份说明书里最保命的一节</strong>。</p>
+<p>这一节列的是<strong>这个项目不声称的能力</strong>。检测类项目最容易含糊的地方，
+就是把"跑通了一条链路"说成"做出了一个系统"。</p>
 
-<p>面试官最擅长的一件事，是顺着你的话往下追问。你说"我做了自动驾驶感知"，他下一个问题一定是
-"那时序信息怎么处理""多传感器怎么融合"——然后你就答不上来了。<strong>把边界划在前面，这些问题根本不会被问出口。</strong></p>
+<p>下面每一条，都是这个项目实际没有做、或者没做到的事。写清楚它们比多写两个指标更重要——
+<strong>一个项目的价值，很大程度上取决于它的边界是不是清楚的。</strong></p>
 
 <table>
-  <tr><th style="width:210px">不要说</th><th>为什么不能说</th><th style="width:300px">可以怎么说</th></tr>
+  <tr><th style="width:210px">不声称</th><th>为什么不能说</th><th style="width:300px">更准确的表述</th></tr>
   <tr class="hi">
     <td><strong>自动驾驶感知系统</strong></td>
-    <td>它只是"感知"里最基础的一环——单帧、单目、12 类。没有时序，没有毫米波雷达 / 激光雷达，没有做恶劣天气验证。</td>
+    <td>本项目只是"感知"里最基础的一环——单帧、单目、12 类。没有时序信息，没有毫米波雷达 / 激光雷达，没有做恶劣天气验证。</td>
     <td>"一个<strong>道路场景的单帧目标检测基线</strong>，是感知链路的第一步。"</td>
   </tr>
   <tr>
     <td><strong>模型部署 / 推理加速</strong></td>
-    <td>没有导出 ONNX，没有用 TensorRT，没做量化。你只做了 PyTorch 侧的性能测量。</td>
-    <td>"我做的是 <strong>PyTorch 侧的推理性能测量</strong>，部署还没做，那是下一步计划。"</td>
+    <td>没有导出 ONNX，没有用 TensorRT，没做量化。只有 PyTorch 侧的性能测量。</td>
+    <td>"完成的是 <strong>PyTorch 侧的推理性能测量</strong>，部署未做，属于后续计划。"</td>
   </tr>
   <tr class="hi">
-    <td><strong>我设计了检测算法</strong></td>
-    <td>网络结构是 Ultralytics 现成的，你没改过 backbone、neck、head，也没写过损失函数。</td>
-    <td>"我用的是现成的 YOLO26n 做迁移学习，<strong>没有改网络结构</strong>；我的工作重点在数据与评估方法上。"</td>
+    <td><strong>设计了检测算法</strong></td>
+    <td>网络结构是 Ultralytics 现成的，没有改过 backbone、neck、head，也没有写损失函数。</td>
+    <td>"用的是现成的 YOLO26n 做迁移学习，<strong>未改动网络结构</strong>；工作重点在数据与评估方法上。"</td>
   </tr>
   <tr>
-    <td><strong>我实现了多目标跟踪</strong></td>
-    <td>调用的是框架内置的 ByteTrack，你没动过关联算法。</td>
-    <td>"我<strong>跑通了跟踪的调用链路</strong>并做了统计，但匹配算法本身我没改过。"</td>
+    <td><strong>实现了多目标跟踪</strong></td>
+    <td>调用的是框架内置的 ByteTrack，没有改动关联算法。</td>
+    <td>"<strong>跑通了跟踪的调用链路</strong>并做了轨迹统计，匹配算法本身未修改。"</td>
   </tr>
   <tr class="hi">
     <td><strong>精度超过某某论文</strong></td>
     <td>数据集不同、划分方式不同、有没有用测试时增强也不同。跨数据集比 mAP 没有意义。</td>
-    <td>"我<strong>只跟自己的基线比</strong>，没有和其他论文横比——因为数据集不一样，比了也不成立。"</td>
+    <td>"<strong>只与自己的基线比较</strong>，未与其他论文横向对比——数据集不一致，比较不成立。"</td>
   </tr>
 </table>
 
 <div class="box ok">
-  <span class="t">✅ 那该说成什么？</span>
-  <p>一句话版本，背下来：</p>
-  <p><strong>"我独立做了一次完整的检测训练与评估，并且清楚它的每一步为什么这么做、以及它现在还不够用在哪里。"</strong></p>
-  <p>这个定位<strong>一点都不虚</strong>，而且比任何夸大更难被问倒。因为你说的每句话，后面都有证据。</p>
+  <span class="t">✅ 那这个项目是什么？</span>
+  <p>一句话：<strong>"一次完整的检测训练与评估，每一步为什么这么做、以及它现在还不够用在哪里，都记录在案。"</strong></p>
+  <p>这个定位不虚，而且每一句后面都有证据可查。</p>
 </div>
 
 <h3 id="p1-4">1.4 全流程六站：一张图看懂整条链路</h3>
@@ -538,7 +527,7 @@
   <text x="34" y="262" font-size="11.5" font-weight="700" fill="#1a1d21">这条线的特点：前三站花的功夫，比第四站多得多</text>
   <text x="34" y="283" font-size="11" fill="#4b5563">· 第 2 站（洗数据）写了 7 个脚本，第 3 站（训练）只跑了 1 条命令、11 分钟</text>
   <text x="34" y="302" font-size="11" fill="#4b5563">· 这不是本末倒置——真实项目里，数据决定上限，模型只是逼近这个上限</text>
-  <text x="34" y="320" font-size="11" fill="#4b5563">· 面试官问"你做了什么工程上的事"，答案在第 2 站和第 4 站，不在第 3 站</text>
+  <text x="34" y="320" font-size="11" fill="#4b5563">· 工程投入集中在数据准备与验收，而不是训练本身</text>
 </svg>
 <figcaption>图 2 · 全流程六站：第 1～4 站已完成，第 5 站（演示）做了一部分，第 6 站（部署）明确没做</figcaption>
 </figure>
@@ -553,17 +542,15 @@
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"这个项目我花的功夫主要在数据上：7 个脚本里有 5 个是在查数据，只有 1 个在做格式转换。
-  训练本身只跑了 11 分钟。我觉得这个比例挺有代表性的——真实工作里，数据决定模型的上限，
-  很多看起来'模型不行'的问题，往回查都是数据问题。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>这个项目我花的功夫主要在数据上：7 个脚本里有 5 个是在查数据，只有 1 个在做格式转换。 训练本身只跑了 11 分钟。我觉得这个比例挺有代表性的——真实工作里，数据决定模型的上限， 很多看起来“模型不行”的问题，往回查都是数据问题。</p>
 </div>
 <!-- ==================== 2 ==================== -->
 <h2 id="p2"><span class="num">2</span>从零建立八个概念</h2>
 
 <div class="lead">
   <p><strong>这一部分是全书的地基。</strong>后面所有章节里的数字——0.680、0.423、16.4 毫秒——都建立在这一部分的八个词上。</p>
-  <p>每一个词都按同样的四步讲：<strong>先打比方 → 再给严格定义 → 再给本项目的真实数字 → 最后给一句面试可以直接说的话。</strong></p>
+  <p>每一个词都按同样的四步讲：<strong>先打比方 → 再给严格定义 → 再给本项目的真实数字 → 最后给一句不绕术语的总结。</strong></p>
   <p class="muted">如果你时间很紧，至少把 2.2（标注框）、2.4（IoU）、2.7（mAP）这三个看懂，它们出现的频率最高。</p>
 </div>
 
@@ -627,7 +614,7 @@
  <span class="cmt">└─────────────────────────────────── 类别编号 11 = vehicles（车辆）</span></code></pre>
 
 <p>为什么给的是"中心点 + 宽高"而不是"左上角 + 右下角"？两种写法都能表达一个矩形，
-但"中心点 + 宽高"在做计算时更顺手。<strong>知道这个细节，面试被问到就不会卡壳。</strong></p>
+但"中心点 + 宽高"在做计算时更顺手。<strong>这是格式层面一个常见疑问，值得记一下。</strong></p>
 
 <figure>
 <svg viewBox="0 0 680 330" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Microsoft YaHei, sans-serif">
@@ -689,9 +676,8 @@
 </figure>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"YOLO 的标注是一行一个目标，5 个数字：类别编号加中心点 xy 和宽高，后四个都是归一化到 0～1 的比例。
-  用比例而不是像素，是为了让框的位置不受图片缩放影响。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>YOLO 的标注是一行一个目标，5 个数字：类别编号加中心点 xy 和宽高，后四个都是归一化到 0～1 的比例。 用比例而不是像素，是为了让框的位置不受图片缩放影响。</p>
 </div>
 
 <h3 id="p2-3">2.3 损失函数：模型在"最小化"什么</h3>
@@ -801,10 +787,8 @@
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"IoU 是交集除以并集，衡量两个框重叠的程度，取值 0 到 1。
-  它同时决定了两件事：一是我和标注能不能算'匹配上了'，二是评估时用多严的尺子。
-  mAP50 用的是 IoU 0.5，mAP50-95 是把 0.5 到 0.95 十个档位平均，所以后者对定位精度敏感得多。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>IoU 是交集除以并集，衡量两个框重叠的程度，取值 0 到 1。 它同时决定了两件事：一是我和标注能不能算“匹配上了”，二是评估时用多严的尺子。 mAP50 用的是 IoU 0.5，mAP50-95 是把 0.5 到 0.95 十个档位平均，所以后者对定位精度敏感得多。</p>
 </div>
 
 <h3 id="p2-5">2.5 命中、误报、漏报：只有三种结果</h3>
@@ -945,10 +929,8 @@
 所以如果这是真实产品，应该把阈值往下调一点。</p>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"精确率是'报出来的有多少对'，召回率是'该报的报出多少'，这两个是拉锯关系，靠置信度阈值来调。
-  我的模型精确率 0.787、召回率 0.627，说明它偏保守——误报少但漏报偏多。
-  在自动驾驶场景里这个偏向不太好，因为漏检的代价更高，所以实际部署时应该把阈值适当调低。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>精确率是“报出来的有多少对”，召回率是“该报的报出多少”，这两个是拉锯关系，靠置信度阈值来调。 我的模型精确率 0.787、召回率 0.627，说明它偏保守——误报少但漏报偏多。 在自动驾驶场景里这个偏向不太好，因为漏检的代价更高，所以实际部署时应该把阈值适当调低。</p>
 </div>
 
 <h3 id="p2-7">2.7 mAP50 与 mAP50-95：一个数概括所有类</h3>
@@ -976,7 +958,7 @@
   <p><strong>mAP50 回答"找没找到"</strong>——只要框大致对就行。<br>
   <strong>mAP50-95 回答"对得有多精确"</strong>——要求框卡得很准。</p>
   <p>本项目的两个数字是 <strong>0.680 和 0.423</strong>。差这么多，说明：
-  <strong>模型基本上能找对位置，但框不够精确</strong>。这个判断在面试里很有用，它直接指向了改进方向。</p>
+  <strong>模型基本上能找对位置，但框不够精确</strong>。这个判断直接指向了改进方向。</p>
 </div>
 
 <div class="kpis">
@@ -994,10 +976,8 @@
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"在留出的测试集上，mAP50 是 0.680，mAP50-95 是 0.423。两个差这么多，
-  说明模型能找对位置但框得不够精确，这是小目标定位上的典型问题。
-  验证集上的 mAP50 是 0.641，两个数不一样是因为划分不同、样本不同，我不会把它们混着说。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>在留出的测试集上，mAP50 是 0.680，mAP50-95 是 0.423。两个差这么多， 说明模型能找对位置但框得不够精确，这是小目标定位上的典型问题。 验证集上的 mAP50 是 0.641，两个数不一样是因为划分不同、样本不同，这两个数来自不同划分，不能混着说。</p>
 </div>
 
 <h3 id="p2-8">2.8 过拟合：模型"背答案"了</h3>
@@ -1035,10 +1015,8 @@
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"明显的过拟合。训练集的分类损失从 6.04 降到 0.75，但验证集在第 20 轮之后就卡在 1.08 到 1.14 再没动过，
-  最后两者的差距是 0.34。而且 mAP50 在第 19 轮就到顶了，后面 30 轮基本没贡献。
-  所以我的结论是：瓶颈在数据量，不在训练轮数——继续加轮数是无效的。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>明显的过拟合。训练集的分类损失从 6.04 降到 0.75，但验证集在第 20 轮之后就卡在 1.08 到 1.14 再没动过， 最后两者的差距是 0.34。而且 mAP50 在第 19 轮就到顶了，后面 30 轮基本没贡献。 所以我的结论是：瓶颈在数据量，不在训练轮数——继续加轮数是无效的。</p>
 </div>
 
 <div class="box ok">
@@ -1085,7 +1063,7 @@
   <p>这不是学术礼节，是<strong>许可条款</strong>。你把这份数据用在项目里、发到 GitHub 上、写进论文里，都必须标明来源和作者。</p>
   <p>本项目的做法：<code>datasets/road-traffic/README.dataset.txt</code> 保留 Roboflow 的原始说明文件（<strong>不要删</strong>），
   另外根目录的 <code>LICENSE</code> 里单独写了一节说明"代码是 MIT，但数据集是 CC BY 4.0，两者不同"。</p>
-  <p><strong>面试里主动提这一句，比不提强得多</strong>——它说明你知道工程项目的合规边界在哪。</p>
+  <p><strong>这一条值得单独写出来</strong>——它说明你知道工程项目的合规边界在哪。</p>
 </div>
 
 <div class="box tip">
@@ -1166,7 +1144,7 @@ h  = y2 - y1</code></pre>
   <p><strong>丢掉了形状信息。</strong>一个细长的多边形和一个方块，如果外接矩形一样，转换后就完全一样了。</p>
   <p>对<strong>检测</strong>任务来说这没问题——检测本来只要"在哪、是什么、多大"。
   但如果以后要做<strong>分割</strong>（精确到每个像素属于谁），这个转换就不可逆了，得回到原始多边形。</p>
-  <p><strong>面试里主动说这句"我丢掉了形状信息"，比只说"我转好了"强得多。</strong></p>
+  <p><strong>这一步会丢掉形状信息，是有意接受的代价——写在文档里，比含糊带过更清楚。</strong></p>
 </div>
 
 <div class="box ok">
@@ -1198,9 +1176,8 @@ h  = y2 - y1</code></pre>
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"格式校验只能证明标签合法，不能证明标注正确。类别标错、框画偏、整张漏标，
-  这些脚本一个都查不出来。所以我又加了一步人工抽检。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>格式校验只能证明标签合法，不能证明标注正确。类别标错、框画偏、整张漏标， 这些脚本一个都查不出来。所以我又加了一步人工抽检。</p>
 </div>
 
 <h3 id="p3-5">3.5 人眼抽检：脚本查不出的东西，只能靠看</h3>
@@ -1227,7 +1204,7 @@ h  = y2 - y1</code></pre>
   <p><strong>① 它是"我验证过数据"这句话能拿出来的实物证据。</strong>不是"我觉得数据没问题"，而是"我查到一处，这是图"。</p>
   <p><strong>② 它同时证明了那条边界是真实存在的。</strong>如果我说"格式检查通过就等于数据没问题"，然后有人指出这处漏标，
   我就没法回答了。先自己说出来，就没人能拿它攻击我。</p>
-  <p><strong>③ 面试里讲这种具体例子，比讲任何抽象理论都有说服力。</strong>"我抽检了 24 张，发现 1 处漏标"——这句话的信息量，比"我做了数据清洗"大十倍。</p>
+  <p><strong>③ 具体例子比抽象结论更有说服力。</strong>"抽检 24 张、发现 1 处漏标"，这样一句话的信息量，比"做过数据清洗"大十倍。</p>
 </div>
 
 <h3 id="p3-6">3.6 数据泄漏检查：评估分数可信吗</h3>
@@ -1275,11 +1252,8 @@ h  = y2 - y1</code></pre>
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"我用三层做了泄漏检查：md5 查内容完全相同、感知哈希查画面近似、文件名时间戳查场景重叠。
-  前两层都是 0 对，很干净。但第三层发现三个划分的时间跨度完全重叠，跨划分最近的两张只隔 4.9 秒。
-  所以我不会说测试集完全独立——划分是按图随机切的，存在轻度场景重叠，
-  这个 mAP50 0.680 应该按偏乐观理解。要彻底解决，得按采集批次重新划分数据集。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>我用三层做了泄漏检查：md5 查内容完全相同、感知哈希查画面近似、文件名时间戳查场景重叠。 前两层都是 0 对，很干净。但第三层发现三个划分的时间跨度完全重叠，跨划分最近的两张只隔 4.9 秒。 所以不能说测试集完全独立——划分是按图随机切的，存在轻度场景重叠， 这个 mAP50 0.680 应该按偏乐观理解。要彻底解决，得按采集批次重新划分数据集。</p>
 </div>
 
 <h3 id="p3-7">3.7 长尾分布：763 比 1</h3>
@@ -1324,11 +1298,8 @@ h  = y2 - y1</code></pre>
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"这份数据的类别分布极不均衡：训练集里 vehicles 有 763 个框，tractors 只有 1 个，
-  差 700 多倍。这是长尾分布的典型样子，真实数据基本都是这样。
-  它直接决定了后面表现的分化——样本多的类学得好，样本少的类学不会。
-  所以我不会只报一个总 mAP，一定会给逐类结果。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>这份数据的类别分布极不均衡：训练集里 vehicles 有 763 个框，tractors 只有 1 个， 差 700 多倍。这是长尾分布的典型样子，真实数据基本都是这样。 它直接决定了后面表现的分化——样本多的类学得好，样本少的类学不会。 所以不能只报一个总 mAP，必须同时给逐类结果。</p>
 </div>
 
 <div class="box ok">
@@ -1384,9 +1355,7 @@ h  = y2 - y1</code></pre>
 <div class="box tip">
   <span class="t">💡 一个要主动说出的事实</span>
   <p><strong>选 nano 是因为硬件限制和项目定位，不是因为"nano 最好"。</strong></p>
-  <p>如果面试官问"为什么不用大模型"，正确的回答是：
-  "我的显存只有 8 GB，而且这个阶段的目标是跑通完整链路、拿到一个可信的基线。
-  真要提精度，应该先补数据——我的实验已经证明瓶颈在数据量上，换大模型不解决这个问题。"</p>
+  <p>显存只有 8 GB，而这个阶段的目标是跑通完整链路、拿到一个可信的基线。真要提精度，应该先补数据——实验已经证明瓶颈在数据量上，换大模型不解决这个问题。</p>
 </div>
 
 <h3 id="p4-2">4.2 迁移学习：为什么不从零开始</h3>
@@ -1415,7 +1384,7 @@ h  = y2 - y1</code></pre>
   更重要的是<strong>底层的视觉能力</strong>：怎么找边缘、怎么分辨纹理、怎么把小块拼成物体。
   这些能力是通用的，换任何数据集都用得上。</p>
   <p>训练时最后那层分类头会被<strong>替换掉重学</strong>（因为类别数从 80 变成了 12），但前面的骨干网络会保留下来继续微调。
-  <strong>这个"换头"的细节，面试里能说出来很加分。</strong></p>
+  <strong>这个"换头"的细节，是迁移学习里最容易忽略的一步。</strong></p>
 </div>
 
 <h3 id="p4-3">4.3 那行训练命令里，每个参数在干什么</h3>
@@ -1478,7 +1447,7 @@ h  = y2 - y1</code></pre>
 
 <div class="box warn">
   <span class="t">⚠️ 坑一：<code>workers=0</code> 到底是怎么回事</span>
-  <p><strong>不要说成"Windows 上必须设 0"</strong>——那是错的，Windows 上完全可以设更大的值。</p>
+  <p><strong>常见的错误说法是"Windows 上必须设 0"</strong>——那是错的，Windows 上完全可以设更大的值。</p>
   <p>准确的说法是：<strong>这是为了便于排查问题而采取的保守设置。</strong>
   Windows 上 DataLoader 用 spawn 方式开子进程，一旦配置出问题，
   程序会长时间没有任何输出，<strong>看起来像卡死</strong>。设成 0 让数据加载在主进程里跑，报错能直接打出来。</p>
@@ -1492,7 +1461,7 @@ h  = y2 - y1</code></pre>
   <p><strong>Ultralytics 会相对「你当时站在哪个目录」来解析，而不是相对 yaml 文件所在目录。</strong>
   结果就是：从项目根目录启动训练，它跑去找「项目根 / valid / images」，找不到就报错。</p>
   <p>解决办法：<strong>把 <code>path</code> 写成绝对路径。</strong>代价是换台机器要改一次，但至少不会静默出错。</p>
-  <p class="muted">面试里可以这么讲："我踩过一个坑——配置文件写了相对路径，但框架是按当前工作目录解析的。
+  <p class="muted">这里有个值得记下来的经验：配置文件写了相对路径，但框架是按当前工作目录解析的。
   我读了源码才确认，最后改成绝对路径。这件事让我意识到：<strong>配置文件写了什么、程序实际执行了什么、结果证明了什么，是三件不同的事。</strong>"</p>
 </div>
 
@@ -1585,7 +1554,7 @@ h  = y2 - y1</code></pre>
 两个独立的证据指向同一个结论，这个判断就站得住。</p>
 
 <div class="box ok">
-  <span class="t">✅ 把这张图读成一句面试答案</span>
+  <span class="t">✅ 这张图读出来的结论</span>
   <p>"这场训练有明显的过拟合：训练集的分类损失从 6.04 降到 0.75，
   但验证集在第 20 轮之后就卡在 1.08 到 1.14 再没动过，末轮差距 0.34；
   框损失也是同一个模式，末轮差 0.22。
@@ -1608,7 +1577,7 @@ h  = y2 - y1</code></pre>
 <div class="lead">
   <p>模型训练完了，跑出一个数字。<strong>但数字本身没有意义——有意义的是"这个数字是怎么来的"。</strong></p>
   <p>这一部分教你三件事：怎么看这个数字、怎么拆开看、以及<strong>哪句话绝对不能说</strong>。
-  最后这一件最重要，因为它是面试里最大的雷区。</p>
+  最后这一件最重要，因为它是评估结论最容易出错的地方。</p>
 </div>
 
 <h3 id="p5-1">5.1 为什么数据要分成三份</h3>
@@ -1664,8 +1633,7 @@ h  = y2 - y1</code></pre>
   <p><strong>验证集：随便看</strong>——挑模型、调阈值、比较不同方案，都在它上面做。</p>
   <p><strong>测试集：只在方案定稿后跑一次。</strong>本项目的评估脚本
   <code>09_evaluate.py --split test</code> 就是这次"唯一一次"，跑完把时间、配置、权重路径一起写进报告，方便日后回溯。</p>
-  <p>所以面试里如果被问"你调参调了多少次"，可以答：
-  "调参都在验证集上做的，测试集我只跑过一次。这也是为什么我敢报这个数字。"</p>
+  <p>所以调参全部在验证集上做，测试集只跑过一次——这也是这个数字可以被引用的前提。</p>
 </div>
 
 <h3 id="p5-2">5.2 测试集结果：这次评估跑出了什么</h3>
@@ -1694,9 +1662,8 @@ h  = y2 - y1</code></pre>
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"在留出的测试集上，mAP50 是 0.680，mAP50-95 是 0.423，精确率 0.787、召回率 0.627。
-  这个测试集我只跑过这一次。验证集上的 mAP50 是 0.641，两个数不一样是因为划分不同，我不会混着说。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>在留出的测试集上，mAP50 是 0.680，mAP50-95 是 0.423，精确率 0.787、召回率 0.627。 这个测试集我只跑过这一次。验证集上的 mAP50 是 0.641，两个数不一样是因为划分不同，这两个数来自不同划分，不能混着说。</p>
 </div>
 
 <h3 id="p5-3">5.3 逐类 AP：好类和差类差多远</h3>
@@ -1724,7 +1691,7 @@ h  = y2 - y1</code></pre>
   <span class="t">还有一个类根本没出现在表里：tractors</span>
   <p><code>tractors</code> 在整个测试集里<strong>一个标注都没有</strong>（训练集里也只有 1 个框）。</p>
   <p>所以它的 AP <strong>没法算</strong>，不是"考了 0 分"，而是<strong>"根本没考"</strong>。</p>
-  <p>这两句话差别很大，面试里说错了很尴尬。</p>
+  <p>这两句话差别很大，说错了结论就反了。</p>
 </div>
 
 <p>从这张表能读出三条判断：</p>
@@ -1800,18 +1767,16 @@ h  = y2 - y1</code></pre>
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"置信度阈值不是拍脑袋定的。我把阈值从 0 扫到 1，每格算一次平均 F1，画成曲线找峰值，
-  最优值出现在 0.30，F1 是 0.654。但曲线在 0.2 到 0.5 之间很平，所以项目里沿用了框架默认的 0.25，
-  差别可以忽略。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>置信度阈值不是拍脑袋定的。我把阈值从 0 扫到 1，每格算一次平均 F1，画成曲线找峰值， 最优值出现在 0.30，F1 是 0.654。但曲线在 0.2 到 0.5 之间很平，所以项目里沿用了框架默认的 0.25， 差别可以忽略。</p>
 </div>
 
 <h3 id="p5-6">5.6 最容易说错的一句话：bridges 的 AP50 = 0</h3>
 
 <div class="box warn">
   <span class="t">🔴 这一节建议至少读三遍</span>
-  <p>如果你在面试里说"我的模型在 bridges 这个类上完全失败，AP 是 0"——<strong>这是错的，而且容易被一句话问倒。</strong></p>
-  <p>因为面试官只要问一句"测试集里这类有多少个样本"，你就答不上来了。</p>
+  <p>"我的模型在 bridges 这个类上完全失败，AP 是 0"——<strong>这个说法是错的，而且一句话就能驳倒。</strong></p>
+  <p>因为只要问一句"测试集里这类有多少个样本"，这个结论就站不住了。</p>
 </div>
 
 <table>
@@ -1823,10 +1788,10 @@ h  = y2 - y1</code></pre>
 </table>
 
 <div class="box ok">
-  <span class="t">✅ 完整的说法（背下来）</span>
-  <p><em>"bridges 的 AP50 是 0，但这个 0 不能当结论——它在测试集里只有 1 个标注框，
+  <span class="t">✅ 完整的说法</span>
+  <p>bridges 的 AP50 是 0，但这个 0 不能当结论——它在测试集里只有 1 个标注框，
   换一次划分，只要这一个框碰巧检出来，数字就可能直接变成 1.0。
-  真正能说明问题的是它的训练样本只有 7 个框。所以我的判断是：<strong>样本量才是原因，AP=0 只是症状。</strong>"</em></p>
+  真正能说明问题的是它的训练样本只有 7 个框。所以我的判断是：<strong>样本量才是原因，AP=0 只是症状。</strong></p>
 </div>
 
 <div class="box tip">
@@ -1834,8 +1799,7 @@ h  = y2 - y1</code></pre>
   <p>只看总体 mAP 会骗人（被大类撑起来）；只看单个类的 mAP 同样会骗人（小样本的波动极大）。</p>
   <p><strong>所以本项目的评估脚本在输出表格时，每一行都带上"训练集框数"和"本划分框数"两列</strong>——
   就是为了逼着读表的人看到样本量。</p>
-  <p>这句话如果能在面试里说出来，效果比报任何一个数字都好：
-  <strong>"读指标的时候，我会先看它的样本量。"</strong></p>
+  <p>换句话说：<strong>读指标的时候，先看它的样本量。</strong></p>
 </div>
 
 <div class="box ok">
@@ -1850,8 +1814,7 @@ h  = y2 - y1</code></pre>
 
 <div class="lead">
   <p>前三站做完了，你手上有数据、有模型、有一组数字。<strong>但这些东西都在命令行里，别人看不见。</strong></p>
-  <p>这一站解决的就是"怎么让人看见"。它也是面试里最实际的加分项——
-  当面试官问"能不能演示一下"，你能不能立刻拿出一张图、一段视频。</p>
+  <p>这一站解决的就是"怎么让人看见"。这也是"可演示"这件事的意义——有一张图、一段视频，别人才能直接看到结果。</p>
   <p>更重要的：这一站里有<strong>一条本项目最诚实的发现</strong>，值得单独讲（见 <a href="#p6-3">6.3</a>）。</p>
 </div>
 
@@ -1881,7 +1844,7 @@ python scripts/06_predict.py --source 0</code></pre>
   <span class="t">⚠️ 一个必须分清的差别</span>
   <p>这个脚本打印的是<strong>"模型输出了几个框"</strong>，<strong>不是"对了几个"</strong>。</p>
   <p>它可能报出 10 个框，其中 8 个是错的；也可能一个都不报。正确率要看第 5 部分的评估报告。</p>
-  <p><strong>"模型敢不敢报"和"模型报得对不对"，是两件事。</strong>面试里混着说，很容易露怯。</p>
+  <p><strong>"模型敢不敢报"和"模型报得对不对"，是两件事。</strong>把这两件混起来说，结论就不成立。</p>
 </div>
 
 <div class="box tip">
@@ -1890,7 +1853,7 @@ python scripts/06_predict.py --source 0</code></pre>
   结果是<strong>零检出</strong>。</p>
   <p>这不是程序坏了——是因为那个模型只认得它学过的 12 类，而那张图里的场景和这 12 类的特征对不上。</p>
   <p><strong>这个"失败案例"很有说明价值</strong>：它证明了模型学的是这个数据集的分布，不是"通用视觉常识"。
-  如果面试官问"泛化能力怎么样"，这就是一个诚实且具体的回答。</p>
+  这也是判断泛化能力的一个具体例子。</p>
 </div>
 
 <h3 id="p6-2">6.2 对照拼图：把漏检和误检摆在明面上</h3>
@@ -1922,18 +1885,15 @@ python scripts/06_predict.py --source 0</code></pre>
   <p><strong>① 一眼能看到错在哪。</strong>右下那两张里，误检几乎全落在 <code>traffic lights</code> 上
   ——把远处的车灯或路牌当成了信号灯。这正好解释了第 5 部分那个现象：
   <strong>traffic lights 的 mAP50 有 0.810，但 mAP50-95 只有 0.398</strong>——能找到大致位置，但框不准、也容易多报。</p>
-  <p><strong>② 它可以直接当简历配图或面试开场材料。</strong>"我做了个检测项目"和"你看这张图，绿的是对的、黄的是漏的、红的是多报的"，
+  <p><strong>② 它比单个数字直观得多。</strong>"我做了个检测项目"和"你看这张图，绿的是对的、黄的是漏的、红的是多报的"，
   后者说服力强得多。</p>
   <p><strong>③ 它主动暴露了缺陷。</strong>如果只展示"检测完整"那两张，看起来完美，但一旦被追问"有没有失败案例"就露馅。
   把漏检和误检摆在明面上，反而让人相信你真的检查过。</p>
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"mAP 是被平均过的数，看不出错在哪。所以我另外做了一个脚本，
-  按明确规则自动挑出'检测完整''典型漏检''典型误检'各两张，把标注和预测画在同一张图上。
-  从这张图能看出来，我的误检主要集中在交通信号灯这一类——把远处的车灯或路牌认成了灯。
-  这也解释了为什么这一类 mAP50 有 0.81 但 mAP50-95 只有 0.40。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>mAP 是被平均过的数，看不出错在哪。所以我另外做了一个脚本， 按明确规则自动挑出“检测完整”“典型漏检”“典型误检”各两张，把标注和预测画在同一张图上。 从这张图能看出来，我的误检主要集中在交通信号灯这一类——把远处的车灯或路牌认成了灯。 这也解释了为什么这一类 mAP50 有 0.81 但 mAP50-95 只有 0.40。</p>
 </div>
 
 <h3 id="p6-3">6.3 多目标跟踪：一个"数据不支持"的发现</h3>
@@ -2038,13 +1998,8 @@ python scripts/06_predict.py --source 0</code></pre>
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说</span>
-  <p><em>"我跑通了多目标跟踪的链路，用的是框架内置的 ByteTrack，输出带轨迹 ID 的视频，
-  120 帧里 373 个检测框收敛成 4 条轨迹。</p>
-  <p>但有两件事我要说清楚：<strong>第一</strong>，我没做 MOT 的定量评估（没有 MOTA / IDF1），
-  因为这个数据集不支持——它虽然叫 road-traffic，但实测相邻两张图最小间隔 1.09 秒，
-  不是连续帧，跟踪器的运动模型会失效。<strong>第二</strong>，ByteTrack 不用外观特征，
-  遮挡后重现会分配新 ID，所以轨迹数不等于真实目标数。"</em></p>
+  <span class="t">💬 一句话说清</span>
+  <p>我跑通了多目标跟踪的链路，用的是框架内置的 ByteTrack，输出带轨迹 ID 的视频， 120 帧里 373 个检测框收敛成 4 条轨迹。</p> <p>但有两件事需要说明：<strong>第一</strong>，没有做 MOT 的定量评估（没有 MOTA / IDF1）， 因为这个数据集不支持——它虽然叫 road-traffic，但实测相邻两张图最小间隔 1.09 秒， 不是连续帧，跟踪器的运动模型会失效。<strong>第二</strong>，ByteTrack 不用外观特征， 遮挡后重现会分配新 ID，所以轨迹数不等于真实目标数。</p>
 </div>
 
 <div class="box ok">
@@ -2052,13 +2007,13 @@ python scripts/06_predict.py --source 0</code></pre>
   <p><strong>不是"我做了跟踪"，而是"我在动手之前先问了这份数据支不支持这个任务"。</strong></p>
   <p>很多人会直接拿快照集去跑跟踪，然后报一个看起来很漂亮的轨迹数——那个数字是假的。
   发现"这份数据不能做这件事"，本身就是一种能力。</p>
-  <p>面试里这么讲，比"我实现了多目标跟踪"可信得多。</p>
+  <p>这比笼统地说"实现了多目标跟踪"准确得多。</p>
 </div>
 
 <h3 id="p6-4">6.4 为什么"延迟 16 毫秒"这句话必须带条件</h3>
 
 <p>项目里还写了性能测试脚本 <code>benchmark_inference.py</code>。它测出来一个反直觉的结论，
-而这个结论本身就是最好的面试素材。</p>
+而这个结论本身值得单独讲。</p>
 
 <figure><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABeEAAAHbCAYAAABMclFHAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjExLjIsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvgI3uAAAAAAlwSFlzAAAQ6wAAEOsBUJTofAABAABJREFUeJzs3QeYU8X6x/GXbfTeO0hHEamC3St2xd69+lew94Yd9dp7v3qtiAr2XrE3FEQFEUSK9N47W/N/voMTzp5NdpNll13g93mewG6STU7OOTkz8847MxUikUjERERERERERERERESkxKWU/EuKiIiIiIiIiIiIiAgUhBcRERERERERERERKSUKwouIiIiIiIiIiIiIlBIF4UVERERERERERERESomC8CIiIiIiIiIiIiIipURBeBERERERERERERGRUqIgvIiIiIiIiIiIiIhIKVEQXkRERERERERERESklCgILyIiIiIiIiIiIiJSShSEFxEREREREZFya/369fbwww/br7/+WtabIiIiUiwKwouIyDbl0EMPtY8++qjA/Y8//rg9//zz7ue//vrL7rvvvi26XTfddJPdcMMNhT7n4osvtrvuuiuh1+N5r732WszH/v3vf9szzzxjxZWZmWn33nuvjRo1KqHnz5w505544olivdfy5cvtoIMOsrFjxxbr70VEpOw899xz9uijj5bZ+1O2//nnn3Efp2x56KGHXLmWrOHDh9uxxx67mVsoJRmEv/766+3GG29M6u+GDh1qn376aYkeCM6LWPWsnJwcV6d5/fXXi/3a1KfOP//8zdxCEREpj9LKegNERCR5eXl5dsghh1j79u3tkUce0S4MoKF1+OGH59sn06ZNs8svv9zdQHD5qquusnr16tn//d//5Xvu77//boMGDYob+L7mmmuK3N916tSxYcOG5bvvl19+cY2zoAULFtgdd9xhF110kbVr185Gjhxpbdu2LfL1v/32W7v22mvjBuy/+uora9iwYb775syZY//73/9s8ODBlp6eXmRg/IUXXnCvP3r0aGvTpk2hz6fTgwbj0qVLXUfDf//7X3vvvfdiPveCCy5wx4fOEp7bunVrd8yuvPLKIj+3iEhJO/PMM23evHlxO09vueWWhF6H5/bt2zf6O4E4OlYpq4MIGF922WX22GOPJXS9L2sbNmxwQWyu0WlpBZuO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EREpJQrCi4iIiIiIiIiIiIiUEgXhRURERERERERERERKiYLwIiIiIiIiIiIiIiKlREF4EREREREREREREZFSoiC8iIiIiIiIiIiIiEgpURBeRERERERERERERKSUKAgvIiIiIiIiIiIiIlJKFIQXERERERERERERESklCsKLiIiIiIiIiIiIiJQSBeFFREREREREREREREqJgvAiIiIiIiIiIiIiIqVEQXgRERERERERERERkVKiILyIiIiIiIiIiIiISClREF5EREREREREREREpJQoCC8iIiIiIiIiIiIiUkoUhBcRERERERERERERKSUKwouIiIiIiIiIiIiIlBIF4UVERERERERERERESomC8CIiIiIiIiIiIiIipURBeBERERERERERERGRUqIgvIiIiIiIiIiIiIhIKVEQXkRERERERERERESklCgILyIiIiIiIiIiIiJSShSEFxEREREREREREREpJQrCi4iIiIiIiIiIiIiUEgXhRURERERERERERERKiYLwIiIiIiIiIiIiIiKlREF4EREREREREREREZFSoiC8iIiIiIiIiIiIiEgpURBeRERERERERERERKSUKAgvIiIiIiIiIiIiIlJKFIQXERERERERERERESklCsKLiIiIiIiIiIiIiJQSBeFFREREREREREREREqJgvAiIiIiIiIiIiIiIqVEQXgRERERERERERERkVKiILyIiIiIiIiIiIiISClREF5EREREREREREREpJQoCC8iIiIiIiIiIiIiUkoUhBcRERERERERERERKSUKwouIiIiIiIiIiIiIlBIF4UVERERERERERERESomC8CIiIiIiIiIiIiIipURBeBERERERERERERGRUqIgvIiIiIiIiIiIiIhIKVEQXkRERERERERERESklCgILyIiIiIiIiIiIiJSShSEFxEREREREREREREpJQrCi4iIiIiIiIiIiIiUEgXhRURERERERERERERKiYLwIiIiIiIiIiIiIiKlREF4EREREREREREREZFSoiC8iIiIiIiIiIiIiEgpURBeRERERERERERERKSUKAgvIiIiIiIiIiIiIlJKFIQXERERERERERERESklCsKLiIiIiIiIiIiIiJQSBeFFREREREREREREREqJgvAiIiIiIiIiIiIiIqVEQXgRERERERERERERkVKiILyIbFPGjBljF154oU2cOLGsN0VERERERESkxGRlZdlll11mr7/+uvaqyFZGQXgp1z799FNbvHhx3MffffddmzNnTtKv++yzz9rTTz+d8PNfffVV27BhQ6HPuemmm+zHH3+0kkbheuONN5ab7SlJOTk5LmA+ZcqUfPd//vnntnLlyqRfb/369XbKKafY119/bR06dCjWNq1atcoeeeQRW7hwYczHP/jggwLHozS8//77RR7jWL7//nt37EvLk08+6To64uG977jjjlJ7fxGRsvDwww/bsGHDyuS9v/jiC1fuU2aGfffdd/biiy/GfKy0RCIRmzp1qr3yyiv2wgsvFHic/fTYY4/F/fu3337bcnNzi1UnvPfee6O/Dx8+3JYsWVLo37Df7rrrrqTfS0RExLdVZ8yYEXdn/Pzzz/b888+7spFykfZoSfnvf//r6h9hlPsPPfSQNWrUqMQPEmXmO++8Y9uSb7/91h3HtWvXxn0O9RbqDFvCrFmz3Pb8/fffSf/tdddd52IdieA8Wb58eTG2UEpThQhXC5Ekel2vv/5622OPPeyII45I6G+eeuopW7Rokd1www1Jv1fnzp2tWrVq9tVXX1nt2rXzPU6mc7du3ezwww+3N954I99jv/76qz333HMFXvOCCy6wTp062bHHHusK1VgFzFtvvWX/+te/rFatWtGg7A477OAulDfffHP0eQQa9913X+vbt6/7vVWrVu4zDhw40P1OoPaoo46y7t27uwv/a6+9VuRn5vMMGDAg3328L9vpOxtKYns2B4UTjf7i+Pe//2277rpr9HeCzJUrV3bHd5999nH3cVxat25tBx10UIGOEo7N/vvvb9WrV4/5+hdffLE9+uijtvvuu9suu+wSdzuqVKli99xzT9zC6rTTTnPnEMdj7ty59uGHH9rxxx/vzgn26ZAhQ2J2/gwdOtRGjx5tm4Nj1Lt3b2vbtq316tXLHfu//vrLnnjiiZjP5/g2btzYbr31Vrv77rvd9lN5orJYUtuz3377RY8X+4BOirPPPjtmBwXfR76rBGjq1KmzWe8tIlvemjVr3HXusMMOs379+kWvI3feeWfca6/3wAMPWEpKil166aUJd4j/9ttvxdrO8847z3bccUcrKfHK6UGDBlmLFi1cGcV1+ZlnninwHBrd/fv3d2ULrrjiCsvMzCzWdrDPjzzyyHx1ofbt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iEi5RDklIiIi2ycF4UVERCRpzzzzjA0aNMjuv/9+N0d8OJN9yZIl+e7j91gLoifzXO/yyy+3gQMHFlgMp3bt2u71REREyqP169eX9SaIiIhIGVEQXkRERJLy6aefugD8N998Y126dCnweI8ePey7776z008/3f0+Y8YMN2983759N+u5HvPPcwsje76wDHoREZGypDJKRERk+6UgvIiIiCTl0UcftaOPPtqqV6/uguZe/fr1rWrVqnbuuefa8ccfb4cccoh169bNLrroIuvfv7+1adPGPe+VV15xU87wnKKeKyIiIiIiIrK1SynrDRAREZGty7x582zIkCHWtm3bfLd3333XPU4Q/e6777aLL77YdtllF6tZs6a98MIL0b8fMWKEy6ZP5LkiIiIiIiIiWztlwouIiEhSfv311yKfc8kll7hbLM8991zCzxURERERERHZ2ikTXkRERERERERERESklCgILyIiIiIiIiIiIiJSShSEFxEREREREREREREpJQrCi4iIiIiIiIiIiIiUEgXhRURERERERERERERKiYLwIiIiIiIiIiIiIiKlREF4EREREREREREREZFSoiC8iIiIiIiIiIiIiEgpURBeRERERERERERERKSUKAgvIiIiIiIiIiIiIlJKFIQXERERERERERERESklCsKLiIiIiIiIiIiIiJQSBeFFREREREREREREREqJgvAiIiIiIiIiIiIiIqVEQXgRERERERERERERkVKiILyIiIiIiIiIiIiISClREF5EREREREREREREpJQoCC8iIiIiIiIiIiIiUkoUhBcRERERERERERERKSVpVs5MmTLFRo4caVWrVrUDDjjAatSoke/xtWvX2kcffWTLly+3PfbYwzp37lxm2yoiIiIiIiIiIiIistUE4Z944gm78847rUuXLvb7779bdna2ffvtt9a+fXv3+IwZM2yfffZxAfoGDRrY+eefb08++aQNHDiwrDddRERERERERERERKR8T0fTqFEj++uvv+zDDz+0qVOnWu3ate2WW26JPn7BBRdYx44dbfz48fbVV1/Z4MGD7bLLLrMVK1aU6XaLiIiIiIiIiIiIiJT7IPxRRx1llStXdj9XrFjR+vTpY3PnznW/L1myxD755BO7/PLLLSUlJRqUZ3qazz77rEy3W0RERERERERERESk3Afhg3JycmzMmDFu3neMHTvW8vLyrEePHtHn1K1b15o3b24TJkwowy0VEREREREREREREdkK5oTHY489ZosXL7aPP/7YunXrZtdff727f8GCBS4DnsB7UL169dwirfGsWrXK3bz58+e7/yORiLuJiIiUNyqfRERERERERLYd5S4IP3LkSBeEX7RokQu4sxhrp06dXGZ8ampqgef7qWnieeCBB/LNK+8RuPdT34iIiJQnhXUulzd0bmdkZOTrJP/mm29s/fr1BZ7LwutNmzYtcP+IESPcaDeP5/BcERERERERkW1BuQvCDxs2zP2fnZ1tZ5xxhh188MH2999/W40aNdx9NOqDwXMWZQ1nxwcxh/zAgQPzBQt69+7tFn0t7O9ERKRszJw9z954b4RNnznXqlerYgftt4ftvXuvfM/56vvRNuLLH2zp8pXWtHEDO+rQfrbzju0Lfd35CxfbkGHv2IzZ89zfnHHyUda8aSMrj2IFsMuj0aNH27HHHmvPPfec9evXL3r/3XffbfPmzYv+ToCdRdXffffdAkH4rKwsO/DAA22nnXaKdrb3799fQXgRERERERHZZpS7ILyXnp5up512mr388ss2Z84c69ixo7uf+d979uzpfl63bp3LlO/atWvc1yF4zy2sQoUK7iYiIuXH6jVr7YQBV1pubm70vs+/+cluueZCO/SAvdzv/xvymj099A33c1paqv32+5/24Yhv7Y4bL7H999kt5usuXbbCzrjwBvc/fh030UaO+s1efe5+q1WzYBlR1sp7+bR06VK7+uqrXRlNED3so48+yvf7iy++aHfddZcddthhBZ67bNky9z/rwLAou4iIiIiIiMi2ptwszEqW+9dff53vvi+++MJq1qxpDRs2tM6dO1vbtm3t6aefjj7+wgsvWK1atWz//fcvgy0WEZGSRvC9Q9tW9vCd19rbLz5ip53Y393/2jufuP9zcnNt6Cvvup8fuuMa+/HTYXbpuf92c6g/8+KbcV/3pdfedwH4/ffdzd4f9rj13GVHl0X/1gef6yAWAyPU1q5da6NGjSpyajfK95tvvtluvfXWmFPIEYTnNRSAFxERERERkW1VucqEP+aYY2zXXXe1Nm3auGHrZMUxxN03zB955BE74ogj3CKtTCfz2muv2ZAhQ6xKlSplvekiIlICqlWras8+cqulp28sno4/4iAb+sp7tnjJxmzpSF7EcnLzrGJGuvXttYvLGGeqmoeefNE9Fs93P/3q/h9wytHWuFF9O+Gog23M2Ak25rcJduYpR+vYJalXr142fPjwhJ47dOhQF2Q/+ujY+5kgPOX4l19+afXr13cj3xgNVxgtui4iIlsjLbwuIiKy/So3QXga3H/++acLrDOP7Iknnmivvvqqy4L3mB/+119/tTfe2DgNwY8//ljoVDQiIrJ1SWNO8MAa3KN/He/+b9Vy4zziBOdPOOogG/bGhzb4zkdtz749XDZ7SkoFO+eM42O+Zm5uns2eM989Z4dWzdx9/v+58xeV/ofazj300EN28cUXF5op37hxY7viiitchj2d7AT4+/btG/dvtOi6iEj5sGbtOhv66vtMpGbnn3l8zKDzF9+Ndp3emZlZ1rljGzuuf2KjmH/8eZx9MOI7t45LrNfeGm1NC68nYu7cuTZ27FirU6eOde/evcCoNqasGzlypGVmZtruu+9u1apVK7NtFRERKWvlJgiPBg0a2IUXXljoc1i4jZuIiGzbvv/pV7vn0edctvvZpx0Xvf/ic061yVNn2Kdf/uBuOOPkI22/vfrEfJ316zdYbl6eVataJTodStWqG0dQbdiwYYt8lu0V2e2zZ8+2U089Ne5z9t13Xzf6za/1wmLqPH/atGlx/0aLrouIlP0aLh999q09P+wdN91bp/Y7WN26dQsE4K+/7WH77Osfo/etWLXGzj3jxCJfPzs7x55+6W2bN3+RrVu/ocBrb622loXXE3H99dfb/fff70axE4ynE/29996LLqz+119/2UEHHWQ5OTmuLkcZ//HHH7vRdCIiItujchWEFxERYd73J5971V74Z+73y847zXbpsnFxbjz+zHA3lUyXzu2sT8+u9vHn37kgQMsWTe2wA/YuuAMrbHpdzy8mWtS0J7J5XnrpJevfv3/C08bxvEsvvdRNTbdy5Uq3LkwsWnRdRKTsTJ85x0499xqX2V7YouIfffadC8A3bdzQrr3sLGvburmlpaUltPg467wQgI/32lurbeVzYP78+TZ16lRr1qyZWyeGxdfPO+88+/77793jdKgTcH/llVdch8yRRx5pZ5xxhv3xxx9lvekiIiLb98KsIiIiBMovv/5uGzL8HatapbLd95+r7ORjD43umLy8PLdIa2pqqj169/V2zv8db3cOvsw99vJrH8TcgbwOc8hv2JDphs1jydIV7v8G9beNzLryiMy3d999N+5c8PHQOCebLl4AXkREytb6DZkuAN+iWWM76ehD4j7v9Xc/df/fffPl1qfnzlavbm2rVbN6ka8/8a9priO+TevmJbrdUrJYu40APKpWrWqnn366/fbbb+7333//3a3vdtNNN7lRiNTbBg0aZBMmTHA3ERGR7ZGC8CIiUm4MGfa2jRw91mpUr2rPP3ab7b17z3yP5+TkupsTyb/IWeY/2e1YuWqNjfntDxd4J+usfdtW0SluMHL0xkZi1506bJHPtT0aN26cW3R1jz32iDmdzJVXXul+JmPu0UcfdevA0Fi/5JJL7M477yyDLRYRkUS0bN7EPhj+X3tr6MN28P57xnwO5e/Ev6a6QP2aNWvtulsfslvve9LGT5xc6GsvX7HKBt10v1WvVsUuOusUHZCtyJw5c9z0shg9erRVr17ddtxxx+jjPXturNP5KehERES2N5qORkREygWC6S+//qH7uUKFFLvzoWeijzGf+wO3DbKMjHTr1W0n+2nMODv/qlutd/cu9tnXI91z9ujTPZpNf+KAK2zx0uXWfedO9tRDt9ih++9t4ydOsbsffta++OYn+37Ur5aWlmpHHbpfGX3abcf+++9v9erVK3A/AXgWWY/1WPv27aND8nNzc92ibQxlJ6Puo48+sj33jB3UERGRsscIM26FWbBoieXlRWztuvV2waDb3bUeH474xoY8drt1bL9DzBFUV998vy1cvNSV+XVqa0TU1mL69On2yCOPRNd3Y474Ro0a5XtO5cqV3cKsS5Ysifs6q1atcrfglDe+juiTLkRERMqTZMonBeFFRKTcLPLGDStXrbZfx02MPlazxqbh6zdffb7dcs9/7cefx7kh6wRzDz9wH7tg4Enu8ZQKFaxy5Uru50qVNv5/9OH9bMJfU+2DT7+xr74fbVUqV7LrLj/bZejJ5nn77bfjBue5xXLuuedGf957773dTUREth1+1NryFSvt9hsusW47d7aHnxxqH3/+vb3y9sd289UXFPib+x8fYr/+/qdbbH3Pvj1cGS/lHx3pxx57rPXu3duuu+666No7zP8fxn2+QyaWBx54wG655ZYC9y9fvtwF8UVERMobyqhEKQgvIiLlQpUqld0UNLEEG3LMKct88CtWrrLFS5Zb40b1Xaa8x9yjw56+12bPmW+tWzWL3nfToPPtggEn2dLlK61F00bRQL2IiIiUrHp1a0Wnrtl/n93cz0cd2s8F4YMLrnpTp8+y198d4TrWJ/71t1109e22du1699isufPd73ScX3XRmTpU5cjjjz/upphjUfU77rjDzf0OMt7XrFlTIFOQUW916tSJ+3q81sCBA/NlwhPcZ62YunW1jo+IiJQ/69dvrK8kQkF4EREpF9JSU61L5/YJP79WzRruFkulihnWrk3LAvcTwOcmIiIipYfyuW6dWrZo8TK3KDqd5bPmLnCPNWywKZjKCLj5CxdbdnZONFA76pff870WwXhGv61YuVqHrBx56KGH3FouLMJ+0EEH5XusXbt2Nm/ePBeIJyCPv//+27Kzs/PNEx9Wo0YNdwujc8ZPYyciIlKeJFM+KQgvIiIiUs7k5ubZ6+9+aouXLLOLzs6/OCH3T5oyvcDf1KpRvcBzg6b+Pcu++PYnF8hq3rSRHdxvT6tdK3ZHlojI5jr6sH729NA37KxLbrKdd2xvH3/+nbv/kP33cv9zLTrm9EvdFHTHHL6/jfnytXx/z3Q0p513rXVqv4O9+ORdOiDlyNKlS+3aa6+1oUOHFgjA41//+pcbxTh8+HA766yz3H3Dhg2zHXbYwbp161YGWywiIlL2FIQXERERKSfy8vJcxueTz79qf07+2xo3rF8gsP75Nz/ZL2MnFPjbWM/13nh3hN3z6LNuoUSP4NgT990Yc4FEEZHNdfqJR9iESVNt5OixNuXvmZaakmJnn36c9e21SzTrPSd3YwZ8ZlaWdvhWZNSoUbZhwwY3H/y4cePyPXbKKadYp06d3PzwTFMzbdo0y8zMtCeffNLefPNNZbSLiMh2S0F4ERERkXJg+YpVLuuTqRkKw3oIuOWaCy0tbeP8u6hcqWLM52dlZdvD/3vRBeCZT3nXHjvbcy+/ZR999q09+vQwe/zeG0r4k4jI9oJ52h+567p8a7N4lSpVdI/NmDXXlixdbq1aNrN6dTbOFQ9G4rz5wsM2Z+4C26lzu6ReW8pWrVq17JhjjrHZs2cXeMzPBT948GDr2LGjffjhh1a1alX75ptv3PzuIiIi2ysF4UVEZLMtWbtiu9+L9apuCiyIFMf6DRtcAL5K5Uq2zx69XZA8FqZwILh16AEbp3Qoyrr1G2z9hkyrWaO6nXDUxmkDTjuhv3v9ZctX6mCJSLERIN+t98bM9nhatWjqbrEQlA8G5pN9bSkbu+22m7sV5fjjj3c3ERERURBeRERKIADf+b7+2/1+nHjlewrEy2YvZPi/B2+2HTu2tWXLV8QNwjN/cnpamt310DNuEeIdWjW3A/fb3SpmZMR53erWp2dX+2nMOHvptfetd48uNmTYO+6xY484QEdNRERERESklCkTXkRERKQcIAO+R9fOhT5nzZp1lpOT625vvDciev9TL7xuT94/2Jo1bRTz7+666TK76Orb7aEnX4zed+4Zx7vFEEVERERERKR0KQgvIiIispVgDvi7Bl/mppbJi+TZ7DkL7KXX37c58xbaY88Ms7tuujzm3731/uc2fuIUa9SgnnXu2MYtlPj8y29br25drOtOHbb45xAREREREdmeKAgvIiJSSnLWrba8rEzLqFVP+1hKBHPB99unb/R3Fllt16alDbj4Rps8bWbMv8nOzrGnh75uGenp9uKTd7nFEL/8dpQNuvl+e3roG/bYPdfr6IhspTJXFr6Qs2yeijXraxeKiIhIiVAQXkREpBTkZq63n45qbZGcbOv50jir3LiV9rNs/nmVm2cVKpilpKRE71u+YuPiqnVrb1rcMC8vz1auWuMC7mvXrXcLs1avVtVq1qjmHm/caGNgacmy5ToqIltxAP7zAS3LejO2af2enalAvIiIiJQIBeFFRERKwYKPXrBIdqb7efZL91r7qx7XfpbNtnDxEjv38lts7916WYP6dWzh4qX2/qdfu8eOOGRf939OTo79+9xrbcrfM+3Y/gfYNZcOtBbNGtusOfPtlnv+6xZpfeWtj91zu+6oqWhERERERERKm4LwIiIiJSwva4PNGfZA9PfFX7xmrQYMtow6DbWvZbNUqVzZKlSoYMPf+ih6H9PMnHvGCXbYgfu437Oyc2zu/IXu579nznH/33b9xTbopvvtwxHfuhu6delkF511io6IiIiIiIhIKVMQXkREpIQt+PAFy1o6P39Q/tWHbIfz7tS+loTUqlnDbrjiHKtSpXLo/ur25tCHbfyEyTZ/4WL3+C47dXDP96pUrmQv/e9um/jXNOvbaxd3X+cObezNoQ/ZuD/+smXLV1qzJo1sp05tdTRERERERES2AAXhRUREShAB99nD7i9w//z3nrVmJ1yqbHhJCIH0Iw/dL+Zjaamp1m3nTtbNOsX9e6af4RZUMSPDenfv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Fn1zWQ/LXL4g7vMPfnWVO0/cdgy/2WZ8uOkaGLRkXfxAftimlfJERERERERERERERKREVYgUlnu/DZozZ441b97cZs+ebc2aNSvrzRER2eotWbvCOt/X37Z3E698z+pV3TSVDsXr9/vVcD/3fOl3q9ykdcKvpbIqOaWxv9ZvyLLn3viqRF5LCjrz2H2tcqWNQ1hFpHgyVy52WbFSevo9O9Mq1qxfYq+n8r14+2van79bs6ZNy+20J9qO8rk/tolpYMrLdmw1055oO8rn/ti2p6OZM3eutem0c0JtUU1HIyIiIiIiIiLlUka12vmCQ/EEg01FIXiUkV4n8W1I4P21Hdof2+z5kZae1GsHO2GK3A46VQIdK9oO7Y+t7fzIqBZ7KqpYNB2NiIiIiIiIiIiIiEgpURBeRERERERERERERKSUKAgvIiIiIiIiIiIiIlJKFIQXERERERERERERESklCsKLiIiIiIiIiIiIiJQSBeFFREREREREREREREqJgvAiIiIiIiIiIiIiIqVEQXgRERERERERERERkVKiILyIiIiIiIiIiIiISClJK60XFhEREREREZFt25AhQ+zEE0+0SpUqRe8bOXKkffTRR/met88++1i/fv3KYAtFRETKnjLhRURERERERCQpCxYscMH3M844wzZs2JDvsS+++MKef/55mzp1avS2bNky7WEREdluKRNeRERERERERBJ277332i233GINGzaM+fiKFStsr732suHDh2uvioiIKAgvIiIiIiIiIsmIRCL28ssvW9WqVW3//fePGYSvUaOGdqqIiMg/NB2NiIiIiIiIiCRs0KBBdsQRR8R9nCB8zZo1tUdFRET+oeloRERERERERKTEEIT/5Zdf7NZbb7VmzZrZYYcdZvXr1y/0b1atWuVu3vz586NZ99xERETKm2TKJwXhRUREpFjy8vLs+uuvd5lwffr0yVcReeKJJ9w8sPy8zz772DXXXGPVqlWLWWnp2rWrey3vyCOPtNtuu01HRUREZCvVpUsXmzdvnv3888+uTnDRRRfZ66+/bgcffHDcv3nggQfcPPNhy5cvt8qVK5fyFouIiCSPMipRCsKLiIhI0iZOnOga1F9++aXtt99++R577rnn7NNPP3WB95ycHBs8eLBNmjTJ3njjjQKvs3LlShs/fry999570QZ2kyZNdERERES2Yg899FD05+zsbDv22GPtwgsvtGnTpsX9m8svv9wGDhyYLxO+d+/eVrt2batbt26pb7OIiEiy1q9fn/BzFYQXERGRpIwZM8b69u1rp512mlWqVKnA44ceeqgNGDAg+juN5379+rlGeHp6er7nLlu2zFJTU90w9QoVKuhIiIiIbGMo+4855hjX4U7nfFpa7DAEC7nGWsyV+oHqCCIiUh4lUz5pYVYRERFJSqtWrezvv/+2Z5991gXQwxo1apTvdxrcPC9Wo5sgfK1atdS4FhER2UZRD3j11Vdtl112iRuAFxER2dapBBQREZGk1KtXL+HnZmVluUXZjj/++JiBdoLwq1evtu7du7sF2w488EC74IILrGLFinFfUwu3bRu0yJ6IbG/Xqu3punfIIYdY1apVXdk/atQo9//bb79d1pslIiJSZhSEFxERkVLBXK4nnHCCy4B79NFHYz5n5513dsPTyYz7448/7I477rDff//dhgwZUmYLt9WpU2ezX0MSC0bRCSMiydN1auu8ViWzeNvWom3btq6zPVz+Mrf79OnTLSUlxU499VQ76KCDLCMjo8y2U0REpKwpCC8iIiIl7vvvv3eLsBGEv/fee+M2vJm6xk9fwwKvzZs3txNPPNGeeuqpuH+jhdu2DWRFaqG9LWvElz/Y8Lc+svMHnGS9uu1U7Odg6t+z7M33P7MZs+a66aY6tm9tJx51sNWrW7sUP4HI1n2tSmbxtq1pirobbrihwP1HH310mWyPiIhIeaUgvIiIiJQoMtlZnPW5555zC7Elo2HDhpaXl2e5ublxn6OF27YNWmRvy+D7NHL0WBv+5kc26pff3X2rVq/Nt/8TeU7Y0y++YV9+Oyr6O3/36Rc/2CvP3GfVqlUp1c8ksrVeq3TdExER2X6Vq4VZp06d6hrrzDXbokULGzBggC1evDjfc+677z5r06aNG4J51FFHuaHuIiIiUn4wpcxJJ50UNwD/888/25gxY6JzxntLly61m266yQ444IASmVZGRMxuvvu/dul1d0WD68V9TliLpo3toTuusa/fG2KvP/+ANW5Y3xYsWmJ//DlFu11EREREpDSC8HPmzIm7yMySJUsSfp0LL7zQOnbsaJ988ok98cQT9t1337lGvPfQQw+5hv39999vH3/8sc2cOTPpDDsREZHt1cqVK92ipptbXhflr7/+shdeeMFq1aqV7/baa6+5xwcPHuxuePjhh61SpUpuGpomTZq4Rdyef/75EtsWke3dhsxMq1mjuh3b/wDr3rVzsZ8TduFZJ9sefbq7rPdGDepZ5cqV3P316mk6GpHyilFm8ZLYWL+FeoKIiIiUk+lovv76a+vdu7dVqbJpmCkNZxaZoYEdRND89ddftx9++CGh13722WetadOm+YbG9u/f31asWGHVq1d3AXga7UceeaR7/L///a/17dvXZdT16tUr2Y8iIiKyzVq9erX99ttvttdee0XvI8ucsvrmm2/O99x58+a5sv2tt95y/yeDMpjRa0GU/Rs2bCjwXOoLePPNN6ND8q+66io7+eSTbe3atdasWbN89QsR2XzXXnqW1apZ3X3nBt18f7GfE8sjT71kP44eZ3PmLbDsnBz7v5OOtLat818PRKTskLjGgqi+zGWh1D59+sTseL/00ktd3YFOdBERESkHQfgbb7zROnXq5BZMKwyPEzD/6KOPEn7tYAAe1apViwbjmV+WqWkOOeSQ6OO77rqrmxd25MiRCsKLiIgEjBgxws4++2wbN26cC27HM2vWLDd/O4uiFqdDmzpBWNu2bQv9m3CgPVz+i0jJqV2rRok8J5Y58xbalL9nup/T0lJt4l/TbMq0mdauTctivZ6IlBymezv33HPtggsusEGDBsV9HiPaWVj1jTfecCPRRUREpJwE4YcOHWrdu3e3Aw88MOZUMPSqX3vttS74zm2PPfYo9saRGd+1a1c3//uXX37p7mvdunX0cXr0yaqbPXt23Ndg2H1w6L0ffkdlI94UOiIiIsURLFfylTFJljklUT5RRr/33nt2yimnuFFssRaDY3qYiy++2E39xporWjBORJJxxw2XWHZ2ji1dtsI+/uJ7e3ro63bBoNvsrRce1uKsImUsIyPDhg8fbvvvv7/961//sp49exZ4zowZM+yiiy6yv//+29UV2rVrVybbKiIisj1IOghPEPyZZ55xhTULpzFNDP744w/X2CdwfvDBB7sh8PXr1y/WRpH5fvXVV7ve+K+++srdx9C49PR0dwtn08Ua8u498MADdssttxS4n+lztOibiMjmoZNU8gfPly1bFv05WuasWGEZFZcmvKsoo0oC66vQcU7ZPHDgwGh5ypzrjFij45z/Dz/8cAXgRSRpaWlp7tasaSM767RjbczYCfbL2AlucdY+vbpq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Etayfgm7YOg+llLiU5s1+2d3C3pi7Cvu59jRd9vBB7QugG9JRCSy7du3u5++XgpKTk52eearVs06tVJOnisiIiIiIiISSxSEjzHHdTrMXp8ywx4f+7KddkIne/r5Se7+gw9oFXrOE+NesVk//GxnnX58hhQ1pLThtcyqv6bP+Vb+v6BwvCMQ3qphSbv52Y32zPWV0z22bUeqXf/0Rjvu4NJW87+Z8E++u8WemZ703zN6mzU2u348/061Ywes/+/+480aH2+3vLrTLvpnubWq8ov9sWSplanT2d6dXcGe6FvB5i+Yb0OGTbZmTRrYLd0Osinf97N2jddaw2pb3DtMfG2q2wfgonPPsAb161jDBnX35NciIpIp8sl3797dhg4dascff3y6xx555BG76667bMuWLda8eXN79dVX7eCDI6+8yslzRUREREREROIyCJ+QkGBVqlTJi7eSLFx47pkuD/yESe+4G5jNfvnFaSkENm3eYs+/9Lb7NzPmX3t+ZLrXk0+eIHy5smXs7DNPLLLfd+p/e7LmZP/VO3pWsH7PbLTVCalu81bv12U7ba+6Jeymbmkz3HFL9wq2f5OSNuu3Hbb460ds3oJFNmr4QLv9tVo27e5dszhPv+U7S1zyjk1+4XdLKV7Rttc63w5pc4D9ujzZLhmZaKtWl7OkpG42a55Z/TW1rVTpUlaqehP7JyXVep9YzqZ/+IULwnfu0E4z4EWk0NTXW7dutbFjx7rg+5o1azI8/v7777s885999pnts88+dvXVV9s555xjCxcudLlnc/tcERER2T2JiYlWuXL6SUciIiJSyIPwzIC7+eab7bfffrM77rjD2rZta/Xr18+7TxenypQubZ07tLWqVTI2jthgdcLT97vZ8CtWrrLGDetbj24nh55bsUJ5u+PWq+y72fOsyynH5ui9i5LtO82KFTMrVTLrKPympBRL+S9oP6JPJfdzY1LKfz9TrWmdEjbwvAru38x0L1G8WChI/92vO6xkxTOs2j6b7bVZVWzjlhS7/7XNofcuVaWl9eh2im1cWcsWbmpn5xxbx84/qUXo8d8XJ9qE196zvZo0tEt67h+6f/r32+ytmduszYH7WNUqlZQHXkR2C3tSjB8/3m699VYXPCeFDIHu3Pr+++/tySeftEcffdQuv/zyDI+PGTPGLr74YmvTpo37/d5777WGDRva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YqKrl5ld/sQTT9gff/xhs2fPthkzZrjZ8O+8846deuqp7t9s3MqYPHX8vvvum6O/s3jx4oj3X3jhhe4WiQ++Z+e5IiIiknPU6z///LMdeOCB1r9/f7vhhhvcBLqFCxe6NsKSJUts3bp11qZNm1Df/fXXXy9UQXgREZGiJMdTRU455RTXifdOO+0069Onj7v/oIMOcrPhvGOPPTZiqhoRERHJX+PGjbOBAweGfn/00UfdKD1Lzpnp1rdvX/vtt99Cj5Nmbtu2XfsCiIiISOxKSkqydu3a2Zo1a9zvtAFIAXfTTTe5zc8JvjOhziNtXdWqhX8FpoiISKzK8Ux48sYye65ChQqh+5j9TioalrSRb47fveuvvz7vPq2IiIhku74m4O7rZGbFly1b1gXn2fz01VdfdXli/eMMnNerV0/froiISBFAWjcC7W+++abb7Jxl8tu3b7e5c+faoEGD7O6777ajjz46Xd89PEWNiIiIFGAQngqcpWx04r0DDjjAbf7GUvdnn302w2tWrly5+59UREREsu3ggw92y8xZVs4ma+Rb37Jli3usZs2abtl5uGHDhimFnIiISBFB352Z75UrV7bk5GQ3K540dQTo77nnHncLatasmX399dcF9nlFRESKshwH4ckVy42N3vxu6i+99JKbUUduOXZUv+CCC9xO7LuD5XJVqlSxSpUqhe4jmPDTTz+lex67u+c0f62IiEhRR+B97733drPh2avlxhtvdJuz0REnLzzBeWa8kStWREREih76yaSPJdf7okWLXN1/xx132KRJk6xMmTJ20UUXuUH5UqVKFfRHFRERKfJynBOeDj0bsQb17NnTpaghH/y3335rrVq1svHjx+f6Q7377rtuBh/L5YM++ugjO/74411Dwd9GjRqV678jIiJSlFEfL1++PPR769at7cEHH7TvvvvO9t9/f9cxv/jii2316tUF+jlFREQk74X33Qm8X3HFFa5fff/999vLL7/s2gPvvfeevn4REZHCNhOeGXTkk/OCy9XYhPW5556zH374wc1iz6nvv//ehgwZYh988IHt2LEjw+MbNmxwqW/8LHwRERGJjLyvpI5jyTlYjk7nG8x4u+yyy9xgNnUqdbuIiIgUHampqW5i2+eff+5+b9Sokb3xxhuhx1kJN3XqVPvyyy9dGhoREREpZDPhWdJG/nfvrrvuspNP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Wdu32d+W/L3c2hy0r0uP0f2ME6xEiRL22tvT7atv57iZulddeq71Oi9yPnmeW6J4cUvb8UhEJDIF4UVEREREREREpMghtczM91/K9DnX9OnpbkFdTz3W3bJj2mtP79ZnFNmT1mzeEPdfeM0Ku1Lg7EkKwouIiIiIiIiIiIgU8QD8viPOtHg3/5Z3CiQQryC8iIiIiIiIiIgUGus2pli8q15J+edFihIF4UVEREREREREpNAE4A+/aZ3Fu28eqa5AvEgRomE1EREREREREREREZF8opnwIiIiIiIiIiIiUuB+nPerPfviG/b7H39ZqZIl7carL7bjOx8e8bkrVq628y+/NeJj1/bpaWd3OdG93wsvv22L/lxqqamp1rxZI7u0Zzc7+IDW+fw/EUlPM+FFRERERERERESkQM35aYFd2e8u++b7H61C+XJWp3YNs9TUqM9ftyHBNm3eYikpKVapYoV0t1Kl0+Ydf/jp1zbzux+tQoVylmqp9tW3c6zvLcPsjyXL9uD/TKQQz4SfOnWqHXrooVa/fv10969evdreeOMNW79+vXXu3Nk6dOhQYJ9RREREREREREREdt99o8a6gPqIu2+xozu2z/L5GxI2up9nnHy03Xpd74jPOeTAfeyiHmda7VrV3e833H6fC8T/9MuvtlfThjpsEr8z4Tdu3Gg33nijdenSxf755590j82fP9/23Xdfe/nll23OnDl29NFH24gRIwrss4qIiIiIiIiIiMjumbdgkf2xZKl1PrJdtgLwwSB8tapVoj7n2E6HhQLwq1avcze0atlMh0zidyY8wfUbbrjBKleu7PI0hbvmmmvc7HdmwuORRx6xgQMH2iWXXGI1a9YsgE8sIiIiIiIiIiIiu2Pegt/dz4YN6lq/wQ/a/F8XW9NG9e3may6xls2bRHzNhoRE93PCa+/Yq29Ns9o1q1v7NgfYpRecZVUqVww97/FnX7ZJb0+3pK3b3P13336t7bP3XjpgEr8z4bdu3epmtr///vsZHlu5cqV99tlnLhDv9e7d27Zv324zZszYw59URERERERERERE8sLqNWkz1Amms+FqpYrl7fu5v9i1/e+1LUlbI74mIXGT1alVwxrVr2uVK1W03//42ya+/q5ddv0dtm379tDzataoai33amIN69dxrxn99AT74NOZOnASvzPhCapjyZIlGR778ccf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RERE8hSz2wnAk36mYcOGdthhh1mZMmVCj48ePTq0JJ/Z8d9884199NFHbjZ8586d3WtFREQkdj333HM2fPjwdPddc801dtNNNxXYZxIRESlICsKLiIhIniKITiA+s41bg0qVKmUnn3yyjoKIiEgRsWTJEqtZs6YNGDAgdF+rVq0K9DOJiIgUJAXhRURERERERCTPbNiwwfbee2/r2rWrvlURERFtzCoiIiIiIiIieR2Er1y5sr5UERGR/xT3/xARERERERERyYsgfJUqVfRFioiI/EfpaEREREREREQkT4Pw48aNs8mTJ7tN2nv06GG9evWyEiVKRH1NYmKiu3krVqxwP1NTU91N8o6+z9ihYxU7dKzi83il5uB9FIQXERERERERkTxz22232fbt223r1q329ddf25VXXmkLFiywhx56KOprRo4caUOHDs1w//r1661cuXK79XmqV6++W68vaggarVu3zgojHavYOVbQ8dpFxyo+j9f69euz/VwF4UVEREREREQkz5x++umhf/fs2dNq1Khho0ePtgcffNCKFSsW8TX9+vWzPn36pJsJ3759e6tWrZp7/e7TbHqPY5A332l+0bGKnWMlno5VfB6vpKSkbD9XQXgRERERERERyTf169e3LVu2WEpKStSUNGzkGmkzVwIl0QL3OaPAbvA7Ldx0rGLnWImnYxWfx6tYDt5HG7OKiIiIiIiISJ5Zu3at7dy5090+//xzGzZsmJ1zzjmZ5oQXEREpyjQTXkRERERERETyTPPmzS0hIcGKFy/u8rlffvnldu+99+obFhGRuKUgvIiIiIiIiIjkmTVr1ti///7rgvB169ZVmgYREYl7CsKLiIiIiIiISJ4pWbKkNWjQQN+oiIjIf5QTXkREREREREREREQknygILyIiIiIiIiIiIiKSTxSEFxERERERERERERHJJwrCi4iIiIiIiIiIiIjkEwXhRURERERERERERETyiYLwIiIiIiIiIiIiIiL5pKTFkC+++MJuvfXWdPedcMIJNmzYsAL7TCIiIiIiIiIiIiIiRSIIv2TJElu2bJndddddofuaN29eoJ9JRERERERERERERKRIBOE3bNhgjRo1sj59+hT0RxERERERERERERERKVo54QnCV65cuaA/hoiIiIiIiIiIiIhI0QzCV6lSpaA/hoiIiIiIiIiIiIhI0UxHw+asnTp1snr16tkpp5xiF110kZUoUSLqaxITE93NW7FihfuZmprqbpJ39H3GDh2r2KFjFZ/HS8ddREREREREpOiIqSB8t27drG3bti44MWfOHLvqqqvsk08+sfHjx0d9zciRI23o0KEZ7l+/fr2VK1dutz5P9erVd+v1RQ3HZd26dVYY6VjFzrGCjtcuOlbxebyoo0RERERERESkaIipIPzpp5+e7vd27drZlVdeaY888kjUoF2/fv3SbeTKTPj27dtbtWrVrEaNGnnwqTSb3itWrFgefaf5Rccqdo6VeDpW8Xm8kpKS8uTziIiIiIiIiEjBi6kgfLhWrVqFZgxGC8KzkWukzVwJlHDbfQrsBr/Twk3HKnaOlXg6VvF5vGL9uO/cudOGDx9ur7zyilsdcPTRR9u9994bcYAiJSXFGjZs6H56PXr0sNGjR+/hTy0iIiIiIiKSP2IqCE9H3gcmli5daoMHD7YDDjjAmjdvXtAfTURERP4zduxY++uvv+yFF15wAfnbbrvNLrzwQps+fXrE/V5YpfbVV19Z+fLl3X1KSSUiIiIiIiJFSUwF4Q866CDXqS9durStWbPGbcw6YcKEgv5YIiIiEnDeeee5fVu8ESNGuE3Vd+zYYaVKlUr3XZFDv2TJknbkkUfqOxQREREREZEiKaaC8DNnzrQ///zTkpOTrUmTJi6vu4iIiBQuVatWTfd7YmKilSlTJkMA3qeUC3++iIiIiIiISFESU0H4ihUruvQzIiIiEhs2b95sd9xxh/Xq1Svi48yEJyVN48aNrVatWnbSSSfZwIEDXZ0fDUF9bh7pbHzaOm4SG3SsROeVxFtZpXJPREQkfsVUEF5ERERix6JFi6x79+7WoEEDe/jhhyM+p127dvbNN9+4lDTz5s1zAfhff/3V3nzzzajvO3LkSBs6dGjEWfXlypXb7c+tnPR7BsEoBmHigc6pPSdeziudU7F5TlFPiYiISHxSEF5ERETy3Lvvvutmv9944402aNAgK168eNRAkg8msfcLqebOPPNMS0pKihpQ79evn/Xp0yfdTPj27du719aoUUNHM0YUK1Yszo6XVmnsCfF3XkksnVPUbSIiIhKfFIQXERGRPMXM9p49e9rkyZPt2GOPzdFrK1So4AIe0YL2qFy5sruF43XcJDbE37FSEH5PiL/zSmLpnNL5KSIiEr8UhBcREZE89dBDD9nFF19snTp1sp07d4buL1GihAtAfPTRRy7Ifswxx1hCQoL7d6VKldzm6/3797du3bq5jVxFREREREREioLo08xEREREcmHx4sX2xBNPWKlSpdLdXnrpJff4448/bo8++qj794QJE6xKlSou9Qybr++33372zDPP6HsXERERERGRIkMz4UVERCRPMdN9x44dGe6vWrWq+/nGG2+EluRfe+21Lr/7li1bXE53LdUXERERERGRokZBeBEREclTWW1gR1qaoLJly7qbiIiIiIiISFGkdDQiIiIiIiIiIiIiIvlEQXgRERERERERERERkXyiILyIiIiIiIiIiIiISD5REF5EREREREREREREJJ8oCC8iIiIiIiIiIiIikk8UhBcRERERERERERERyScKwouIiIiIiIiIiIiI5BMF4UVERERERERERERE8omC8CIiIiIiIiIiIiIi+URBeBERERERERERERGRfKIgvIiIiIiIiIiIiIhIPlEQXkREREREREREREQknygILyIiIiIiIiIiIiKSTxSEFxERERERERERERHJJwrCi4iIiIiIiIiIiIjkEwXhRURERERERERERETyiYLwIiIiIiIiIiIiIiL5REF4EREREREREREREZF8oiC8iIiIiIiIiIiIiEg+URBeRERERERERERERCSfKAgvIiIiIiIiIiIiIpJPFIQXEREREREREREREcknCsKLiIiIiIiIiIiIiOSTmA3C79y5s6A/goiIiIiIiIhEkZqaasnJyfp+REQk7sVUED4lJcUGDBhgVatWtdKlS9tRRx1lixcvLuiPJSIiIhEkJibaokWLbMeOHXn6XBERESncNm/ebL1797by5ctbmTJlrEuXLrZ27dqC/lgiIiIFJqaC8Pfee6+NHz/e3n33Xfv999/dfWeddZYbXRcREZHCY9CgQVavXj1r3769NWrUyL744os8ea6IiIgUfn379rVZs2bZt99+a7Nnz7YFCxZYnz59CvpjiYiIFJjisZR+ZuTIkTZkyBDr2LGjNW/e3B577DH76aef7KuvvirojyciIiL/eeutt+ypp55ydfSaNWusR48e1rNnz4iz3HPyXBERESn8/vnnH5s4caKNGjXKDjzwQHcbPny4TZkyxVasWFHQH09ERKRAxEwQfu7cubZhwwY78cQTQ/cdfPDBLjUNo+siIiJSODz//PN2ySWXuAHz4sWLu5nuy5cvt6+//nq3nisiIiKF3+eff24lS5a0zp07h+475phj3Ap2ZseLiIjEo5IWI/744w/3s3Hjxunub9iwoRtpzyzHLDdv6dKl7ievyYs0NsWKFbM3b0mxeLclYatt3lC40wLpWMXOsfLH68Pzn7J4tnX9Jlu6bqMVdjpWeX+8/CyxWN2E/IcffrDzzz8/9Hvt2rVdmpn58+dbp06dcv3cPVW3+/P6xMNb5sl7SUZr16yKu3SCaofkv1hp4+TlOdX6bg1Y5qfVG7dZamJaHZMXYr1+z0nfvX79+laqVKnQfTVq1LCyZcuq714IxEJZqTozdo4V1B9U3z3WbC2gvnvJWNrYhc1YGVEPKleunG3bti3q60hhM3To0Az3H3bYYfnyOUVERPLK6tWrrWnTpjH5uelsB1WvXt2taNud53qq20VEJJbFav2ek747G7KGU99dRETiuW6PmSA8O6qTHzYlJcUtV/eSkpKsYsWKUV/Xr1+/dBvAbN261c2Ya9asWYaAfixixIWN7FjWx6Z2UrjpeMUOHavYURSPFaPoVOIHHHCAxSJmw2zfvj3dfdThwRlxuXluvNTtOVUUrwEpeDqvROdU3ov1+j0nffdIE+Wor9V3V30dK1QPxg4dq9ixogj2W3JSt8dMT5Wl6SxbppPdpEkTd5//nTyy0VSuXNndglq0aGFFDScvqXkkNuh4xQ4dq9hR1I5VLM+Qq1Onjq1cuTLdfatWrXJ1+e48N97q9ni/BqRw0HklOqfyVizX79lFHc7+LgQm/OA4AQom0KnvrnI11qgejB06VrGjXhHrt2S3bo+ZjVkPPfRQt3zt/fffD93HyAk5YY8//vgC/WwiIiKyyxFHHGEffPBB6Pcff/zR1q5dGzHHe06eKyIiIoVfx44d3ax3Nmj1ZsyYYZUqVXL1voiISDyKmZnw5JTr27evDR482I2YVKtWza655hrr1auXW34uIiIihcNNN93kgujDhw+3Qw45xAYNGmRXXHGF1a1b1z3+wAMPuNRyt956a5bPFRERkdjSsmVL69Kli+u/P/300y41Tf/+/d2NzVlFRETiUcwE4XHfffe53LFXX321+/2cc85x98UzluMPGTIkw7J8KZx0vGKHjlXs0DMz1X8AAEKrSURBVLEqfJjlNmXKFLeBKj+7detmAwYMCD0ezBOb1XMla7oGJD/ovBKdU7I7xo8f7wbae/ToYRUqVHB9+IEDB8b1l6pyNbboeMUOHavYUTnOY5jFUkmsLiIiIiIiIiIiIiIieS5mcsKLiIiIiIiIiIiIiMQaBeFFRERERERERERERPKJgvAiIiIiIiIiIiIiIvlEQXgRERERERERERERkXxSMr/eWHJm3rx5duONN2a4/7HHHrPk5OTQY8WLF7f69evb8ccfbxdccIEVK1Ys9NyZM2e6XehXr15thx9+uF133XVWrly50OOffPKJvfjii7Z27VrbZ5993HvWq1dPhyoXzj//fPc9B3Xv3t2uvvrqdI9VrVrVDjjgALv++uutWrVqoeeuWbPGRo0a5Y57o0aN7IYbbrAWLVqEHl++fLk9+uij9ssvv1jdunXtwgsvtKOPPlrHKheeeeYZe+2119LdV716dXdf8LHSpUvbXnvtZZdeeqkdeuihEd/roYcesk6dOtlhhx2W4bHp06fbK6+8YomJiXbVVVfZySefrOOVQ7/99pv17ds3w/0PP/ywK8v8Y5R7lIPHHHOMXXzxxa5cDPftt9/aZ599ZrfddluGx/7880974okn7Ndff7V27drZoEGDrESJEjpekmOXX365XXHFFe488ii3Oe/+97//xcw3+sgjj1itWrVcXeM9+OCDVqdOHevVq1emrz3vvPNce4J2h4hI0IABA1y7qlWrVunuX7FihV100UX24YcfxtTfEfFmzJjh6slwb731ln3zzTehx2hfNmnSxLp27Wqnnnpquue+++679sYbb9iWLVtc3/6yyy5L1x5988033S0pKcnatGnj+ouVK1fWQcihHTt22CmnnJLhfmIlHBP/GP2LmjVrujYdfY6yZcum6zsQl/njjz+sdevW1q9fP6tdu3bo8QULFri+xZIlS6xx48auL3jggQfqWOXCkCFD7Kuvvkp3H/EU2qrBx8qXL2977723i780b948w/vs3LnTbr/9dheHId4SlJqaai+//LJNnTrVxdr69+9vbdu21fHKoU8//dTuueeeDPe/+uqrLs7lH6Nc47o444wz7Mwzz4z4XlOmTLGEhATXtw83d+5cF7dZunSpu2Y55rFMM+ELiQ0bNthHH31kBx98sAu2+hsVrX+MwCABQCoSGpq9e/cOvf7nn392gQAqBQqQkSNHuso+2FAgOEzQncDVxx9/bIccckiGQLJkzxdffOEKk+Cx8kF0HitVqpRrTFHgP/30067iWLduXej1p512mqsYTjjhBHfsOGZU2khJSXHH+p9//rGTTjrJVQzHHntshkCyZD+wS1AseKyOPPLI0GPz5893x4rvnAK+ffv29vbbb6d7D4K1BNUJrEW6ZgYPHuwCURxvjhUNM65TyRkGMCjr9t9//3THi8Es/9hBBx3k7uM6ocxjMDJo8+bNroF21FFH2U8//ZThb9Ax4j2oxLkO58yZ4zpAIjn1ww8/2Jdffunq7SCufQa7s2vTpk12//33u3KpadOmdsQRR9jw4cNdp9zjPgZkqcO5Pgj+M1jr8bpIQSaug2effTbLz0C5ddNNN7kBYixatMh1dnh9Zv79918XRGBgX/IXg4W0CcLRKQkO4hOkCS8Xd8fuvN/dd9/tOlxS+D3++OP23HPPZeu54eUC7dmzzjrL/QxHEIo62fMDlrRtfXkze/ZsV6ahZ8+erqyLdLvzzjvTvTf30TbIzd8R2V3005jgFmyvcqMP6B+jf0HdvnLlStfmvPfee9MFnKjrOVcJJN58880uWOg99dRTrt9B/cp7MNGuY8eOtm3bNh28HKIcoA/BZIPgsWrQoEHoMcoT2kL0OYYOHWodOnQI9eV8X5wJdcRRpk2b5iZk+fKH9hjHhr7JiSee6H6nX8mEIMm5H3/80V0zwWNF3Mo/RtuTa2u//faz999/3/2kfA/v79F2HjFihOsbhgfgaddwfRGjoe8fvPYk+zhOXD/EKIPHq0yZMqHHuHa4nqiLiU/ecccd6d6D2ApB9W7durlBrnD00zmWXF8E4Bk8oQ8W01KlUPjiiy9SORx//vlnth4bM2aMu2/BggXu93///Td106ZNocdff/119/jff//tfp87d27q2rVrQ48nJiamVqtWLfWxxx7L5/9Z0dSgQYPU++67L1uPLV++PLVChQqpQ4YMCd23ePHi0L83b96cWqlSpdQHH3zQ/Z6cnJz66aefpnvPCy+8MLVDhw758D8p+m6++ebUgw46KNuPnXLKKamtWrUK/T527NjU4sWLp3bp0sVdU1OnTk33/M8//zy1ZMmSqbNnzw7d988//6Tu3Lkzz/8vRd13332XrlzL6rHx48e7++bMmeN+X7FiRWqVKlVSW7RokbrffvulXnDBBeneY+vWranNmjVLHThwYLr7ly5dmm//Jym6jj766NQPP/zQ/fuRRx5JrVOnjrvVqFEjtVSpUqHfuU2ePDnieyxbtiy1devWqQcffHDquHHjUj/66KPUF198MbVz586pr7zySuh5zZs3d+XVzJkzXf3epk0bd45v377dPV6mTJkMZRMoy/hskZx44omuvvK3qlWrpvu9cuXK6X4fMGCAe13w/0U7gvIveJ+/nXPOOXnyPUua/v37px533HEZvo6nnnoqtUmTJqHfr7nmmtQePXq4f//111+pBx54YLr2YU4F3y8ztEM5L1euXBm676uvvkqdNGmSDmEMmDhxoitTounWrZurb8NvTZs2TX3ttddSa9eu7dpT++67rzsfH3/8cfc62kKcFxs2bHC/+3OVete3v77++uvU7t27u39TpiUlJbl27/XXX+/+7W87duxwn+Pjjz92z+Xvr1+/Pld/R2R3Pf/886klSpTI9mO33nqraxvQ78OSJUvS9RXoO5YrVy50H/U9571HHIBzfvr06Tp4OcT3yHdH+yk7j33//ffuvgkTJoT65sE4jD8Wb731Vqj/MX/+/HTve/jhh6f26tVLxyoX6HNHK6vDH6POoN457bTTQvfRz6PvfsYZZ0TsVz733HOu/Uob3FNfMHfoq/AdUz9n57E77rjD9Rt83T1r1qzUsmXLprZr1y61fv366eJloE1JnIxj5m3bts21OWOZ0tHEKL9sihm+zH4PLocCqRr8yC2Y+RlUqVIlN/rrZ4dI/uFY8P1zrDzSnngspWLU3R8rUmt07tw53XtwjL/77jsdpj10bZFaYfv27S5FDTNQvv/+e/czmN7JI60QqYj8CD2U5mnPl4PMRmbUnVm/jLKfc845GZ7/zjvvuDKPJYdBDRs23EOfWIqKcePGudnnzPYg1QFpXJYtWxaapXPNNde4WfJetHRHzPpkeSbLYSlvPN4zuHoKfpY8KI+YEc9KKpao5wazh3KDa4jZ+5n5/PPPIy7Tlz2Lc4gVQWnxyvzFjEBmogX/ll91JoULKxSefPLJdPf5GeOkoAqmuvQzCnkNZRRLzGmTLly40O666y63CoMZ6qTRYFYvZSMz2SgDmanITDhmrzELjtU29D9IXcV9zE7k35QnvCeYRUydzopdViryGLPXWQ1asmRJd06HzwTOzd8RKYg2K2ktf//9d9cvJEVNeH+R69Bff76+D7YB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" alt="推理性能实测三联图：单张端到端两轮重复、同一张图的三种测法、批量 8 摊到每张"><figcaption>图 16 · 推理性能实测：(a) 单张端到端两轮重复对比 (b) 同一张图的三种测法 (c) 批量 8 摊到每张</figcaption></figure>
 
@@ -2099,713 +2054,28 @@ python scripts/06_predict.py --source 0</code></pre>
   <p><strong>① FP16 在这台机器上没有稳定收益</strong>——单张时并不更快（相对同轮 FP32 慢 9% 到 71%，波动极大），
   只有批量下才接近。<strong>所以项目没有采用 FP16。</strong></p>
   <p><strong>② 我只能报告现象，不能解释原因</strong>——我没有做 profiling（性能剖析），
-  所以不会编一个理由说"因为某某原因"。<strong>"我只知道它慢，但不知道为什么"——这句话是可以说的。</strong></p>
+  所以不会编一个理由说"因为某某原因"。<strong>"只知道它慢、但不知道为什么"——这种话是可以直接说的。</strong></p>
 </div>
 
 <div class="say">
-  <span class="t">🎤 面试怎么说（这段很值钱）</span>
-  <p><em>"我测延迟的时候踩过一个坑。第一版测出 23.7 毫秒，后来复现不出来，空闲状态下只有 16.4 毫秒。
+  <span class="t">💬 一句话说清</span>
+  <p>测延迟时踩过一个坑。第一版测出 23.7 毫秒，后来复现不出来，空闲状态下只有 16.4 毫秒。
   查下来是测的时候机器在跑别的任务，而且每组只测了一次。</p>
-  <p>所以我重做了实验：每种精度各两轮、进程分开启动。结果 FP32 两轮完全一致，FP16 两轮差了 57%。
-  这件事让我确认了一个原则：<strong>报数字必须连同测量条件一起报</strong>——
-  机器是否空闲、测了几轮、测的是哪一档，这些不是细节，是数字的一部分。"</em></p>
-  <p class="muted">主动讲自己报错过数字，比报一个漂亮数字可信得多。这是这一节最大的价值。</p>
-</div>
-<!-- ==================== 7 ==================== -->
-<h2 id="p7"><span class="num">7</span>诚实清单：这个项目不做什么</h2>
-
-<div class="lead">
-  <p>这一节看起来是"列缺点"，其实是<strong>整份说明书里最能提高你面试成功率的一节</strong>。</p>
-  <p>原因很简单：<strong>面试官最擅长顺着你的话往下追问。</strong>你说"我做了自动驾驶感知"，
-  他下一个问题必然是时序、雷达、恶劣天气。把边界提前划出来，这些问题根本不会被问出口。</p>
-  <p class="muted">背下这张表，比多背十个技术名词有用。</p>
-</div>
-
-<h3>9 条局限，以及被问到时怎么答</h3>
-
-<table>
-  <tr><th class="c" style="width:44px">#</th><th style="width:190px">局限</th><th style="width:270px">为什么是局限</th><th>被问到怎么答</th></tr>
-
-  <tr class="hi">
-    <td class="c">1</td>
-    <td><strong>不是车规数据集</strong></td>
-    <td>12 类、814 张，含 bridges / chimneys / stairs 这些非道路目标；不及 nuScenes 的百万分之一</td>
-    <td>"这是公开的 RF100 数据集，用来跑通完整链路是合适的，但不能据此宣称做了自动驾驶感知。<br><strong>想更贴近道路场景，下一步应该换 BDD100K 这类数据集。</strong>"</td>
-  </tr>
-
-  <tr>
-    <td class="c">2</td>
-    <td><strong>类别严重不均衡</strong></td>
-    <td>训练集 vehicles 763 个框，tractors 只有 1 个；测试集里 tractors 干脆没有标注</td>
-    <td>"长尾分布，这是真实数据的常态。<strong>所以我从不只报一个总 mAP，一定会给逐类结果和样本量。</strong>"</td>
-  </tr>
-
-  <tr class="hi">
-    <td class="c">3</td>
-    <td><strong>测试集不是完全独立</strong></td>
-    <td>三个划分的时间跨度完全重叠，跨划分最近两张只隔 4.9 秒，存在轻度场景重叠</td>
-    <td>"我做了三层泄漏检查，内容层面很干净，但时间戳分析说明划分是按图随机切的。<br><strong>所以我不会说测试集完全独立，这个数字要按偏乐观理解。</strong>"</td>
-  </tr>
-
-  <tr>
-    <td class="c">4</td>
-    <td><strong>训练存在明显过拟合</strong></td>
-    <td>训练集分类损失降到 0.75，验证集从第 20 轮起卡在 1.08～1.14</td>
-    <td>"有的，而且我知道原因：<strong>瓶颈在数据量，不在训练轮数</strong>。<br>所以我没有去把 50 轮改成 100 轮——那是错误的方向。"</td>
-  </tr>
-
-  <tr class="hi">
-    <td class="c">5</td>
-    <td><strong>定位精度是短板</strong></td>
-    <td>mAP50-95 只有 0.423，比 mAP50 低了 0.26；小目标尤其明显</td>
-    <td>"mAP50 和 mAP50-95 差这么多，说明模型<strong>能找对位置但框不够准</strong>，这是小目标上的典型问题，不是分类能力的问题。"</td>
-  </tr>
-
-  <tr>
-    <td class="c">6</td>
-    <td><strong>没有做部署</strong></td>
-    <td>没有导出 ONNX，没有用 TensorRT，没做量化；性能数字全是 PyTorch 侧的</td>
-    <td>"<strong>部署是下一步计划，这次明确没做。</strong>我做的是 PyTorch 侧的推理性能测量，<br>而且已经知道自己的延迟数字必须带条件才能说。"</td>
-  </tr>
-
-  <tr class="hi">
-    <td class="c">7</td>
-    <td><strong>没有动过模型结构</strong></td>
-    <td>用的是现成的 YOLO26n 做迁移学习，没改网络、没写损失函数</td>
-    <td>"网络是框架现成的，我没搭过 backbone / neck / head，也没写过损失函数。<br><strong>我的工作重点在数据与评估方法上。</strong>"</td>
-  </tr>
-
-  <tr>
-    <td class="c">8</td>
-    <td><strong>训练集不是视频</strong></td>
-    <td>相邻两张最小间隔 1.09 秒，是快照集不是连续帧</td>
-    <td>"所以<strong>跟踪的定量评估我做不了</strong>——没有 MOTA / IDF1。我只验证了跟踪链路能跑通，<br>并且知道它会在什么情况下失效。"</td>
-  </tr>
-
-  <tr class="hi">
-    <td class="c">9</td>
-    <td><strong>硬件是笔记本</strong></td>
-    <td>RTX 5060 Laptop（8 GB 显存），和车载平台的性能没有可比性</td>
-    <td>"笔记本上的速度不能当作车载端侧性能来宣称。<br><strong>这也是为什么我坚持每个速度数字都要带上硬件型号和测量条件。</strong>"</td>
-  </tr>
-</table>
-
-<h3>还有三条"没做但值得做"的</h3>
-
-<p>这三条不是缺陷，是<strong>下一步的路线图</strong>。主动说出来，说明你想过往后怎么走：</p>
-
-<table>
-  <tr><th style="width:250px">没做的事</th><th>为什么值得做</th></tr>
-  <tr class="hi"><td><strong>按采集批次重新划分数据集</strong></td>
-      <td>用文件名时间戳聚类，同一批次的图只进一个划分。这样能彻底消除场景重叠。<br>
-      <span class="muted">注意：重划之后现有指标就不能直接对比了，得重新评估一次并注明"旧划分下的结果"。</span></td></tr>
-  <tr><td><strong>补少数类的数据</strong></td>
-      <td>垫底三类（bridges 7 个框、taxis 14 个、chimneys 19 个）训练样本都不足 20 个。<br>
-      实验已经证明瓶颈在数据量上，所以这是优先级最高的一步。</td></tr>
-  <tr class="hi"><td><strong>导出 ONNX + TensorRT 优化</strong></td>
-      <td>这才是"部署"。做完之后，性能数字才有资格和别人的部署结果比。</td></tr>
-</table>
-
-<div class="box ok">
-  <span class="t">✅ 怎么用这张清单（重要）</span>
-  <p><strong>不要等被问。</strong>讲完指标之后主动接一句：</p>
-  <p><em>"不过这个结果有几个前提得先说清楚：</em></p>
-  <p><em>第一，这是 12 类的公开数据集，不是车规数据，含桥梁、烟囱这些非道路目标，所以我不声称这是自动驾驶感知系统。</em></p>
-  <p><em>第二，类别很不均衡，训练集里 tractors 只有 1 个框，所以我不只报总 mAP，一定给逐类结果。</em></p>
-  <p><em>第三，我查过数据泄漏——内容层面干净，但三个划分的时间跨度重叠，所以我不会说测试集完全独立。</em></p>
-  <p><em>第四，存在明显过拟合，但我判断瓶颈在数据量，所以我不打算靠加训练轮数来解决。</em></p>
-  <p><em>另外部署我没做，那是下一步。"</em></p>
-  <p class="muted">这段话讲完，面试官基本不会再追问"你的局限是什么"——因为你已经全说了。
-  而且他会记住一件事：<strong>这个人知道自己项目的边界。</strong></p>
-</div>
-
-<div class="box tip">
-  <span class="t">💡 一个心态上的提醒</span>
-  <p>不要觉得"列这么多缺点会不会显得我很弱"。</p>
-  <p>面试官不是在找一个什么都会的人——<strong>他在找一个能判断现状、能自己找出问题、并且知道下一步该做什么的人</strong>。
-  一个项目如果号称没有任何问题，那只有两种可能：要么没认真做过，要么在说谎。</p>
-  <p><strong>能主动说清"我做的这个东西目前不够用在哪"，本身就是能力的证明。</strong></p>
-</div>
-<!-- ==================== 8 ==================== -->
-<h2 id="p8"><span class="num">8</span>面试重述训练</h2>
-
-<div class="lead">
-  <p><strong>前面七部分是在"学"，这一部分是在"练"。</strong>读完前面，你知道了这个项目是什么；
-  读完这一部分，你能把它说出来。</p>
-  <p>顺序建议：先背 8.1（三十秒），再顺着 8.2（三分钟）讲两遍，然后拿 8.3 的 20 个问题自测。
-  <strong>讲的时候一定要出声</strong>——默读和开口说，完全是两件事。</p>
-</div>
-
-<h3 id="p8-1">8.1 三十秒逐字稿（背下来）</h3>
-
-<div class="box ok">
-  <span class="t">🎤 三十秒版 · 适用于自我介绍、HR 面、电梯里</span>
-  <p><em>"我做过一个道路场景的目标检测项目，用的是 YOLO26n。</em></p>
-  <p><em>数据集是公开的，814 张图、12 个类别。我从整理标注开始做——
-  原始数据里混着矩形框和多边形两种格式，我先把它统一成检测格式，
-  然后做了数据质量检查和泄漏检查。</em></p>
-  <p><em>最后在留出的测试集上，mAP50 是 0.68，单张推理 16 毫秒。</em></p>
-  <p><em>不过我更想说的是这个项目暴露的问题：<strong>有四个类别因为样本太少基本没学会，
-  模型也明显过拟合了</strong>。我把这些都写进了评估报告的结论里。"</em></p>
-</div>
-
-<div class="box tip">
-  <span class="t">💡 最后那两句是加分点，不要省</span>
-  <p>很多人讲三十秒版本，会把"我做了 0.68"当成结尾。但那样听起来像是在报成绩。</p>
-  <p><strong>把"我还发现了什么问题"放进去，性质就变了</strong>——从"我跑了个模型"变成"我做了一次完整的实验"。</p>
-  <p>而且这句话会<strong>主动引导面试官往你准备最充分的地方问</strong>（数据、过拟合、长尾）。
-  这是很实用的一招。</p>
-</div>
-
-<h3 id="p8-2">8.2 三分钟逐字稿（技术面主体）</h3>
-
-<p>分六段。<strong>斜杠 / 表示短停顿，双斜杠 // 表示长停顿换段。</strong>建议按段练，每段单独讲顺了再连起来。</p>
-
-<div class="box note">
-  <span class="t">第一段 · 任务与数据（约 30 秒）</span>
-  <p>我这个项目做的是道路场景的多类别目标检测，12 个类别，包括车辆、行人过街横道、交通信号灯这些。</p>
-  <p>数据集是 Roboflow 的 RF100 公开数据集，814 张图，一共 3165 个标注框，许可是 CC BY 4.0，需要署名。 //</p>
-</div>
-
-<div class="box note">
-  <span class="t">第二段 · 我做的第一件事是清数据（约 40 秒）</span>
-  <p>拿到数据之后我没有直接训练，而是先看它长什么样。</p>
-  <p>结果发现标注里混了两种格式：一部分是标准的检测框，一部分是多边形轮廓。
-  其中验证集里 839 行有 804 行是多边形——<strong>如果不管它，我的验证集实际上是空的</strong>。</p>
-  <p>所以我写了一个脚本，把多边形统一转成最小外接矩形，转之前先确认那些多边形的数值本身没坏，
-  转完留下了一份审计日志。</p>
-  <p>然后做了三层自动检查：格式、坐标范围、空标签，全部通过。
-  <strong>但格式通过不等于标注正确</strong>，所以我又做了一步人工抽检——把标注画回原图上看。
-  这一步查到一处漏标：有张图里明明有一辆摩托车，标签文件却是空的。 //</p>
-</div>
-
-<div class="box note">
-  <span class="t">第三段 · 训练（约 30 秒）</span>
-  <p>然后才开始训练。用的是 YOLO26n 从预训练权重做迁移学习，50 轮，imgsz 640，batch 8，
-  在 8 GB 显存的笔记本上跑了 11 分钟。</p>
-  <p><strong>重点不是那个 mAP，而是我从曲线里读出了两个问题。</strong></p>
-  <p>第一，明显的过拟合：训练集的分类损失从 6.04 降到 0.75，
-  但验证集在第 20 轮之后就卡在 1.08 到 1.14 再没动过，末轮差距 0.34；框损失也是同一个模式。</p>
-  <p>第二，mAP50 在第 19 轮就到顶了，后面 30 轮基本没贡献。
-  <strong>这两条加在一起说明：瓶颈在数据量，不在训练轮数。</strong> //</p>
-</div>
-
-<div class="box note">
-  <span class="t">第四段 · 评估（约 40 秒）</span>
-  <p>评估我只在测试集上跑了一次。因为验证集是用来挑模型调阈值的，
-  测试集如果也反复看，那它就不再是没见过的数据了，数字会虚高。</p>
-  <p>结果是 mAP50 = 0.680，mAP50-95 = 0.423，精确率 0.787，召回率 0.627。
-  置信度阈值是扫 F1 曲线定的，最优在 0.30。</p>
-  <p><strong>逐类看差距很大</strong>：样本充足的类，比如车辆 0.844、消防栓 0.949；
-  但垫底的几类里，bridges 的 AP 是 0。</p>
-  <p><strong>不过这个 0 我不会当成结论</strong>——它在测试集里只有 1 个标注框，
-  统计上没有意义。真正能说明问题的是它的训练样本只有 7 个框。
-  <strong>样本量才是原因，AP=0 只是症状。</strong> //</p>
-</div>
-
-<div class="box note">
-  <span class="t">第五段 · 性能与演示（约 30 秒）</span>
-  <p>性能我也测了。测延迟的时候踩过一个坑：第一版测出 23.7 毫秒，后来复现不出来，
-  空闲状态下只有 16.4 毫秒——差了 45%。查下来是当时机器在跑别的任务，而且每组只测了一次。</p>
-  <p>我重做了实验，每种精度各两轮，进程分开跑。结果 FP32 两轮完全一致，
-  而 FP16 两轮差了 57%，<strong>所以我最终没有采用 FP16</strong>。</p>
-  <p>这件事让我确认一个原则：<strong>报数字必须连同测量条件一起报</strong>——
-  机器空不空闲、测了几轮、测的是哪一档，这些都是数字的一部分。</p>
-  <p>演示方面，我做了一张人工标注和模型预测的对照图，绿的是对的、黄的是漏检、红的是误检，
-  这张图能一眼看出误检主要集中在交通信号灯上。 //</p>
-</div>
-
-<div class="box note">
-  <span class="t">第六段 · 边界（约 15 秒）</span>
-  <p>最后说边界：这个项目只做到检测基线，<strong>部署没做</strong>，ONNX 和 TensorRT 是下一步计划；
-  网络结构是现成的，我没有改过；另外这个数据集不是视频抽帧，
-  相邻两张最小间隔 1.09 秒，所以<strong>跟踪我做不了定量评估</strong>，只验证了链路能跑通。</p>
-</div>
-
-<div class="box tip">
-  <span class="t">💡 讲的时候三个纪律</span>
-  <p><strong>① 每个数字都带条件。</strong>不说"mAP 是 0.68"，说"<strong>在测试集上</strong> mAP50 是 0.68"。</p>
-  <p><strong>② 主动暴露问题。</strong>别等着被问。第二段的漏标、第三段的过拟合、第四段的 bridges，
-  这三个都是"主动说出来强于被问出来"。</p>
-  <p><strong>③ 每段都落在一个判断上。</strong>不要只陈述"我做了什么"，要接一句"这说明了什么"。
-  "验证集损失卡住了，<strong>所以</strong>我判断瓶颈在数据量"——这个"所以"是分水岭。</p>
-</div>
-
-<h3 id="p8-3">8.3 二十个高频追问</h3>
-
-<p>按类别分四组。<strong>每组前面的几题是几乎一定会被问的</strong>，务必练顺。</p>
-
-<h4>A 组 · 项目与数据（1～5）</h4>
-
-<div class="qa">
-  <div class="q"><span class="n">01</span>这个项目是你独立做的吗？做了多久？</div>
-  <div class="a">
-    <p>是我独立做的，从数据整理到评估报告都是自己写的脚本。整个链路走完大概两周的业余时间，
-    其中大部分花在数据上——13 个脚本里有 8 个是处理数据的。</p>
-    <span class="why">为什么这么答：说清"独立"和"时间分配"，暗示你不是跑个 demo 而是一步步做的。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">02</span>数据集从哪来的？有什么特点？</div>
-  <div class="a">
-    <p>Roboflow 的 RF100 公开数据集，许可 CC BY 4.0，需要署名。814 张图、12 类、3165 个框。</p>
-    <p>特点有三个：<strong>一是它不是车规数据</strong>，里面有桥梁、烟囱、楼梯这些非道路目标；
-    <strong>二是类别极不均衡</strong>，训练集里 vehicles 有 763 个框，tractors 只有 1 个；
-    <strong>三是它不是视频抽帧</strong>，相邻两张最小间隔 1.09 秒，是快照集。</p>
-    <span class="why">为什么这么答：三个特点都是后面所有分析的伏笔，主动说等于给面试官划了提问范围。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">03</span>你说标注有两种格式，具体是什么？</div>
-  <div class="a">
-    <p>一种是标准的 YOLO 检测格式，5 个字段：类别、中心点 xy、宽高，后四个都是归一化到 0～1 的比例。</p>
-    <p>另一种是多边形，一个类别后面跟一串点的坐标，用来描述不规则轮廓。
-    我的验证集里 839 行有 804 行是多边形。</p>
-    <span class="why">注意：这里正好可以反问式地展示洞察——"如果不管它，验证集实际上是空的"。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">04</span>多边形转矩形框，丢掉了什么信息？</div>
-  <div class="a">
-    <p>丢掉了形状信息。一个细长的多边形和一个方块，如果外接矩形一样，转换后就完全一样了。</p>
-    <p>对检测任务来说这没问题，检测本来只要"在哪、是什么、多大"。
-    但如果以后要做分割，这个转换就不可逆了，得回到原始多边形。</p>
-    <span class="why">这题很能区分水平。能说出"丢了什么"的人，说明他知道自己在做什么取舍。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">05</span>数据质量怎么保证的？</div>
-  <div class="a">
-    <p>分三层：<strong>自动检查</strong>（图片标签配对、字段数、坐标范围、类别越界、空标签）、
-    <strong>人工抽检</strong>（把标注画回原图，三个划分各抽 8 张）、<strong>泄漏检查</strong>
-    （md5 查内容相同、感知哈希查近似、时间戳查场景重叠）。</p>
-    <p><strong>但我要强调一句：自动检查只能证明格式合法，不能证明标注正确。</strong>
-    类别标错、框画偏、整张漏标，脚本一个都发现不了。所以我必须做人工抽检——
-    而且确实查到了一处漏标。</p>
-    <span class="why">"格式≠语义"这条边界是本项目最有价值的方法论之一，一定要说出来。</span>
-  </div>
-</div>
-
-<h4>B 组 · 训练与调参（6～10）</h4>
-
-<div class="qa">
-  <div class="q"><span class="n">06</span>为什么选 YOLO26n 的 nano 版？</div>
-  <div class="a">
-    <p>两个原因：显存只有 8 GB，更大的型号跑不动；以及这个阶段的目标是跑通完整链路、拿到可信的基线，
-    不是刷分。</p>
-    <p><strong>而且我的实验后来证明了：换个更大的模型不解决问题。</strong>
-    因为瓶颈在数据量——训练集 loss 已经降到 0.75，验证集早就卡住了，说明模型容量已经够了。</p>
-    <span class="why">把"选型"和"实验结论"连起来，说明你不是随便选的。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">07</span>为什么用预训练权重？</div>
-  <div class="a">
-    <p>迁移学习。<strong>814 张图从零训练是训练不出来的</strong>。</p>
-    <p>预训练模型虽然是在 COCO 上学的 80 类，和我这 12 类完全不同，但它学到的是底层视觉能力
-    ——怎么找边缘、怎么分辨纹理——这些是通用的。训练时最后那层分类头会被替换掉重学，
-    因为类别数变了，但骨干网络保留下来继续微调。</p>
-    <span class="why">"换头"这个细节是加分项。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">08</span>batch 和 imgsz 是怎么定的？</div>
-  <div class="a">
-    <p>batch 8 是受 8 GB 显存限制，再大容易 OOM。<strong>imgsz 640 是正好匹配数据集</strong>
-    ——数据本身就是 640×640 的，不用额外缩放，没有缩放带来的信息损失。</p>
-    <span class="why">注意 imgsz 这题，关键是"匹配数据集"而不是随口给个值。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">09</span>workers 设成 0 是怎么回事？</div>
-  <div class="a">
-    <p><strong>不要说成"Windows 上必须设 0"，那是错的。</strong></p>
-    <p>准确说是：这是为了便于排查问题的保守设置。Windows 上 DataLoader 用 spawn 方式开子进程，
-    配置出问题时程序会长时间没输出、看起来像卡死。设成 0 让数据加载在主进程里跑，报错能直接打出来。
-    代价是慢一点，但"能跑起来并看得见问题"比快 20% 重要。</p>
-    <span class="why">这题很容易踩。原始资料里就写着"必须设 0"，我核对后专门纠正过。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">10</span>训练了多少轮？怎么判断该停？</div>
-  <div class="a">
-    <p>跑了 50 轮，因为 patience 设的是 100，等于没打算早停，所以一定跑满。</p>
-    <p><strong>但事后看，50 轮其实偏多。</strong>mAP50 在第 19 轮就到顶了，之后 30 轮都在 0.60 到 0.64 之间晃，
-    对 mAP50 零贡献。而 mAP50-95 还在慢慢涨——因为 best.pt 是按 fitness 选的，
-    权重 0.9 偏向 mAP50-95，所以它选到了第 48 轮。</p>
-    <span class="why">这题能引出"瓶颈在数据"的结论，很值得展开。</span>
-  </div>
-</div>
-
-<h4>C 组 · 指标与评估（11～15）</h4>
-
-<div class="qa">
-  <div class="q"><span class="n">11</span>IoU 是什么？为什么门槛是 0.5？</div>
-  <div class="a">
-    <p>IoU 是交集除以并集，衡量两个框重叠的程度，取值 0 到 1。</p>
-    <p>0.5 是业界约定俗成的及格线——框套上一半以上就算对。但这个线其实很松
-    （想想两张纸只重叠一半也算对），所以后来才有更严的 mAP50-95。</p>
-    <span class="why">能主动说"0.5 很松"，说明你理解这个指标的局限。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">12</span>你的 mAP50 和 mAP50-95 差这么多，为什么？</div>
-  <div class="a">
-    <p>因为考试标准不一样。mAP50 只要求 IoU 到 0.5，mAP50-95 要求从 0.5 一直考到 0.95，对<strong>定位精度</strong>敏感得多。</p>
-    <p>我的 0.680 和 0.423 差了 0.26，说明<strong>模型能找对位置，但框得不够准</strong>。
-    这在小目标上尤其明显——交通信号灯的 mAP50 有 0.810，mAP50-95 只剩 0.398。
-    <strong>反映的是定位能力，不是分类能力。</strong></p>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">13</span>精确率 0.787、召回率 0.627，说明什么？</div>
-  <div class="a">
-    <p>说明模型<strong>偏保守</strong>：报出来的框比较可信，但该报的漏掉了一些。</p>
-    <p>在自动驾驶场景里这个偏向其实是问题——<strong>漏检一辆车比多报一个框危险得多</strong>。
-    所以如果这是真实产品，应该把置信度阈值往下调一点。</p>
-    <span class="why">把指标翻译成业务判断，这是面试官想听的。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">14</span>置信度阈值是怎么定的？</div>
-  <div class="a">
-    <p>把阈值从 0 扫到 1，每一格算一次平均 F1，画成曲线找峰值。最优在 0.30，F1 是 0.654。</p>
-    <p>但曲线在 0.2 到 0.5 之间很平，所以项目里沿用了默认的 0.25，差别可以忽略。
-    <strong>这不是偷懒，是知道了最优值之后判断它值不值得改。</strong></p>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">15</span>哪个类表现最差？为什么？</div>
-  <div class="a">
-    <p>bridges 的 AP50 是 0，但<strong>这个 0 不能当结论</strong>——它在测试集里只有 <strong>1 个</strong>标注框。</p>
-    <p>真正能说明问题的是它的<strong>训练样本只有 7 个框</strong>。垫底的三个类（bridges 7 个、taxis 14 个、
-    chimneys 19 个）训练样本都在 20 个以下，是典型的长尾问题。
-    <strong>样本量才是原因，AP=0 只是症状。</strong></p>
-    <span class="why">这题是最大的雷区，务必背熟。见 5.6 节。</span>
-  </div>
-</div>
-
-<h4>D 组 · 工程与延伸（16～20）</h4>
-
-<div class="qa">
-  <div class="q"><span class="n">16</span>你怎么判断模型过拟合了？</div>
-  <div class="a">
-    <p>把训练集和验证集的损失画在同一张图上看。<strong>训练集的分类损失从 6.04 降到 0.75，
-    验证集从第 20 轮起就卡在 1.08 到 1.14 再没动过，末轮差距 0.34。</strong>框损失是同一个模式，末轮差 0.22。</p>
-    <p>两个独立的损失都裂了，说明不是局部的定位问题，是整体性的过拟合。</p>
-    <span class="why">"两个损失互相印证"这个说法很硬——单一证据容易被质疑，两条证据指向同一结论就站得住。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">17</span>过拟合了怎么解决？</div>
-  <div class="a">
-    <p><strong>先说不能做什么：不能靠加训练轮数。</strong>我的实验已经证明 mAP50 第 19 轮就饱和了，
-    多训只会让裂缝更大。</p>
-    <p>该做的是三件：<strong>补数据</strong>（尤其是样本少的类）、<strong>加强数据增强</strong>
-    （更强的噪声和尺度抖动）、或者<strong>换更小的模型</strong>。</p>
-    <p>而且我的优先级很明确：<strong>先补数据</strong>，因为瓶颈已经证明在数据量上。</p>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">18</span>延迟是多少？怎么测的？</div>
-  <div class="a">
-    <p><strong>先说条件再说数字。</strong>FP32、单张端到端、机器空闲、重复两轮，是 16.4 毫秒，约 61 FPS。
-    批量 8 的时候每张 7.8 到 8.8 毫秒，吞吐提升约 2 倍。</p>
-    <p><strong>"延迟"这个词必须先定义</strong>——同一份权重、同一张图，纯 GPU 前向约 13.8 毫秒、
-    框架内置推理阶段约 10.3 毫秒、完整端到端 16.4 毫秒，最大差 1.45 倍。</p>
-    <span class="why">这题的正确姿势就是先讲条件。面试官会很满意这种回答习惯。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">19</span>你测的延迟数据可靠吗？</div>
-  <div class="a">
-    <p>可靠，但它是我重测之后的结果。<strong>第一版我测出 23.7 毫秒，后来复现不出来</strong>，
-    空闲状态下只有 16.4 毫秒——差了 45%。</p>
-    <p>查下来两个原因：测的时候机器在并行跑别的任务，而且每组只测了一次。
-    我重做了实验，每种精度各两轮、进程分开启动，FP32 两轮完全一致，FP16 两轮差了 57%。</p>
-    <p><strong>所以 FP16 我最终没有采用</strong>——它在这台机器上没有稳定收益。
-    至于为什么 FP16 反而慢，我只有现象没有原因，因为我没做 profiling。</p>
-    <span class="why">主动讲自己报错过数字 + 承认"我不知道为什么"，这两件事合起来反而最能建立信任。</span>
-  </div>
-</div>
-
-<div class="qa">
-  <div class="q"><span class="n">20</span>如果让你继续做这个项目，下一步做什么？</div>
-  <div class="a">
-    <p>按优先级排三件：</p>
-    <p><strong>第一，按采集批次重新划分数据集。</strong>我的泄漏检查发现三个划分的时间跨度重叠
-    ——跨划分最近两张只隔 4.9 秒。要彻底解决得按文件名时间戳聚类，同一批次只进一个划分。
-    但注意：重划之后现有指标就不能直接对比了，得重新评估一次并注明是旧划分下的结果。</p>
-    <p><strong>第二，补少数类的数据</strong>，因为实验已经证明瓶颈在数据量上。</p>
-    <p><strong>第三，导出 ONNX 做 TensorRT 优化</strong>——那才算真正做完了部署，
-    性能数字才有资格和别人比。</p>
-    <span class="why">有优先级、有理由、还知道每一步的代价——这是"有规划"的样子。</span>
-  </div>
-</div>
-
-<h3 id="p8-4">8.4 被问住的时候怎么办</h3>
-
-<p>一定会遇到答不上来的问题。这很正常，<strong>关键不是"答不上来"，而是"答不上来之后的反应"</strong>。</p>
-
-<div class="box warn">
-  <span class="t">🔴 三件绝对不能做的事</span>
-  <p><strong>① 不能编。</strong>面试官问得越深，编的漏洞越大。而且一旦被发现编了一次，前面说的全部打折扣。</p>
-  <p><strong>② 不能说"这个我没用过所以不知道"就结束。</strong>这等于放弃了一次展示思考的机会。</p>
-  <p><strong>③ 不能慌。</strong>答不上一个技术点，不会导致全盘否定。慌乱才会。</p>
-</div>
-
-<div class="box ok">
-  <span class="t">✅ 三步止损话术（背下来）</span>
-  <p><strong>第一步 · 诚实承认</strong><br>
-  <em>"这块我确实没做过，不敢乱说。"</em></p>
-  <p><strong>第二步 · 说出你知道的部分</strong><br>
-  <em>"不过和它相关的东西我了解一些：据我了解……（说出你确实知道的那一点）"</em></p>
-  <p><strong>第三步 · 给出你会怎么学</strong><br>
-  <em>"如果要用的话，我的思路是先……（说出一个具体的入手方向）。"</em></p>
-  <p class="muted">举个例子。被问"你了解 BEV 感知吗"：<br>
-  <em>"BEV 我只看过文献，没动手做过，不敢说得太细。我理解它是把多个视角的图像统一投影到一个鸟瞰图空间里做检测，
-  这样能解决单目视角下遮挡和尺度的问题。如果要用，我的思路是先跑通一个 BEVFormer 的官方实现，
-  在 nuScenes 上复现它的指标，再考虑改动。"</em></p>
-  <p><strong>这个回答的信息量，比硬编一段话大得多</strong>——它同时展示了：诚实、有了解、有学习路径。</p>
-</div>
-
-<div class="box tip">
-  <span class="t">💡 三类问题的不同应对</span>
-  <p><strong>A 类 · 我做过但没想清楚</strong>（比如"你这个脚本为什么这么写"）<br>
-  → <strong>想办法现场推一遍</strong>。"让我想想……当时的需求是 X，所以我选了这个做法，
-  它的代价是 Y。" 能现场推理，比背答案更打动人。</p>
-  <p><strong>B 类 · 没做过但对方默认我会</strong>（比如"部署过吗""C++ 写过推理吗"）<br>
-  → <strong>直接说没做过，然后接上相邻的已知</strong>。"部署我没做，那是下一步计划。
-  不过 PyTorch 侧的推理计时我做了三档口径的对比，所以对'延迟'这件事的坑有概念。"</p>
-  <p><strong>C 类 · 确实不该会</strong>（比如"你们实验室那个算法的损失函数怎么设计的"）<br>
-  → <strong>如实说不了解，不要硬扯</strong>。这类问题答不上来不扣分，硬扯才扣分。</p>
-</div>
-
-<h3 id="p8-5">8.5 面试前一晚自检清单</h3>
-
-<p>面试前一晚<strong>不要再学新东西了</strong>。这一晚的任务是把已经会的说顺。按下面顺序过一遍，40 分钟足够。</p>
-
-<div class="box note">
-  <span class="t">📋 自检清单（逐条打勾）</span>
-  <p><strong>第一轮 · 数字（10 分钟）</strong></p>
-  <p>□ 能不看稿说出：814 张图 / 12 类 / 3165 个框<br>
-  □ 能说出：测试集 mAP50 = 0.680，mAP50-95 = 0.423（<strong>并且都带"测试集"三个字</strong>）<br>
-  □ 能说出：精确率 0.787、召回率 0.627、最优阈值 0.30<br>
-  □ 能说出：单张端到端 16.4 ms，<strong>并且先讲条件</strong><br>
-  □ 能说出：模型 2.39 M 参数、5.4 GFLOPs、训练 11 分钟</p>
-</div>
-
-<div class="box note">
-  <span class="t">📋 自检清单（续）</span>
-  <p><strong>第二轮 · 三个必说的"坑"（10 分钟）</strong></p>
-  <p>□ <strong>漏标</strong>：验证集里有一处摩托车漏标，是人工抽检查出来的，用来证明"格式通过 ≠ 标注正确"<br>
-  □ <strong>过拟合</strong>：训练集 cls_loss 6.04 → 0.75，验证集卡在 1.08～1.14，末轮差 0.34<br>
-  □ <strong>bridges</strong>：AP50 是 0，但测试集只有 1 个框，<strong>训练样本只有 7 个才是原因</strong></p>
-  <p><strong>第三轮 · 两个"我做过但别人想不到"的（10 分钟）</strong></p>
-  <p>□ <strong>数据泄漏检查</strong>：三层检查，内容 0 重复，但时间戳重叠（最近 4.9 秒）<br>
-  □ <strong>延迟测错过</strong>：第一版 23.7 ms 复现不出来，查下来是机器没空闲 + 只测一次</p>
-</div>
-
-<div class="box note">
-  <span class="t">📋 自检清单（续）</span>
-  <p><strong>第四轮 · 出声讲一遍（10 分钟）</strong></p>
-  <p>□ 三十秒版讲两遍，不看稿<br>
-  □ 三分钟版讲一遍，可以看稿但要出声<br>
-  □ <strong>掐表</strong>——实际讲出来往往比想象的长</p>
-  <p><strong>最后一件事：准备好"我不能说什么"</strong></p>
-  <p>□ 不能说自动驾驶感知系统<br>
-  □ 不能说部署 / 推理加速<br>
-  □ 不能说设计了检测算法<br>
-  □ 不能说实现了多目标跟踪算法<br>
-  □ 不能说测试集完全独立<br>
-  <span class="muted">这五句在心里默念一遍，面试时嘴就会自动刹车。</span></p>
-</div>
-
-<div class="box ok">
-  <span class="t">✅ 最后一句话</span>
-  <p>这个项目你真正拥有的，不是那个 0.680，而是<strong>你知道这个 0.680 是怎么来的、
-  它在哪里不成立、以及下一步该往哪走</strong>。</p>
-  <p>面试官要找的就是这样的人。<strong>你已经在路上了。</strong></p>
-</div>
-<!-- ==================== 附录 A ==================== -->
-<h2 id="a1"><span class="num">A</span>数字速查表</h2>
-
-<p>面试时随手能报的数字。每一个都能在项目里找到出处，被追问时可以直接翻文件。</p>
-
-<h3>数据集</h3>
-<table>
-  <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr>
-  <tr class="hi"><td>图片总数</td><td class="c"><strong>814 张</strong></td><td><code>datasets/road-traffic/</code></td></tr>
-  <tr><td>划分</td><td class="c">train 494 / valid 187 / test 133</td><td><code>docs/label_conversion_report.txt</code></td></tr>
-  <tr class="hi"><td>标注框总数</td><td class="c"><strong>3,165 个</strong></td><td>同左</td></tr>
-  <tr><td>类别数</td><td class="c">12 类</td><td><code>datasets/road-traffic-detect/data.yaml</code></td></tr>
-  <tr class="hi"><td>需要转换的多边形</td><td class="c">860 个（train 3 / valid 804 / test 53）</td><td>同左</td></tr>
-  <tr><td>转换异常行数</td><td class="c"><strong>0</strong></td><td>同左</td></tr>
-  <tr class="hi"><td>空标签文件</td><td class="c">1 个（valid 里，判定为漏标）</td><td><code>scripts/visualize_labels.py</code> 输出</td></tr>
-  <tr><td>许可</td><td class="c">CC BY 4.0（须署名）</td><td><code>datasets/road-traffic/README.dataset.txt</code></td></tr>
-</table>
-
-<h3>训练</h3>
-<table>
-  <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr>
-  <tr class="hi"><td>模型 / 轮数</td><td class="c">yolo26n.pt / 50 epochs</td><td><code>runs/detect/runs/road_baseline/args.yaml</code></td></tr>
-  <tr><td>batch / imgsz</td><td class="c">8 / 640</td><td>同左</td></tr>
-  <tr class="hi"><td>学习率</td><td class="c">0.01 → 0.0001</td><td>同左（<code>lr0</code> / <code>lrf</code>）</td></tr>
-  <tr><td><strong>总耗时</strong></td><td class="c"><strong>660.4 秒（约 11 分钟）</strong></td><td><code>results.csv</code> 末行</td></tr>
-  <tr class="hi"><td>best.pt 对应轮次</td><td class="c">第 48 轮</td><td>按 <code>fitness = 0.1×mAP50 + 0.9×mAP50-95</code> 复算</td></tr>
-  <tr><td>mAP50 最高点</td><td class="c">0.6440 @ 第 <strong>19</strong> 轮</td><td>同左</td></tr>
-  <tr class="hi"><td>mAP50-95 最高点</td><td class="c">0.4160 @ 第 48 轮</td><td>同左</td></tr>
-  <tr><td>过拟合证据</td><td class="c">训练 cls_loss 6.04→0.75，验证卡在 1.08~1.14，末轮差 <strong>0.34</strong></td><td>同左</td></tr>
-</table>
-
-<h3>评估（测试集，133 张）</h3>
-<table>
-  <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr>
-  <tr class="hi"><td><strong>mAP50</strong></td><td class="c"><strong>0.6797</strong></td><td><code>results/eval_report/metrics_overall.json</code></td></tr>
-  <tr class="hi"><td><strong>mAP50-95</strong></td><td class="c"><strong>0.4228</strong></td><td>同左</td></tr>
-  <tr><td>精确率 P</td><td class="c">0.7865</td><td>同左</td></tr>
-  <tr><td>召回率 R</td><td class="c">0.6267</td><td>同左</td></tr>
-  <tr class="hi"><td>最优置信度阈值</td><td class="c">0.30（平均 F1 = 0.654）</td><td>同左</td></tr>
-  <tr><td>最优 / 最差类</td><td class="c">fire hydrants 0.9493 / bridges 0.0000（仅 1 个框）</td><td><code>metrics_per_class.csv</code></td></tr>
-  <tr class="hi"><td>测试集里没有标注的类</td><td class="c">tractors（"没考"≠"考 0 分"）</td><td>同左</td></tr>
-  <tr><td>验证集 mAP50（对照）</td><td class="c">0.6414</td><td><code>results.csv</code></td></tr>
-</table>
-
-<h3>性能与模型</h3>
-<table>
-  <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr>
-  <tr class="hi"><td><strong>单张端到端（FP32）</strong></td><td class="c"><strong>16.4 ms</strong>（约 61 FPS）</td><td><code>docs/inference_benchmark.json</code></td></tr>
-  <tr><td>批量 8 时每张</td><td class="c">7.8 ~ 8.8 ms</td><td>同左</td></tr>
-  <tr class="hi"><td>纯 GPU 前向（FP32 中位）</td><td class="c">13.76 ~ 15.78 ms</td><td>同左</td></tr>
-  <tr><td>三档测法最大差异</td><td class="c"><strong>1.45 倍</strong></td><td>同左</td></tr>
-  <tr class="hi"><td>FP16 两轮差异</td><td class="c"><strong>57%</strong>（故未采用）</td><td>同左</td></tr>
-  <tr><td>参数量（融合后）</td><td class="c">2.39 M</td><td>同左</td></tr>
-  <tr class="hi"><td>算力消耗 @640</td><td class="c">5.4 GFLOPs</td><td>同左</td></tr>
-  <tr><td>冷启动首次推理</td><td class="c">约 36 秒</td><td>同左</td></tr>
-</table>
-
-<h3>数据泄漏检查</h3>
-<table>
-  <tr><th style="width:230px">检查项</th><th class="c" style="width:130px">结果</th><th>出处</th></tr>
-  <tr class="hi"><td>内容完全相同（md5）</td><td class="c">跨划分 <strong>0 对</strong></td><td><code>docs/data_leakage_report.json</code></td></tr>
-  <tr class="hi"><td>画面近似（dHash 阈值 5）</td><td class="c">跨划分 <strong>0 对</strong></td><td>同左</td></tr>
-  <tr><td>dHash 最接近距离</td><td class="c">15（阈值 3 倍，说明检查有区分度）</td><td>同左</td></tr>
-  <tr class="hi"><td>时间戳邻域</td><td class="c">跨划分最近 <strong>4.9 秒</strong>；1 分钟内 158 对</td><td>同左</td></tr>
-  <tr><td>图片相邻两张最小间隔</td><td class="c"><strong>1.09 秒</strong>（说明不是视频抽帧）</td><td>同左</td></tr>
-</table>
-
-<h3>环境</h3>
-<div class="chips">
-  <span class="chip">Python <b>3.11.16</b></span>
-  <span class="chip">PyTorch <b>2.11.0+cu128</b></span>
-  <span class="chip">Ultralytics <b>8.4.176</b></span>
-  <span class="chip">CUDA <b>12.8</b></span>
-  <span class="chip">GPU <b>RTX 5060 Laptop 8GB</b></span>
-  <span class="chip">conda 环境 <b>yolo_road</b></span>
-</div>
-
-<!-- ==================== 附录 B ==================== -->
-<h2 id="a2"><span class="num">B</span>术语中英对照</h2>
-
-<p>面试时中英文混着用很正常，但用错会很尴尬。下面这张表按出现频率排。</p>
-
-<table>
-  <tr><th style="width:170px">中文</th><th style="width:220px">英文 / 缩写</th><th>一句话解释</th></tr>
-  <tr class="hi"><td>目标检测</td><td>Object Detection</td><td>找出图里有什么、在哪、有几个，输出矩形框</td></tr>
-  <tr><td>标注 / 标注框</td><td>Annotation / Bounding Box</td><td>人工画的框，是模型学习的标准答案</td></tr>
-  <tr class="hi"><td>迁移学习</td><td>Transfer Learning</td><td>从别人训好的模型继续训，而不是从零开始</td></tr>
-  <tr><td>预训练权重</td><td>Pretrained Weights</td><td>别人在大数据集上训好的参数</td></tr>
-  <tr class="hi"><td>训练轮数</td><td>Epoch</td><td>把全部训练数据过一遍叫 1 个 epoch</td></tr>
-  <tr><td>批量大小</td><td>Batch Size</td><td>一次同时处理多少张图才更新一次参数</td></tr>
-  <tr class="hi"><td>学习率</td><td>Learning Rate</td><td>每次调参数时"步幅"多大</td></tr>
-  <tr><td>损失 / 损失函数</td><td>Loss / Loss Function</td><td>衡量"错得多离谱"的分数，训练就是把它降到最低</td></tr>
-  <tr class="hi"><td>过拟合</td><td>Overfitting</td><td>训练集一直变好、验证集不再变好，说明在背答案</td></tr>
-  <tr><td>数据增强</td><td>Data Augmentation</td><td>人为把训练图变形（翻转、调色、拼接），抗过拟合</td></tr>
-  <tr class="hi"><td>交并比</td><td>IoU (Intersection over Union)</td><td>两个框重叠程度，0 到 1</td></tr>
-  <tr><td>置信度</td><td>Confidence</td><td>模型有多确定这个框是对的，0 到 1</td></tr>
-  <tr class="hi"><td>非极大值抑制</td><td>NMS</td><td>同一个目标被报了多个框时，只留下最好的那个</td></tr>
-  <tr><td>命中 / 误报 / 漏报</td><td>TP / FP / FN</td><td>报对了 / 报了但错 / 该报没报</td></tr>
-  <tr class="hi"><td>精确率</td><td>Precision</td><td>报出来的框里有多少是对的</td></tr>
-  <tr><td>召回率</td><td>Recall</td><td>该报的目标里报出来了多少</td></tr>
-  <tr class="hi"><td>平均精度</td><td>AP (Average Precision)</td><td>单个类的综合成绩，PR 曲线下面积</td></tr>
-  <tr><td>平均精度均值</td><td>mAP (mean AP)</td><td>所有类的 AP 再取平均</td></tr>
-  <tr class="hi"><td>精确率与召回率的调和平均</td><td>F1 Score</td><td>把 P 和 R 合成一个数，用来找最优阈值</td></tr>
-  <tr><td>混淆矩阵</td><td>Confusion Matrix</td><td>模型的"错题本"：错成了什么</td></tr>
-  <tr class="hi"><td>多目标跟踪</td><td>MOT (Multi-Object Tracking)</td><td>给跨帧的同一目标分配固定编号</td></tr>
-  <tr><td>身份切换</td><td>ID Switch</td><td>同一目标被跟踪器当成两个不同编号</td></tr>
-  <tr><td>数据泄漏</td><td>Data Leakage</td><td>测试数据混进了训练集，导致分数虚高</td></tr>
-  <tr class="hi"><td>长尾分布</td><td>Long-tail Distribution</td><td>少数类样本极多、多数类样本极少</td></tr>
-</table>
-
-<!-- ==================== 附录 C ==================== -->
-<h2 id="a3"><span class="num">C</span>文件地图</h2>
-
-<p>项目里有 13 个脚本，分两组。<strong>面试被问"你都写了什么"时，按这张表说就行。</strong></p>
-
-<h3>第一组 · 数据准备与核查（7 个）</h3>
-<table>
-  <tr><th style="width:250px">脚本</th><th>干什么</th></tr>
-  <tr><td><code>dataset_config.py</code></td><td><strong>共享配置模块</strong>：自动定位项目根目录、读 data.yaml 拿类别和路径。所有脚本都从这里取，改数据集只需改一处</td></tr>
-  <tr class="hi"><td><code>01_check_dataset.py</code></td><td>结构检查：图片与标签是否一一对应、字段数、类别越界、坐标范围</td></tr>
-  <tr><td><code>02_inspect_label_formats.py</code></td><td>格式普查：按字段数分类，发现有 860 行是另一种格式</td></tr>
-  <tr class="hi"><td><code>03_find_bad_coordinates.py</code></td><td>多边形数值专项排查，确认那些多边形本身没坏</td></tr>
-  <tr><td><code>04_convert_labels_to_detection.py</code></td><td><strong>核心</strong>：多边形 → 最小外接矩形，生成新数据集 + 审计日志</td></tr>
-  <tr class="hi"><td><code>05_validate_detection_dataset.py</code></td><td>转换后验收：六道校验 + 打印每类框数（长尾的直接证据）</td></tr>
-  <tr><td><code>visualize_labels.py</code></td><td>把人工标注画回原图做抽检，<strong>抓到了那处漏标</strong></td></tr>
-</table>
-
-<h3>第二组 · 交付层（6 个）</h3>
-<table>
-  <tr><th style="width:250px">脚本</th><th>干什么</th></tr>
-  <tr class="hi"><td><code>06_predict.py</code></td><td>统一推理入口：单图 / 目录 / 视频 / 摄像头</td></tr>
-  <tr><td><code>07_make_demo_figure.py</code></td><td>按规则自动挑图，生成"人工标注 vs 模型预测"对照拼图</td></tr>
-  <tr class="hi"><td><code>08_track.py</code></td><td>视频多目标跟踪（ByteTrack），输出带轨迹 ID 的视频与统计</td></tr>
-  <tr><td><code>09_evaluate.py</code></td><td><strong>正式评估</strong>：逐类指标 + 最优阈值 + 混淆矩阵，并自动生成评估报告</td></tr>
-  <tr class="hi"><td><code>benchmark_inference.py</code></td><td>推理性能测试：三档计时口径 + 6 项测量条件</td></tr>
-  <tr><td><code>check_data_leakage.py</code></td><td>数据泄漏三重检查：md5 + 感知哈希 + 时间戳邻域</td></tr>
-</table>
-
-<h3>其余关键文件</h3>
-<table>
-  <tr><th style="width:330px">路径</th><th>里面是什么</th></tr>
-  <tr class="hi"><td><code>README.md</code></td><td>项目主页：环境安装、数据来源与许可、12 步运行顺序、训练命令、已知的坑</td></tr>
-  <tr><td><code>requirements.txt</code></td><td>固定版本的依赖清单（含"先装 PyTorch 再装其余"的顺序）</td></tr>
-  <tr class="hi"><td><code>LICENSE</code></td><td>代码 MIT；<strong>数据集 CC BY 4.0（须署名）</strong>；权重另有其许可——三者分开写清</td></tr>
-  <tr><td><code>docs/RESUME_PROJECT.md</code></td><td>简历条目 + 面试要点 + 能力边界表（个人底稿，不随仓库公开）</td></tr>
-  <tr class="hi"><td><code>docs/label_conversion_report.txt</code></td><td>数据转换审计日志</td></tr>
-  <tr><td><code>docs/inference_benchmark.json</code></td><td>性能实测的原始统计量 + 完整测量条件</td></tr>
-  <tr class="hi"><td><code>docs/data_leakage_report.json</code></td><td>泄漏检查的完整结果</td></tr>
-  <tr><td><code>results/eval_report/evaluation_report.md</code></td><td><strong>评估报告</strong>：结论 + 逐类表 + 能说明什么 / 不能说明什么</td></tr>
-  <tr class="hi"><td><code>results/demo/demo_grid.png</code></td><td>对照拼图，可以直接当简历配图</td></tr>
-  <tr><td><code>runs/detect/runs/road_baseline/</code></td><td>训练产物：参数快照、逐轮指标、曲线、混淆矩阵、权重</td></tr>
-</table>
-
-<div class="box tip">
-  <span class="t">💡 怎么用这张地图</span>
-  <p>如果面试官问"你具体写了多少代码"，可以答：
-  <em>"13 个脚本，分两组：7 个处理数据，6 个做交付和核查。加起来大概三千多行。"</em></p>
-  <p>如果问"你觉得自己哪部分做得最好"，可以答：
-  <em>"数据质量和评估这两块。因为模型是现成的，我真正的功夫在'怎么确认数据是干净的'
-  和'这个分数到底能不能信'。"</em></p>
+  <p>所以重做了实验：每种精度各两轮、进程分开启动。结果 FP32 两轮完全一致，FP16 两轮差了 57%。
+  这里确认了一个原则：<strong>报数字必须连同测量条件一起报</strong>——
+  机器是否空闲、测了几轮、测的是哪一档，这些不是细节，是数字的一部分。</p>
+</div> <!-- ==================== 7 ==================== --> <h2 id="p7"><span class="num">7</span>项目边界与已知局限</h2> <div class="lead"> <p>这一节列出这个项目<strong>已知的 9 条局限</strong>，以及后续可以往哪走。</p> <p>列出来不是自我否定——<strong>一个项目的可信度，取决于它的边界是不是清楚的</strong>。 只给一个总分，看不出它在哪里成立，这个总分就没有意义。</p> </div> <h3>9 条已知局限</h3> <table> <tr><th style="width:36px">#</th><th style="width:180px">局限</th><th>具体情况</th></tr> <tr class="hi"> <td>1</td><td><strong>不是车规数据集</strong></td> <td>12 类、814 张，含 bridges / chimneys / stairs 这些非道路目标，规模约为 nuScenes 的百万分之一。 用它跑通完整链路是合适的，但不能据此宣称做了自动驾驶感知；想更贴近道路场景，下一步应换 BDD100K 这类数据集。</td> </tr> <tr> <td>2</td><td><strong>类别严重不均衡</strong></td> <td>训练集 vehicles 有 763 个框，tractors 只有 1 个；测试集里 tractors 干脆没有标注。 这是真实数据的常态，也是<strong>本项目不只报总 mAP、一定同时给逐类结果和样本量</strong>的原因。</td> </tr> <tr class="hi"> <td>3</td><td><strong>测试集不是完全独立</strong></td> <td>三个划分的时间跨度完全重叠，跨划分最近两张只隔 4.9 秒，存在轻度场景重叠。 三层泄漏检查显示<strong>内容层面没有重复</strong>，但时间戳分析说明划分是按图随机切的—— 所以这个测试指标要按<strong>偏乐观</strong>来理解。</td> </tr> <tr> <td>4</td><td><strong>训练存在明显过拟合</strong></td> <td>训练集分类损失一路降到 0.75，验证集从第 20 轮起就卡在 1.08～1.14。 瓶颈判断在<strong>数据量</strong>而不在训练轮数，所以把 50 轮改成 100 轮不是这个项目的改进方向。</td> </tr> <tr class="hi"> <td>5</td><td><strong>定位精度是短板</strong></td> <td>mAP50-95 只有 0.423，比 mAP50 低了 0.26，小目标尤其明显。 这说明模型<strong>能找对位置、但框不够准</strong>，是小目标上的典型问题，不是分类能力的问题。</td> </tr> <tr> <td>6</td><td><strong>没有做部署</strong></td> <td>没有导出 ONNX，没有用 TensorRT，没做量化；性能数字全部来自 PyTorch 侧。 部署属于后续计划，本次明确未做。</td> </tr> <tr class="hi"> <td>7</td><td><strong>没有动过模型结构</strong></td> <td>用的是现成的 YOLO26n 做迁移学习，没有改网络、没有写损失函数。 本项目的工作重点在<strong>数据与评估方法</strong>上。</td> </tr> <tr> <td>8</td><td><strong>训练集不是视频</strong></td> <td>相邻两张最小间隔 1.09 秒，是快照集不是连续帧。因此跟踪的定量评估做不了——没有 MOTA / IDF1， 只验证了跟踪链路能跑通、以及在什么情况下会失效。</td> </tr> <tr class="hi"> <td>9</td><td><strong>硬件是笔记本</strong></td> <td>RTX 5060 Laptop（8 GB 显存），和车载平台的性能没有可比性。 笔记本上的速度不能当作端侧性能来宣称——这也是为什么每个速度数字都带着硬件型号和测量条件。</td> </tr> </table> <h3>后续可以做的三件事</h3> <table> <tr><th style="width:230px">可以做的事</th><th>为什么值得做</th></tr> <tr class="hi"> <td><strong>按采集批次重新划分数据集</strong></td> <td>用文件名时间戳聚类，同一批次的图只进一个划分，彻底消除场景重叠。 <span class="muted">注意：重划之后现有指标不能直接对比，需要重新评估一次并注明"旧划分下的结果"。</span></td> </tr> <tr> <td><strong>补少数类的数据</strong></td> <td>垫底三类（bridges 7 个框、taxis 14 个、chimneys 19 个）训练样本都不足 20 个。 实验已经证明瓶颈在数据量上，所以这是优先级最高的一步。</td> </tr> <tr class="hi"> <td><strong>导出 ONNX + TensorRT 优化</strong></td> <td>这才是"部署"。做完之后，性能数字才有资格和别人的部署结果比。</td> </tr> </table> <div class="box note"> <span class="t">读数字之前，先看四条前提</span> <p>本项目的每个指标都建立在这四条前提上：</p> <ol> <li>这是 12 类的公开数据集，不是车规数据，含桥梁、烟囱这类非道路目标—— <strong>所以定位是检测基线，不是自动驾驶感知系统</strong>。</li> <li>类别严重不均衡，训练集里 tractors 只有 1 个框—— <strong>所以只看总 mAP 不够，逐类结果和样本量必须一起看</strong>。</li> <li>数据泄漏检查显示内容层面干净，但三个划分的时间跨度重叠—— <strong>所以测试指标要按偏乐观理解</strong>。</li> <li>训练存在明显过拟合，但瓶颈在数据量而不在训练轮数—— <strong>所以增加训练轮数不是有效的改进方向</strong>。</li> </ol> <p>另外部署没有做，属于后续计划。</p> </div> <!-- ==================== 附录 A ==================== --> <h2 id="a1"><span class="num">A</span>数字速查表</h2> <p>本项目全部关键数字，每个都能在项目里找到出处，可以直接翻文件核对。</p> <h3>数据集</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td>图片总数</td><td class="c"><strong>814 张</strong></td><td><code>datasets/road-traffic/</code></td></tr> <tr><td>划分</td><td class="c">train 494 / valid 187 / test 133</td><td><code>docs/label_conversion_report.txt</code></td></tr> <tr class="hi"><td>标注框总数</td><td class="c"><strong>3,165 个</strong></td><td>同左</td></tr> <tr><td>类别数</td><td class="c">12 类</td><td><code>datasets/road-traffic-detect/data.yaml</code></td></tr> <tr class="hi"><td>需要转换的多边形</td><td class="c">860 个（train 3 / valid 804 / test 53）</td><td>同左</td></tr> <tr><td>转换异常行数</td><td class="c"><strong>0</strong></td><td>同左</td></tr> <tr class="hi"><td>空标签文件</td><td class="c">1 个（valid 里，判定为漏标）</td><td><code>scripts/visualize_labels.py</code> 输出</td></tr> <tr><td>许可</td><td class="c">CC BY 4.0（须署名）</td><td><code>datasets/road-traffic/README.dataset.txt</code></td></tr> </table> <h3>训练</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td>模型 / 轮数</td><td class="c">yolo26n.pt / 50 epochs</td><td><code>runs/detect/runs/road_baseline/args.yaml</code></td></tr> <tr><td>batch / imgsz</td><td class="c">8 / 640</td><td>同左</td></tr> <tr class="hi"><td>学习率</td><td class="c">0.01 → 0.0001</td><td>同左（<code>lr0</code> / <code>lrf</code>）</td></tr> <tr><td><strong>总耗时</strong></td><td class="c"><strong>660.4 秒（约 11 分钟）</strong></td><td><code>results.csv</code> 末行</td></tr> <tr class="hi"><td>best.pt 对应轮次</td><td class="c">第 48 轮</td><td>按 <code>fitness = 0.1×mAP50 + 0.9×mAP50-95</code> 复算</td></tr> <tr><td>mAP50 最高点</td><td class="c">0.6440 @ 第 <strong>19</strong> 轮</td><td>同左</td></tr> <tr class="hi"><td>mAP50-95 最高点</td><td class="c">0.4160 @ 第 48 轮</td><td>同左</td></tr> <tr><td>过拟合证据</td><td class="c">训练 cls_loss 6.04→0.75，验证卡在 1.08~1.14，末轮差 <strong>0.34</strong></td><td>同左</td></tr> </table> <h3>评估（测试集，133 张）</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td><strong>mAP50</strong></td><td class="c"><strong>0.6797</strong></td><td><code>results/eval_report/metrics_overall.json</code></td></tr> <tr class="hi"><td><strong>mAP50-95</strong></td><td class="c"><strong>0.4228</strong></td><td>同左</td></tr> <tr><td>精确率 P</td><td class="c">0.7865</td><td>同左</td></tr> <tr><td>召回率 R</td><td class="c">0.6267</td><td>同左</td></tr> <tr class="hi"><td>最优置信度阈值</td><td class="c">0.30（平均 F1 = 0.654）</td><td>同左</td></tr> <tr><td>最优 / 最差类</td><td class="c">fire hydrants 0.9493 / bridges 0.0000（仅 1 个框）</td><td><code>metrics_per_class.csv</code></td></tr> <tr class="hi"><td>测试集里没有标注的类</td><td class="c">tractors（"没考"≠"考 0 分"）</td><td>同左</td></tr> <tr><td>验证集 mAP50（对照）</td><td class="c">0.6414</td><td><code>results.csv</code></td></tr> </table> <h3>性能与模型</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td><strong>单张端到端（FP32）</strong></td><td class="c"><strong>16.4 ms</strong>（约 61 FPS）</td><td><code>docs/inference_benchmark.json</code></td></tr> <tr><td>批量 8 时每张</td><td class="c">7.8 ~ 8.8 ms</td><td>同左</td></tr> <tr class="hi"><td>纯 GPU 前向（FP32 中位）</td><td class="c">13.76 ~ 15.78 ms</td><td>同左</td></tr> <tr><td>三档测法最大差异</td><td class="c"><strong>1.45 倍</strong></td><td>同左</td></tr> <tr class="hi"><td>FP16 两轮差异</td><td class="c"><strong>57%</strong>（故未采用）</td><td>同左</td></tr> <tr><td>参数量（融合后）</td><td class="c">2.39 M</td><td>同左</td></tr> <tr class="hi"><td>算力消耗 @640</td><td class="c">5.4 GFLOPs</td><td>同左</td></tr> <tr><td>冷启动首次推理</td><td class="c">约 36 秒</td><td>同左</td></tr> </table> <h3>数据泄漏检查</h3> <table> <tr><th style="width:230px">检查项</th><th class="c" style="width:130px">结果</th><th>出处</th></tr> <tr class="hi"><td>内容完全相同（md5）</td><td class="c">跨划分 <strong>0 对</strong></td><td><code>docs/data_leakage_report.json</code></td></tr> <tr class="hi"><td>画面近似（dHash 阈值 5）</td><td class="c">跨划分 <strong>0 对</strong></td><td>同左</td></tr> <tr><td>dHash 最接近距离</td><td class="c">15（阈值 3 倍，说明检查有区分度）</td><td>同左</td></tr> <tr class="hi"><td>时间戳邻域</td><td class="c">跨划分最近 <strong>4.9 秒</strong>；1 分钟内 158 对</td><td>同左</td></tr> <tr><td>图片相邻两张最小间隔</td><td class="c"><strong>1.09 秒</strong>（说明不是视频抽帧）</td><td>同左</td></tr> </table> <h3>环境</h3> <div class="chips"> <span class="chip">Python <b>3.11.16</b></span> <span class="chip">PyTorch <b>2.11.0+cu128</b></span> <span class="chip">Ultralytics <b>8.4.176</b></span> <span class="chip">CUDA <b>12.8</b></span> <span class="chip">GPU <b>RTX 5060 Laptop 8GB</b></span> <span class="chip">conda 环境 <b>yolo_road</b></span> </div> <!-- ==================== 附录 B ==================== --> <h2 id="a2"><span class="num">B</span>术语中英对照</h2> <p>下面这张表按出现频率排，中英对照。</p> <table> <tr><th style="width:170px">中文</th><th style="width:220px">英文 / 缩写</th><th>一句话解释</th></tr> <tr class="hi"><td>目标检测</td><td>Object Detection</td><td>找出图里有什么、在哪、有几个，输出矩形框</td></tr> <tr><td>标注 / 标注框</td><td>Annotation / Bounding Box</td><td>人工画的框，是模型学习的标准答案</td></tr> <tr class="hi"><td>迁移学习</td><td>Transfer Learning</td><td>从别人训好的模型继续训，而不是从零开始</td></tr> <tr><td>预训练权重</td><td>Pretrained Weights</td><td>别人在大数据集上训好的参数</td></tr> <tr class="hi"><td>训练轮数</td><td>Epoch</td><td>把全部训练数据过一遍叫 1 个 epoch</td></tr> <tr><td>批量大小</td><td>Batch Size</td><td>一次同时处理多少张图才更新一次参数</td></tr> <tr class="hi"><td>学习率</td><td>Learning Rate</td><td>每次调参数时"步幅"多大</td></tr> <tr><td>损失 / 损失函数</td><td>Loss / Loss Function</td><td>衡量"错得多离谱"的分数，训练就是把它降到最低</td></tr> <tr class="hi"><td>过拟合</td><td>Overfitting</td><td>训练集一直变好、验证集不再变好，说明在背答案</td></tr> <tr><td>数据增强</td><td>Data Augmentation</td><td>人为把训练图变形（翻转、调色、拼接），抗过拟合</td></tr> <tr class="hi"><td>交并比</td><td>IoU (Intersection over Union)</td><td>两个框重叠程度，0 到 1</td></tr> <tr><td>置信度</td><td>Confidence</td><td>模型有多确定这个框是对的，0 到 1</td></tr> <tr class="hi"><td>非极大值抑制</td><td>NMS</td><td>同一个目标被报了多个框时，只留下最好的那个</td></tr> <tr><td>命中 / 误报 / 漏报</td><td>TP / FP / FN</td><td>报对了 / 报了但错 / 该报没报</td></tr> <tr class="hi"><td>精确率</td><td>Precision</td><td>报出来的框里有多少是对的</td></tr> <tr><td>召回率</td><td>Recall</td><td>该报的目标里报出来了多少</td></tr> <tr class="hi"><td>平均精度</td><td>AP (Average Precision)</td><td>单个类的综合成绩，PR 曲线下面积</td></tr> <tr><td>平均精度均值</td><td>mAP (mean AP)</td><td>所有类的 AP 再取平均</td></tr> <tr class="hi"><td>精确率与召回率的调和平均</td><td>F1 Score</td><td>把 P 和 R 合成一个数，用来找最优阈值</td></tr> <tr><td>混淆矩阵</td><td>Confusion Matrix</td><td>模型的"错题本"：错成了什么</td></tr> <tr class="hi"><td>多目标跟踪</td><td>MOT (Multi-Object Tracking)</td><td>给跨帧的同一目标分配固定编号</td></tr> <tr><td>身份切换</td><td>ID Switch</td><td>同一目标被跟踪器当成两个不同编号</td></tr> <tr><td>数据泄漏</td><td>Data Leakage</td><td>测试数据混进了训练集，导致分数虚高</td></tr> <tr class="hi"><td>长尾分布</td><td>Long-tail Distribution</td><td>少数类样本极多、多数类样本极少</td></tr> </table> <!-- ==================== 附录 C ==================== --> <h2 id="a3"><span class="num">C</span>文件地图</h2> <p>项目里有 13 个脚本，分两组。<strong>下面是完整的脚本清单。</strong></p> <h3>第一组 · 数据准备与核查（7 个）</h3> <table> <tr><th style="width:250px">脚本</th><th>干什么</th></tr> <tr><td><code>dataset_config.py</code></td><td><strong>共享配置模块</strong>：自动定位项目根目录、读 data.yaml 拿类别和路径。所有脚本都从这里取，改数据集只需改一处</td></tr> <tr class="hi"><td><code>01_check_dataset.py</code></td><td>结构检查：图片与标签是否一一对应、字段数、类别越界、坐标范围</td></tr> <tr><td><code>02_inspect_label_formats.py</code></td><td>格式普查：按字段数分类，发现有 860 行是另一种格式</td></tr> <tr class="hi"><td><code>03_find_bad_coordinates.py</code></td><td>多边形数值专项排查，确认那些多边形本身没坏</td></tr> <tr><td><code>04_convert_labels_to_detection.py</code></td><td><strong>核心</strong>：多边形 → 最小外接矩形，生成新数据集 + 审计日志</td></tr> <tr class="hi"><td><code>05_validate_detection_dataset.py</code></td><td>转换后验收：六道校验 + 打印每类框数（长尾的直接证据）</td></tr> <tr><td><code>visualize_labels.py</code></td><td>把人工标注画回原图做抽检，<strong>抓到了那处漏标</strong></td></tr> </table> <h3>第二组 · 交付层（6 个）</h3> <table> <tr><th style="width:250px">脚本</th><th>干什么</th></tr> <tr class="hi"><td><code>06_predict.py</code></td><td>统一推理入口：单图 / 目录 / 视频 / 摄像头</td></tr> <tr><td><code>07_make_demo_figure.py</code></td><td>按规则自动挑图，生成"人工标注 vs 模型预测"对照拼图</td></tr> <tr class="hi"><td><code>08_track.py</code></td><td>视频多目标跟踪（ByteTrack），输出带轨迹 ID 的视频与统计</td></tr> <tr><td><code>09_evaluate.py</code></td><td><strong>正式评估</strong>：逐类指标 + 最优阈值 + 混淆矩阵，并自动生成评估报告</td></tr> <tr class="hi"><td><code>benchmark_inference.py</code></td><td>推理性能测试：三档计时口径 + 6 项测量条件</td></tr> <tr><td><code>check_data_leakage.py</code></td><td>数据泄漏三重检查：md5 + 感知哈希 + 时间戳邻域</td></tr> </table> <h3>其余关键文件</h3> <table> <tr><th style="width:330px">路径</th><th>里面是什么</th></tr> <tr class="hi"><td><code>README.md</code></td><td>项目主页：环境安装、数据来源与许可、12 步运行顺序、训练命令、已知的坑</td></tr> <tr><td><code>requirements.txt</code></td><td>固定版本的依赖清单（含"先装 PyTorch 再装其余"的顺序）</td></tr> <tr class="hi"><td><code>LICENSE</code></td><td>代码 MIT；<strong>数据集 CC BY 4.0（须署名）</strong>；权重另有其许可——三者分开写清</td></tr> <tr class="hi"><td><code>docs/label_conversion_report.txt</code></td><td>数据转换审计日志</td></tr> <tr><td><code>docs/inference_benchmark.json</code></td><td>性能实测的原始统计量 + 完整测量条件</td></tr> <tr class="hi"><td><code>docs/data_leakage_report.json</code></td><td>泄漏检查的完整结果</td></tr> <tr><td><code>results/eval_report/evaluation_report.md</code></td><td><strong>评估报告</strong>：结论 + 逐类表 + 能说明什么 / 不能说明什么</td></tr> <tr class="hi"><td><code>results/demo/demo_grid.png</code></td><td>对照拼图（检测完整 / 典型漏检 / 典型误检 三档示例）</td></tr> <tr><td><code>runs/detect/runs/road_baseline/</code></td><td>训练产物：参数快照、逐轮指标、曲线、混淆矩阵、权重</td></tr> </table> <div class="box tip">
+  <span class="t">💡 这张地图的用途</span>
+  <p>13 个脚本分两组：<strong>7 个处理数据</strong>（dataset_config、01–05、visualize_labels），
+  <strong>6 个做交付与核查</strong>（06_predict、07_make_demo_figure、08_track、09_evaluate、
+  benchmark_inference、check_data_leakage），合计约三千多行。</p>
+  <p>工作重点在<strong>数据质量</strong>与<strong>评估方法</strong>这两块。模型用的是现成的迁移学习，
+  真正花功夫的地方是"怎么确认数据是干净的""这个分数到底能不能信"——
+  这两件事的答案，都能在上面这张表里找到对应文件。</p>
 </div>
 <footer class="end">
-  <p><strong>YOLO 道路目标检测 · 项目说明书（零基础版）</strong></p>
-  <p>整理于 2026-10-15 ｜ 对应项目：<code>D:\VC Code\YOLO_Road_Detection</code>（本地 git 仓库，分支 main）</p>
+  <p><strong>YOLO 道路目标检测 · 项目说明书</strong></p>
+  <p>整理于 2026-10-16 ｜ 对应项目：<a href="https://github.com/DOURENCHI/YOLO-road-detection">github.com/DOURENCHI/YOLO-road-detection</a>（分支 main）</p>
   <p style="margin-top:16px">
     <strong>本文档里的每一个数字都来自项目内的实测记录文件</strong>，不是估算、也不是凭记忆写的。对应关系如下：<br>
     · 数据集规模与转换审计 → <code>docs/label_conversion_report.txt</code><br>
@@ -2815,9 +2085,9 @@ python scripts/06_predict.py --source 0</code></pre>
     · 数据泄漏检查 → <code>docs/data_leakage_report.json</code>
   </p>
   <p style="margin-top:16px">
-    <strong>关于文档里"我没做到"的部分：</strong>凡是我无法核实的（如 TensorRT 加速比、C++ 部署、
-    模型结构设计细节），文中均已明确标注为"未做 / 未掌握"，不作任何断言。
-    这不是谦虚，是因为一旦说了不成立的话，后面所有可信的结论都会一起打折。
+    <strong>关于"未做"的部分：</strong>凡是无法核实的内容（如 TensorRT 加速比、C++ 部署、
+    模型结构设计细节），文中均已明确标注为"未做"，不作任何断言。
+    这样做是为了让写出来的每一条结论都能经得起核对——一处不成立，会连带削弱其余结论的可信度。
   </p>
   <p style="margin-top:16px">
     配套文档：<code>YOLO_Road_Detection_代码解析.html</code>（按文件组织的逐行代码解读，约 2.3 MB）。

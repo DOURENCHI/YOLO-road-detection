@@ -151,7 +151,7 @@ def plot_confusion_matrix(matrix, class_names, gt_counts, out_path: Path):
     """
     画归一化混淆矩阵。
 
-    有两件事必须先说清楚，因为这两处我都做错过（记录下来免得再踩）：
+    有两件事必须先说清楚，因为这两处都很容易写错：
 
     1) 矩阵的约定是 matrix[预测类别, 人工标注类别] —— **行是预测、列是标注**。
        Ultralytics 源码里的三行注释就是全部证据：
@@ -165,7 +165,7 @@ def plot_confusion_matrix(matrix, class_names, gt_counts, out_path: Path):
 
        ⚠️ 千万别按行归一化。评估时 conf 会设得很低（0.001，为了把 PR 曲线算全），
        这会产生海量低分误报，按行归一化会让"背景"那一列吃掉几乎所有格子，
-       整张图除了最后一列全是零 —— 我就交过这么一版。
+       整张图除了最后一列全是零 —— 按行归一化就会得到这个结果。
     """
     from matplotlib import pyplot as plt
     import numpy as np
@@ -441,7 +441,7 @@ def main() -> int:
     add("图见 `fig_per_class_ap.png`。")
     add("")
 
-    # 小样本类别必须单独拿出来说。把 AP=0 直接写进结论，是最容易被面试官一句话问倒的地方。
+    # 小样本类别必须单独拿出来说。把 AP=0 直接写进结论，是这个项目里最容易把结论下错的地方。
     tiny = [r for r in per_class if r["gt_boxes"] <= 5]
     if tiny:
         add("### 小样本类别要单独看")
