@@ -1,7 +1,7 @@
 # YOLO 道路目标检测项目
 
-**在线演示页**：https://dourenchi.github.io/YOLO_Road_Detection/
-**项目说明书**（零基础版，点开即读）：https://dourenchi.github.io/YOLO_Road_Detection/manual.html
+**在线演示页**：https://dourenchi.github.io/YOLO-road-detection/
+**项目说明书**（零基础版，点开即读）：https://dourenchi.github.io/YOLO-road-detection/manual.html
 
 不用下载仓库，点开链接就能看检测效果、逐类评估结果和完整的项目讲解。
 
@@ -525,8 +525,8 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 
 **在线版**（不用下载仓库，点开就能看）：
 
-- 演示页 —— https://dourenchi.github.io/YOLO_Road_Detection/
-- 项目说明书（零基础版）—— https://dourenchi.github.io/YOLO_Road_Detection/manual.html
+- 演示页 —— https://dourenchi.github.io/YOLO-road-detection/
+- 项目说明书（零基础版）—— https://dourenchi.github.io/YOLO-road-detection/manual.html
 
 这两份由 `site/` 目录发布；push 到 `main` 之后由 `.github/workflows/pages.yml` 自动更新，
 所以在线版永远和仓库里的内容一致，不需要手动同步。
