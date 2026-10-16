@@ -29,6 +29,11 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # 仓库首次部署时自动启用 Pages（需要 workflow 顶层声明 pages: write）。
+          # 如果仓库策略不允许 token 自行启用，就需要手动到
+          # Settings -> Pages -> Source 选 "GitHub Actions"，之后本步骤即可通过。
+          enablement: true
 
       - name: Upload site/ as Pages artifact
         uses: actions/upload-pages-artifact@v3
