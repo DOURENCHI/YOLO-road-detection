@@ -23,25 +23,34 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.pages.outcome == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 仓库首次使用本工作流时，Pages 还没启用，这一步会失败。
+      # 这里不让它中断整个流程，而是在下面给出明确的提示，
+      # 否则 Actions 页面会一直是一片红色 ✗，看不出真正的原因。
       - name: Setup Pages
+        id: pages
         uses: actions/configure-pages@v5
-        with:
-          # 仓库首次部署时自动启用 Pages（需要 workflow 顶层声明 pages: write）。
-          # 如果仓库策略不允许 token 自行启用，就需要手动到
-          # Settings -> Pages -> Source 选 "GitHub Actions"，之后本步骤即可通过。
-          enablement: true
+        continue-on-error: true
+
+      - name: 提示：Pages 尚未启用
+        if: steps.pages.outcome != 'success'
+        run: |
+          echo "::warning title=Pages 尚未启用::请到仓库 Settings -> Pages，把 Source 选为 'GitHub Actions'，然后重新运行本工作流。开启之后，以后每次改动 site/ 都会自动更新在线版。"
 
       - name: Upload site/ as Pages artifact
+        if: steps.pages.outcome == 'success'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
     needs: build
+    if: needs.build.outputs.ready == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

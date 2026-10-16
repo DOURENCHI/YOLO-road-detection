@@ -531,6 +531,13 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 这两份由 `site/` 目录发布；push 到 `main` 之后由 `.github/workflows/pages.yml` 自动更新，
 所以在线版永远和仓库里的内容一致，不需要手动同步。
 
+> **站点部署（只需做一次）**：仓库启用 Pages 这一步只能人工完成，工作流自己没有这个权限。
+> 到 Settings → Pages，把 **Source** 选成 **GitHub Actions**；之后每次改动 `site/` 都会自动发布。
+> 在启用之前，工作流会跑通但给出一条 `Pages 尚未启用` 的提示，不会报错。
+>
+> 站点结构：`site/index.html`（演示页）、`site/manual.html`（说明书）、`site/media/`（图表与视频）。
+> 本地想预览，直接在浏览器里打开 `site/index.html` 即可——全部用相对路径，不需要起服务器。
+
 **《项目说明书》**（零基础版）按「是什么 → 为什么 → 怎么做 → 结果怎样 → 局限在哪 → 面试怎么讲」
 组织，从零建立八个核心概念（检测框、损失函数、IoU、精确率/召回率、mAP、过拟合……）。
 每个概念都配了生活类比、本项目的真实数字，以及“被问到该怎么答”的说法。
