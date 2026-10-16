@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YOLO 道路场景多类别目标检测 · 项目演示</title>
+<meta name="description" content="基于 YOLO26n 的道路场景 12 类目标检测项目：814 张标注图像，测试集 mAP50 0.680，单张端到端 16.4 ms。数据检查 → 标注统一 → 训练 → 评估 → 演示，全链路可复现。">
+<meta property="og:title" content="YOLO 道路场景多类别目标检测 · 项目演示">
+<meta property="og:description" content="814 张标注图像 / 12 类目标 / 测试集 mAP50 0.680 / 单张 16.4 ms。完整的数据检查、训练、评估与演示链路。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="media/demo_grid.jpg">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --ink:#1a1d21; --ink2:#4b5563; --ink3:#7a8290;
+  --line:#e6e8ec; --line2:#f0f2f5;
+  --blue:#1d4ed8; --blue2:#2563eb; --blue-bg:#eef3ff; --blue-line:#c7d8ff;
+  --green:#15803d; --green-bg:#f0f9eb; --green-line:#c9e9b0;
+  --amber:#a16207; --amber-bg:#fff9e9; --amber-line:#f2dfa8;
+  --red:#b91c1c; --red-bg:#fef3f2; --red-line:#f7c9c4;
+  --violet:#6d28d9; --violet-bg:#f5f0ff; --violet-line:#ddd2ff;
+  --code-bg:#f4f6f8; --code-line:#e3e7ec;
+  --mono:"Cascadia Mono","JetBrains Mono",Consolas,"Courier New",monospace;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -12px rgba(16,24,40,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
+  font-size:15.5px;line-height:1.75;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;background:rgba(255,255,255,.86);
+  backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line);
+}
+.topbar .inner{max-width:1080px;margin:0 auto;padding:0 22px;height:58px;display:flex;align-items:center;gap:18px}
+.brand{font-weight:700;font-size:14.5px;letter-spacing:.2px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.brand .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-bg)}
+.tnav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.tnav::-webkit-scrollbar{display:none}
+.tnav a{
+  padding:6px 10px;border-radius:7px;font-size:13.5px;color:var(--ink2);white-space:nowrap;
+}
+.tnav a:hover{background:var(--line2);text-decoration:none;color:var(--ink)}
+.tnav a.on{background:var(--blue-bg);color:var(--blue);font-weight:600}
+.tbtn{
+  padding:6px 13px;border-radius:8px;background:var(--ink);color:#fff!important;font-size:13px;
+  font-weight:600;white-space:nowrap;border:1px solid var(--ink);
+}
+.tbtn:hover{text-decoration:none;opacity:.88}
+@media(max-width:820px){.tnav{display:none}}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+/* ---------- Hero ---------- */
+.hero{padding:54px 0 40px}
+.pill{
+  display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;
+  background:var(--green-bg);border:1px solid var(--green-line);color:var(--green);
+  font-size:12.5px;font-weight:600;letter-spacing:.2px;
+}
+.pill .d{width:6px;height:6px;border-radius:50%;background:var(--green)}
+h1{font-size:40px;line-height:1.24;margin:18px 0 10px;letter-spacing:-.6px;font-weight:800}
+@media(max-width:700px){h1{font-size:29px}}
+.sub{font-family:var(--mono);font-size:14px;color:var(--ink3);margin:0 0 20px}
+.lede{font-size:16.5px;color:var(--ink2);max-width:760px;margin:0 0 24px}
+.lede strong{color:var(--ink);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.tags span{
+  padding:5px 11px;border-radius:7px;background:var(--panel);border:1px solid var(--line);
+  font-size:13px;color:var(--ink2);font-family:var(--mono)
+}
+.cta{display:flex;flex-wrap:wrap;gap:11px}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:10px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:14.5px;
+  font-weight:600;box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s;
+}
+.btn:hover{text-decoration:none;transform:translateY(-1px);box-shadow:0 4px 14px -6px rgba(16,24,40,.22)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:36px 0 8px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 14px;box-shadow:var(--shadow)}
+.kpi .v{font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.5px;line-height:1.2}
+.kpi .v small{font-size:12.5px;font-weight:600;color:var(--ink3);margin-left:2px;letter-spacing:0}
+.kpi .l{font-size:12.5px;color:var(--ink3);margin-top:5px;line-height:1.45}
+.kpi.b .v{color:var(--blue)} .kpi.g .v{color:var(--green)} .kpi.a .v{color:var(--amber)}
+
+/* ---------- 章节 ---------- */
+section{padding:44px 0;border-top:1px solid var(--line);scroll-margin-top:74px}
+h2{font-size:25px;margin:0 0 6px;letter-spacing:-.3px;font-weight:750;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+h2 .en{font-family:var(--mono);font-size:12.5px;color:var(--ink3);font-weight:500;letter-spacing:0}
+h3{font-size:17px;margin:30px 0 10px;font-weight:700}
+.secnote{color:var(--ink2);margin:0 0 22px;max-width:800px}
+figure{margin:22px 0}
+figure img{border:1px solid var(--line);border-radius:12px;background:#fff}
+figcaption{font-size:13px;color:var(--ink3);margin-top:9px;line-height:1.6}
+figcaption strong{color:var(--ink2)}
+
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line2)}
+th{background:var(--line2);font-size:12.5px;color:var(--ink2);font-weight:600;white-space:nowrap;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafbfc}
+td.num,th.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+.bar{display:inline-block;height:7px;border-radius:4px;background:var(--blue);vertical-align:middle;min-width:2px}
+.bar.warn{background:var(--amber)} .bar.bad{background:var(--red)} .bar.ok{background:var(--green)}
+
+/* ---------- 卡片 ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:800px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:17px 18px;box-shadow:var(--shadow)}
+.card h4{margin:0 0 7px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px}
+.card p{margin:0;font-size:14px;color:var(--ink2)}
+.card .n{
+  width:21px;height:21px;border-radius:6px;background:var(--blue-bg);color:var(--blue);
+  font-size:12px;font-family:var(--mono);display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none
+}
+.box{border-radius:12px;padding:15px 17px;border:1px solid;font-size:14.3px;margin:18px 0}
+.box .t{font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.box p{margin:0}
+.box p+p{margin-top:7px}
+.box.blue{background:var(--blue-bg);border-color:var(--blue-line)}
+.box.blue .t{color:var(--blue)}
+.box.green{background:var(--green-bg);border-color:var(--green-line)}
+.box.green .t{color:var(--green)}
+.box.amber{background:var(--amber-bg);border-color:var(--amber-line)}
+.box.amber .t{color:var(--amber)}
+.box.red{background:var(--red-bg);border-color:var(--red-line)}
+.box.red .t{color:var(--red)}
+
+/* ---------- 画廊 ---------- */
+.gal{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+@media(max-width:760px){.gal{grid-template-columns:repeat(2,1fr)}}
+.gal img{
+  border:1px solid var(--line);border-radius:9px;cursor:zoom-in;background:#fff;
+  transition:transform .14s,box-shadow .14s
+}
+.gal img:hover{transform:translateY(-2px) scale(1.012);box-shadow:0 8px 22px -10px rgba(16,24,40,.3)}
+
+/* ---------- 代码 ---------- */
+pre{
+  background:var(--code-bg);border:1px solid var(--code-line);border-radius:10px;
+  padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.8px;line-height:1.72;margin:14px 0
+}
+code{font-family:var(--mono);font-size:.93em;background:var(--code-bg);border:1px solid var(--code-line);padding:1px 5px;border-radius:5px}
+pre code{background:none;border:none;padding:0;font-size:inherit}
+
+/* ---------- 视频 ---------- */
+video{width:100%;max-width:640px;border:1px solid var(--line);border-radius:12px;background:#000;display:block}
+
+/* ---------- 页脚 ---------- */
+footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--ink3);font-size:13.3px}
+footer strong{color:var(--ink2)}
+footer .row{display:flex;flex-wrap:wrap;gap:9px 20px;margin-top:9px}
+footer .row a{color:var(--ink2)}
+
+/* ---------- 放大 ---------- */
+.lb{
+  position:fixed;inset:0;background:rgba(12,15,20,.9);z-index:200;display:none;
+  align-items:center;justify-content:center;padding:26px;cursor:zoom-out
+}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lb .x{position:absolute;top:16px;right:20px;color:#fff;font-size:26px;line-height:1;opacity:.75}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <div class="brand"><span class="dot"></span>YOLO 道路场景检测</div>
+    <nav class="tnav">
+      <a href="#what">项目概览</a>
+      <a href="#demo">检测效果</a>
+      <a href="#eval">评估结果</a>
+      <a href="#errors">错误分析</a>
+      <a href="#perf">性能</a>
+      <a href="#track">跟踪</a>
+      <a href="#eng">工程</a>
+      <a href="#honest">边界</a>
+    </nav>
+    <a class="tbtn" href="manual.html">说明书</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="pill"><span class="d"></span>测试集结果已产出 · 全链路可复现</span>
+    <h1>YOLO 道路场景多类别目标检测</h1>
+    <p class="sub">Road-Scene Multi-Class Object Detection &nbsp;·&nbsp; YOLO26n &nbsp;·&nbsp; PyTorch &nbsp;·&nbsp; Ultralytics</p>
+    <p class="lede">把「数据检查 → 标注统一 → 训练 → 评估 → 演示」完整走通的道路场景目标检测项目。重点不只是把模型训出来，而是让整条链路<strong>可复现、可追溯、每个结论都标清成立的边界</strong>。</p>
+    <div class="tags">
+      <span>12 类目标</span><span>814 张标注图像</span><span>3,165 个标注框</span>
+      <span>测试集 mAP50 0.680</span><span>单张 16.4 ms</span>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="manual.html">在线读项目说明书 →</a>
+      <a class="btn" href="https://github.com/DOURENCHI/YOLO_Road_Detection">查看源码仓库</a>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi b"><div class="v">12<small>类</small></div><div class="l">检测目标类别</div></div>
+    <div class="kpi"><div class="v">814<small>张</small></div><div class="l">标注图像 / 3,165 框</div></div>
+    <div class="kpi g"><div class="v">0.680</div><div class="l">测试集 mAP50</div></div>
+    <div class="kpi g"><div class="v">0.423</div><div class="l">测试集 mAP50-95</div></div>
+    <div class="kpi b"><div class="v">16.4<small>ms</small></div><div class="l">单张端到端（FP32）</div></div>
+    <div class="kpi"><div class="v">2.39<small>M</small></div><div class="l">模型参数量</div></div>
+  </div>
+</div>
+
+<!-- ==================== 1 项目概览 ==================== -->
+<section id="what"><div class="wrap">
+  <h2>项目概览 <span class="en">Overview</span></h2>
+  <p class="secnote">一条六个站点的链路。每一站都有对应的脚本，每个脚本都会打印可核对的数字——而不是只给一个结果。</p>
+
+  <figure>
+  <svg viewBox="0 0 1010 152" role="img" aria-label="项目流水线：数据检查 → 标注统一 → 数据验收 → 训练 → 评估 → 演示与交付">
+    <defs>
+      <marker id="ar" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto">
+        <path d="M0,0 L8,4 L0,8 z" fill="#c7d8ff"/>
+      </marker>
+    </defs>
+    <g font-family="Segoe UI, Microsoft YaHei, sans-serif">
+      <!-- 连接线 -->
+      <g stroke="#c7d8ff" stroke-width="2" marker-end="url(#ar)">
+        <line x1="152" y1="62" x2="172" y2="62"/>
+        <line x1="316" y1="62" x2="336" y2="62"/>
+        <line x1="480" y1="62" x2="500" y2="62"/>
+        <line x1="644" y1="62" x2="664" y2="62"/>
+        <line x1="808" y1="62" x2="828" y2="62"/>
+      </g>
+
+      <g>
+        <rect x="10" y="30" width="142" height="64" rx="11" fill="#eef3ff" stroke="#c7d8ff"/>
+        <text x="81" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">数据检查</text>
+        <text x="81" y="75" text-anchor="middle" font-size="11.5" fill="#4b5563">配对 / 格式 / 数值</text>
+      </g>
+      <g>
+        <rect x="174" y="30" width="142" height="64" rx="11" fill="#eef3ff" stroke="#c7d8ff"/>
+        <text x="245" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">标注统一</text>
+        <text x="245" y="75" text-anchor="middle" font-size="11.5" fill="#4b5563">多边形 → 矩形框</text>
+      </g>
+      <g>
+        <rect x="338" y="30" width="142" height="64" rx="11" fill="#eef3ff" stroke="#c7d8ff"/>
+        <text x="409" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">数据验收</text>
+        <text x="409" y="75" text-anchor="middle" font-size="11.5" fill="#4b5563">三划分 + 分布</text>
+      </g>
+      <g>
+        <rect x="502" y="30" width="142" height="64" rx="11" fill="#f5f0ff" stroke="#ddd2ff"/>
+        <text x="573" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#6d28d9">训练</text>
+        <text x="573" y="75" text-anchor="middle" font-size="11.5" fill="#4b5563">50 轮 · 11 分钟</text>
+      </g>
+      <g>
+        <rect x="666" y="30" width="142" height="64" rx="11" fill="#f0f9eb" stroke="#c9e9b0"/>
+        <text x="737" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#15803d">评估</text>
+        <text x="737" y="75" text-anchor="middle" font-size="11.5" fill="#4b5563">测试集 · 只用一次</text>
+      </g>
+      <g>
+        <rect x="830" y="30" width="170" height="64" rx="11" fill="#fff9e9" stroke="#f2dfa8"/>
+        <text x="915" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#a16207">演示与交付</text>
+        <text x="915" y="75" text-anchor="middle" font-size="11.5" fill="#4b5563">推理 / 跟踪 / 仓库</text>
+      </g>
+
+      <text x="81" y="118" text-anchor="middle" font-size="11" fill="#7a8290">01–03 号脚本</text>
+      <text x="245" y="118" text-anchor="middle" font-size="11" fill="#7a8290">04 号脚本</text>
+      <text x="409" y="118" text-anchor="middle" font-size="11" fill="#7a8290">05 号脚本</text>
+      <text x="573" y="118" text-anchor="middle" font-size="11" fill="#7a8290">Ultralytics</text>
+      <text x="737" y="118" text-anchor="middle" font-size="11" fill="#7a8290">09 号脚本</text>
+      <text x="915" y="118" text-anchor="middle" font-size="11" fill="#7a8290">06 / 07 / 08 号脚本</text>
+    </g>
+  </svg>
+  <figcaption><strong>图 1 · 六站流水线。</strong>前四站决定模型能学到什么，后两站决定结论能不能被验证。</figcaption>
+  </figure>
+
+  <div class="grid3">
+    <div class="card">
+      <h4><span class="n">1</span>数据是七成功夫</h4>
+      <p>原始标注里混着两种格式——矩形框和多边形，必须统一。统一后又做了三层体检和人眼抽检，抽检当场抓到一处漏标。</p>
+    </div>
+    <div class="card">
+      <h4><span class="n">2</span>结论要带条件</h4>
+      <p>「延迟 16.4 ms」必须连同硬件、输入尺寸、预热次数、计时方式、精度模式一起说。换个测法能差 1.45 倍。</p>
+    </div>
+    <div class="card">
+      <h4><span class="n">3</span>先划边界再下结论</h4>
+      <p>总体 mAP 不代表每一类都可靠。有一个类在测试集只有 1 个标注框，它的 AP 是 0——这个 0 不能当结论用。</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ==================== 2 检测效果 ==================== -->
+<section id="demo"><div class="wrap">
+  <h2>检测效果 <span class="en">Detections</span></h2>
+  <p class="secnote">下面这张对照图不是挑好看的——是按规则自动选出来的三档：<strong>检测完整</strong>（漏检 0、误检 0）、<strong>典型漏检</strong>、<strong>典型误检</strong>。挑图规则写在 <code>07_make_demo_figure.py</code> 里。</p>
+
+  <figure>
+    <img src="media/demo_grid.jpg" alt="人工标注 vs 模型预测对照图：三档各两张，绿框为正确检出、黄框为漏检、紫框为误检" data-zoom>
+    <figcaption><strong>图 2 · 人工标注 vs 模型预测。</strong>绿框 = 该报的报出来了；黄框 = 漏检（有标注、模型没报）；紫框 = 误检（模型报了、没有对应标注）。数据：验证集 187 张，阈值 conf=0.25，判定 IoU≥0.5。整体 TP 686 / FP 218 / FN 153。</figcaption>
+  </figure>
+
+  <h3>单图推理结果</h3>
+  <p class="secnote">下面 8 张是 <code>06_predict.py</code> 跑出来的真实输出，平均每张 9.3 ms，共检出 30 个目标（traffic lights 10 / vehicles 18 / chimneys 2）。点开可放大。</p>
+  <div class="gal">
+    <img src="media/det/01.jpg" alt="检测结果 1" loading="lazy" data-zoom>
+    <img src="media/det/02.jpg" alt="检测结果 2" loading="lazy" data-zoom>
+    <img src="media/det/03.jpg" alt="检测结果 3" loading="lazy" data-zoom>
+    <img src="media/det/04.jpg" alt="检测结果 4" loading="lazy" data-zoom>
+    <img src="media/det/05.jpg" alt="检测结果 5" loading="lazy" data-zoom>
+    <img src="media/det/06.jpg" alt="检测结果 6" loading="lazy" data-zoom>
+    <img src="media/det/07.jpg" alt="检测结果 7" loading="lazy" data-zoom>
+    <img src="media/det/08.jpg" alt="检测结果 8" loading="lazy" data-zoom>
+  </div>
+</div></section>
+
+<!-- ==================== 3 评估结果 ==================== -->
+<section id="eval"><div class="wrap">
+  <h2>评估结果 <span class="en">Evaluation</span></h2>
+  <p class="secnote">以下全部是<strong>测试集（133 张）</strong>的数字。测试集只在所有方案定稿后使用一次，用来避免「反复按测试结果挑方案」。训练时的模型选择用的是验证集。</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>指标</th><th class="num">数值</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><strong>mAP50</strong></td><td class="num"><strong>0.6797</strong></td><td>IoU 阈值 0.5 下的平均精度，最常被引用的单一指标</td></tr>
+        <tr><td><strong>mAP50-95</strong></td><td class="num"><strong>0.4228</strong></td><td>IoU 从 0.5 到 0.95 共 10 档取平均，更严格，对框的贴合度敏感</td></tr>
+        <tr><td>精确率 Precision</td><td class="num">0.7865</td><td>报出来的框里，有多少是对的</td></tr>
+        <tr><td>召回率 Recall</td><td class="num">0.6267</td><td>该报的目标里，报出来了多少</td></tr>
+        <tr><td>最优置信度阈值</td><td class="num">0.30</td><td>该阈值下平均 F1 最高（0.6536）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box amber">
+    <div class="t">⚠ 两个容易说错的数字口径</div>
+    <p><strong>① 验证集和测试集不是一回事。</strong>验证集 187 张上 mAP50 是 0.641，测试集 133 张上是 0.680。两个划分的图片不同，本来就不该相等——引用时必须说清是哪个划分。</p>
+    <p><strong>② 这个结果不能用来宣称「完成了自动驾驶感知系统」。</strong>这是 12 类、814 张图的公开数据集，既不是车载量产数据，也没有做 3D 感知、多传感器融合和时序建模。</p>
+  </div>
+
+  <figure>
+    <img src="media/per_class_ap.png" alt="逐类 AP50 柱状图：fire hydrants 0.949 最高，bridges 0.000 最低" data-zoom>
+    <figcaption><strong>图 3 · 逐类 AP50（测试集）。</strong>最好的类 0.949，最差的类 0.000。总体 mAP 会把这些差异平均掉，所以逐类结果才是能看出问题的地方。</figcaption>
+  </figure>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>类别</th><th class="num">AP50</th><th class="num">mAP50-95</th><th class="num">训练框</th><th class="num">测试框</th><th style="min-width:180px">AP50 相对水平</th></tr></thead>
+      <tbody>
+        <tr><td>fire hydrants 消防栓</td><td class="num">0.9493</td><td class="num">0.6269</td><td class="num">60</td><td class="num">23</td><td><span class="bar ok" style="width:95%"></span></td></tr>
+        <tr><td>motorcycles 摩托</td><td class="num">0.8646</td><td class="num">0.4917</td><td class="num">158</td><td class="num">30</td><td><span class="bar ok" style="width:86%"></span></td></tr>
+        <tr><td>stairs 台阶</td><td class="num">0.8477</td><td class="num">0.4466</td><td class="num">32</td><td class="num">6</td><td><span class="bar ok" style="width:85%"></span></td></tr>
+        <tr><td>vehicles 车辆</td><td class="num">0.8441</td><td class="num">0.5223</td><td class="num">763</td><td class="num">209</td><td><span class="bar" style="width:84%"></span></td></tr>
+        <tr><td>traffic lights 信号灯</td><td class="num">0.8102</td><td class="num">0.3979</td><td class="num">459</td><td class="num">129</td><td><span class="bar" style="width:81%"></span></td></tr>
+        <tr><td>crosswalks 人行横道</td><td class="num">0.7725</td><td class="num">0.4277</td><td class="num">157</td><td class="num">81</td><td><span class="bar" style="width:77%"></span></td></tr>
+        <tr><td>buses 公交</td><td class="num">0.7327</td><td class="num">0.5803</td><td class="num">88</td><td class="num">12</td><td><span class="bar" style="width:73%"></span></td></tr>
+        <tr><td>bicycles 自行车</td><td class="num">0.6787</td><td class="num">0.3502</td><td class="num">46</td><td class="num">22</td><td><span class="bar" style="width:68%"></span></td></tr>
+        <tr><td>taxis 出租</td><td class="num">0.6347</td><td class="num">0.5418</td><td class="num">14</td><td class="num">4</td><td><span class="bar warn" style="width:63%"></span></td></tr>
+        <tr><td>chimneys 烟囱</td><td class="num">0.3426</td><td class="num">0.2650</td><td class="num">19</td><td class="num">5</td><td><span class="bar bad" style="width:34%"></span></td></tr>
+        <tr><td>bridges 桥梁</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">7</td><td class="num">1</td><td><span class="bar bad" style="width:1%"></span></td></tr>
+        <tr><td>tractors 拖拉机</td><td class="num">—</td><td class="num">—</td><td class="num">1</td><td class="num">0</td><td style="color:var(--ink3);font-size:12.5px">测试集无标注，不参与评估</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box blue">
+    <div class="t">这张表里最值得注意的一行</div>
+    <p><strong>bridges 的 AP50 是 0，但它不能当结论用。</strong>这个类在训练集只有 7 个框、在测试集只有 <strong>1 个</strong>标注框。模型没检出来，AP 就是 0。它的意思是「这一个框没对上」，不是「模型认不出桥」——换一次划分就可能变成 1.0 或 0.5。</p>
+    <p>同样，<strong>tractors 在测试集里一个标注都没有</strong>，所以它根本不参与评估。这是「没考」，不是「考了 0 分」。把这两行如实标出来，比报一个好看的总体数字更重要。</p>
+  </div>
+</div></section>
+
+<!-- ==================== 4 错误分析 ==================== -->
+<section id="errors"><div class="wrap">
+  <h2>错误分析 <span class="en">Error Analysis</span></h2>
+  <p class="secnote">总体指标回答「有多好」，混淆矩阵回答「错在哪、错成什么」。矩阵按<strong>列</strong>归一化：每一列表示「这一类的标注，被预测成了哪些类」。</p>
+
+  <figure>
+    <img src="media/confusion_matrix.png" alt="归一化混淆矩阵：对角线为正确识别，非对角线为混淆" data-zoom>
+    <figcaption><strong>图 4 · 归一化混淆矩阵（测试集）。</strong>看两件事就够：对角线够不够亮、最亮的非对角格是哪一个。横轴标签下注明了每一类的标注框数——框数越少的类，它的那一格越不能当真。</figcaption>
+  </figure>
+
+  <h3>人眼抽检抓到的问题</h3>
+  <p class="secnote">格式检查只能证明「标签符合程序规定的格式」，证明不了「每个框都框对了目标」。所以另写了一个脚本把标签画回原图做人工抽检。第一轮抽检就抓到一处漏标：</p>
+
+  <figure>
+    <img src="media/empty_label.jpg" alt="空标签核对：画面里有一辆载两人的摩托车，但标签文件是 0 框" data-zoom>
+    <figcaption><strong>图 5 · 抽检抓到的漏标证据。</strong>这是脚本自动挑出来的「空标签核对」图。画面中下部明显有一辆载两人的摩托车在横穿路口，而标签文件是 <strong>0 框</strong>。而类别表里第 6 类就叫 <code>motorcycles</code>——格式检查放它过去了，人眼一看就发现。</figcaption>
+  </figure>
+
+  <div class="box green">
+    <div class="t">✓ 这件事的结论</div>
+    <p><strong>格式合法 ≠ 标注正确。</strong>自动化检查能覆盖「结构」和「数值范围」，覆盖不了「语义」。所以数据验收必须留一步人工抽检，而且抽检要能被复现（同一个脚本、同一组参数、同一批图）。</p>
+  </div>
+
+  <h3>长尾分布</h3>
+  <p class="secnote">12 个类的样本量极不均衡：最多的 <code>vehicles</code> 有 763 个框，最少的 <code>tractors</code> 只有 <strong>1 个框</strong>，相差 763 倍。这个分布直接解释了上面逐类 AP 的差距。</p>
+
+  <div class="box amber">
+    <div class="t">⚠ 但没有做「改进实验」</div>
+    <p>我知道它为什么学不会（样本太少），也知道该往哪改（重采样 / 类别加权 / 补数据），但<strong>没有做这个对照实验</strong>。所以这里只记录「发现 → 定位 → 未解决」，不写「改进后提升多少」。把没做的事说成做了，比不写更糟。</p>
+  </div>
+</div></section>
+
+<!-- ==================== 5 性能 ==================== -->
+<section id="perf"><div class="wrap">
+  <h2>推理性能 <span class="en">Benchmark</span></h2>
+  <p class="secnote">「延迟 xx ms」这句话不加条件是没有意义的。同一份权重、同一张图，换个测法就能差一倍以上。下面每个数字都带完整条件。</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>测量条件</th><th>取值</th></tr></thead>
+      <tbody>
+        <tr><td>硬件</td><td>NVIDIA GeForce RTX 5060 Laptop GPU，8 GB 显存（sm_120）</td></tr>
+        <tr><td>输入尺寸</td><td>640×640（letterbox 填充）</td></tr>
+        <tr><td>预热次数</td><td>单张 30 次 / 批量 6 次</td></tr>
+        <tr><td>样本量</td><td>单张 n=200 / 批量 n=50（批大小 8）</td></tr>
+        <tr><td>计时方式</td><td>纯前向用 CUDA Event；端到端用 <code>perf_counter</code> + <code>cuda.synchronize()</code></td></tr>
+        <tr><td>精度模式</td><td>FP32 与 FP16 各测两轮，四个进程分开启动</td></tr>
+        <tr><td>机器状态</td><td>空闲（没有并行任务）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tw" style="margin-top:16px">
+    <table>
+      <thead><tr><th>口径</th><th class="num">FP32 第 1 轮</th><th class="num">FP32 第 2 轮</th><th class="num">FP16 第 1 轮</th><th class="num">FP16 第 2 轮</th></tr></thead>
+      <tbody>
+        <tr><td>端到端 · 单张（均值）</td><td class="num">16.39</td><td class="num">16.45</td><td class="num">17.84</td><td class="num">27.97</td></tr>
+        <tr><td>端到端 · 批量 8（每张）</td><td class="num">8.76</td><td class="num">7.81</td><td class="num">6.53</td><td class="num">8.02</td></tr>
+        <tr><td>纯 GPU 前向（中位）</td><td class="num">15.78</td><td class="num">13.76</td><td class="num">19.46</td><td class="num">21.57</td></tr>
+        <tr><td>吞吐（批量 8）</td><td class="num">114 FPS</td><td class="num">128 FPS</td><td class="num">153 FPS</td><td class="num">125 FPS</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:13px;color:var(--ink3);margin-top:9px">单位：毫秒。冷启动（进程内第一次推理，含 CUDA kernel 编译）约 34–43 秒，属于一次性开销。</p>
+
+  <div class="grid2" style="margin-top:20px">
+    <div class="box blue" style="margin:0">
+      <div class="t">FP32 单张 16.4 ms</div>
+      <p>两轮测量完全一致（16.39 / 16.45），所以这个数是可信的。批量 8 时每张约 8 ms，<strong>吞吐提升约 2 倍</strong>——批量化才是真正的提速手段。</p>
+    </div>
+    <div class="box amber" style="margin:0">
+      <div class="t">FP16 没有稳定收益</div>
+      <p>两轮差了 57%（17.84 / 27.97）。<strong>我没有做 profiling，所以不解释原因</strong>，只说现象：在这台机器上 FP16 单张没有稳定收益，批量下两者才接近。可以直接在页面上说「不许说 FP16 一般能快 2 倍」。</p>
+    </div>
+  </div>
+
+  <div class="box red">
+    <div class="t">⚠ 这里有一份被我推翻的旧数据</div>
+    <p>第一版测出来的是单张 <strong>23.7 ms</strong>。后来复现不出来，查下来是：测的时候机器正在并行跑文档渲染，而且每组只测了一次、一个进程连跑 1200 多次推理（笔记本持续降频）。</p>
+    <p>空闲状态重测只有 16.4 ms——<strong>第一版比真实值高了 45%</strong>。所以我又做了一次顺序平衡的重复实验（每档两轮、四个进程分开启动），才有了上面这张表。<strong>报出来的每个数字，都补上了「机器是否空闲」和「测了几轮」这两个条件。</strong></p>
+  </div>
+
+  <figure>
+    <img src="media/f1_curve.png" alt="F1 曲线随置信度阈值变化，峰值出现在约 0.30" data-zoom>
+    <figcaption><strong>图 6 · F1 随置信度阈值变化。</strong>峰值出现在 conf≈0.30（平均 F1 0.654）。这个值和 Ultralytics 的默认值 0.25 接近但不相同——说明默认值在这个数据集上基本够用，但没有被当成「调过了」来宣传。</figcaption>
+  </figure>
+</div></section>
+
+<!-- ==================== 6 跟踪 ==================== -->
+<section id="track"><div class="wrap">
+  <h2>多目标跟踪 <span class="en">Tracking</span></h2>
+  <p class="secnote">用 Ultralytics 内置的 ByteTrack 做视频跟踪：120 帧逐帧检测出 373 个框，收敛成 <strong>4 条轨迹</strong>，其中 3 条跟满全程、1 条在第 13 帧出画面后丢失。</p>
+
+  <figure>
+    <video controls preload="metadata" poster="media/track_poster.jpg" src="media/track.mp4"></video>
+    <figcaption><strong>视频 1 · 跟踪输出。</strong>框上标注了轨迹 ID。这段素材是<strong>合成的</strong>——见下面的说明。</figcaption>
+  </figure>
+
+  <div class="box amber">
+    <div class="t">⚠ 这段演示素材要说清楚</div>
+    <p><strong>数据集本身不支持跟踪演示。</strong>814 张图按时间戳排序后，相邻两张的<strong>最小间隔是 1.09 秒</strong>，普遍在 4.8–5.5 秒——它是一套「约 5 秒抽一帧」的快照集，不是视频抽帧。拿它硬做跟踪，目标早跑出画面了，ID 会疯狂新建。</p>
+    <p>所以这段视频是用<strong>一张真实道路图合成的缓慢平移片段</strong>，用来验证跟踪链路本身是通的（检测 → 关联 → 轨迹 ID）。<strong>它是链路验证，不是效果演示。</strong>要真正展示跟踪效果，需要另外录一段真实道路视频。</p>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>跟踪统计</th><th class="num">数值</th></tr></thead>
+      <tbody>
+        <tr><td>处理帧数</td><td class="num">120</td></tr>
+        <tr><td>逐帧检测框总数</td><td class="num">373</td></tr>
+        <tr><td>轨迹总数</td><td class="num">4</td></tr>
+        <tr><td>只出现 1 帧的轨迹</td><td class="num">0</td></tr>
+        <tr><td>轨迹寿命（中位）</td><td class="num">120 帧</td></tr>
+        <tr><td>处理总耗时</td><td class="num">5.69 s</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></section>
+
+<!-- ==================== 7 工程 ==================== -->
+<section id="eng"><div class="wrap">
+  <h2>工程完整度 <span class="en">Engineering</span></h2>
+  <p class="secnote">项目一共 14 个脚本，分为两层：前 7 个管「数据对不对」，后 7 个管「结论站不站得住」。</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>脚本</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><code>dataset_config.py</code></td><td>唯一的路径与类别解析入口，从 <code>data.yaml</code> 读——换数据集只改一处</td></tr>
+        <tr><td><code>01_check_dataset.py</code></td><td>结构与格式检查：图片/标签配对、字段数、数值范围</td></tr>
+        <tr><td><code>02_inspect_label_formats.py</code></td><td>标注格式分类统计（矩形框 vs 多边形）</td></tr>
+        <tr><td><code>03_find_bad_coordinates.py</code></td><td>多边形标注的数值专项排查</td></tr>
+        <tr><td><code>04_convert_labels_to_detection.py</code></td><td>多边形 → 最小外接矩形，生成检测框数据集</td></tr>
+        <tr><td><code>05_validate_detection_dataset.py</code></td><td>转换后数据集验收 + 类别分布统计</td></tr>
+        <tr><td><code>visualize_labels.py</code></td><td>把标签画回原图，人工抽检（抽检抓漏标就靠它）</td></tr>
+        <tr><td><code>06_predict.py</code></td><td>统一推理入口：单图 / 目录 / 视频 / 摄像头</td></tr>
+        <tr><td><code>07_make_demo_figure.py</code></td><td>按规则自动挑图，生成「标注 vs 预测」三档对照拼图</td></tr>
+        <tr><td><code>08_track.py</code></td><td>视频多目标跟踪 + 轨迹统计</td></tr>
+        <tr><td><code>09_evaluate.py</code></td><td>正式评估：逐类指标 / 最优阈值 / 混淆矩阵 + 自动出报告</td></tr>
+        <tr><td><code>benchmark_inference.py</code></td><td>推理性能测试，三档计时分开报</td></tr>
+        <tr><td><code>check_data_leakage.py</code></td><td>数据泄漏三重检查：md5 精确重复 + 感知哈希近似重复 + 时间戳邻域</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>数据泄漏检查的结论要分两句说</h3>
+  <div class="grid3">
+    <div class="card">
+      <h4><span class="n">✓</span>内容层面干净</h4>
+      <p>划分内 0 组、跨划分 0 对完全相同；画面近似检查（dHash 阈值 5）跨划分也是 0 对。抽样里最接近的一对距离是 15，是阈值的 3 倍——说明检查有区分度，不是「什么都算重复」。</p>
+    </div>
+    <div class="card">
+      <h4><span class="n">!</span>但测试集不算完全独立</h4>
+      <p>三个划分的时间戳跨度<strong>完全重叠</strong>，跨划分最近的一对只隔 <strong>4.9 秒</strong>，1 分钟内有 158 对。说明划分是按图随机切的，可能存在轻度场景重叠，<strong>测试指标要按偏乐观来理解</strong>。</p>
+    </div>
+    <div class="card">
+      <h4><span class="n">i</span>这条边界必须一起说</h4>
+      <p>时间戳靠得近只是弱证据，不等于画面重复。所以结论是「内容级没有重复 + 划分方式存在场景重叠风险」，而不是「没有数据泄漏」。</p>
+    </div>
+  </div>
+
+  <h3>仓库里的工程要素</h3>
+  <div class="grid2">
+    <div class="card"><h4>可复现</h4><p><code>requirements.txt</code> pin 了实测版本，README 写清了从零建环境的步骤、脚本运行顺序、真实训练命令与结果目录。数据来源与许可（CC BY 4.0）也标明了。</p></div>
+    <div class="card"><h4>可追溯</h4><p>数据转换有审计报告，性能测试有四轮原始统计量，泄漏检查有完整结果 JSON，连一次失败运行的参数快照都留档当证据。</p></div>
+  </div>
+</div></section>
+
+<!-- ==================== 8 边界 ==================== -->
+<section id="honest"><div class="wrap">
+  <h2>这个项目能说明什么、不能说明什么 <span class="en">Scope</span></h2>
+  <p class="secnote">把边界写清楚，比多报两个指标更有用。下面每一条都是这个项目真实存在的情况。</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>能说明</th><th>不能说明</th></tr></thead>
+      <tbody>
+        <tr><td>能独立完成「数据检查 → 标注统一 → 训练 → 评估」的全链路</td><td>不能说明具备量产级感知系统的工程能力</td></tr>
+        <tr><td>能定位数据层面的问题（格式混排、漏标、长尾、场景重叠）</td><td>不能说明每个标注框都准确——只抽检过一部分</td></tr>
+        <tr><td>能读懂训练曲线并判断过拟合、判断瓶颈在哪</td><td>不能说明做过超参搜索、模型结构改进或集成</td></tr>
+        <tr><td>能给「延迟」这类指标配上完整测量条件，并发现自己的旧数据复现不出来</td><td>不能说明做过 TensorRT / ONNX 等部署优化（<strong>这一阶段明确暂缓</strong>）</td></tr>
+        <tr><td>能按类别指出模型的弱项，并解释弱项与样本量的关系</td><td>不能说明解决了长尾问题——只发现了，没有做改进实验</td></tr>
+        <tr><td>能诚实划出「我会 / 我不会」的分界</td><td>不能说明接触过 3D 感知、多传感器融合、时序建模</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box green">
+    <div class="t">✓ 一句话概括</div>
+    <p>这是一个<strong>把一条完整链路走通、并且把每个结论的成立条件都说清楚</strong>的基线项目。它的价值不在指标有多高，而在每一步都能被追问、被复现、被验证。</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <strong>YOLO 道路场景多类别目标检测</strong> · 项目演示页
+  <div class="row">
+    <a href="manual.html">项目说明书（零基础版）</a>
+    <a href="https://github.com/DOURENCHI/YOLO_Road_Detection">GitHub 仓库</a>
+    <a href="https://github.com/DOURENCHI/YOLO_Road_Detection#readme">README</a>
+  </div>
+  <p style="margin-top:14px">
+    数据集：<strong>road-traffic</strong>（Roboflow RF100 基准，Muntaser Al Abdulla Aljouma），许可 <strong>CC BY 4.0</strong>，使用时须署名。<br>
+    代码许可 MIT。模型：YOLO26n（Ultralytics 8.4.176）· 训练环境：Python 3.11.16 / torch 2.11.0+cu128。<br>
+    本页所有数字均来自项目内实测记录，测量条件随数字一同给出。
+  </p>
+</div></footer>
+
+<div class="lb" id="lb"><span class="x">✕</span><img alt="放大查看" id="lbi"></div>
+
+<script>
+(function(){
+  // 图片放大
+  var lb=document.getElementById('lb'), lbi=document.getElementById('lbi');
+  document.querySelectorAll('[data-zoom]').forEach(function(el){
+    el.addEventListener('click',function(){
+      lbi.src=el.currentSrc||el.src;
+      lb.classList.add('on');
+      document.body.style.overflow='hidden';
+    });
+  });
+  function close(){lb.classList.remove('on');document.body.style.overflow='';lbi.src='';}
+  lb.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+
+  // 导航高亮
+  var links=[].slice.call(document.querySelectorAll('.tnav a'));
+  var targets=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        var i=targets.indexOf(e.target);
+        if(i<0)return;
+        if(e.isIntersecting){
+          links.forEach(function(l){l.classList.remove('on');});
+          links[i].classList.add('on');
+        }
+      });
+    },{rootMargin:'-70px 0px -72% 0px'});
+    targets.forEach(function(t){if(t)io.observe(t);});
+  }
+})();
+</script>
+</body>
+</html>

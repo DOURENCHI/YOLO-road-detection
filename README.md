@@ -1,5 +1,10 @@
 # YOLO 道路目标检测项目
 
+**在线演示页**：https://dourenchi.github.io/YOLO_Road_Detection/
+**项目说明书**（零基础版，点开即读）：https://dourenchi.github.io/YOLO_Road_Detection/manual.html
+
+不用下载仓库，点开链接就能看检测效果、逐类评估结果和完整的项目讲解。
+
 用 Ultralytics YOLO26n 在 road-traffic 数据集上做多类别目标检测的完整流程：
 **数据检查 → 标注格式统一 → 数据验收 → 训练 → 评估 → 推理演示 → 视频跟踪**
 
@@ -50,6 +55,11 @@ YOLO_Road_Detection/
 │   ├── track/                        # 08 号脚本的跟踪视频与轨迹统计
 │   └── eval_report/                  # 09 号脚本的评估报告与图表
 ├── assets/                           # 演示素材（示例图；自己录的视频放 assets/videos/）
+├── site/                             # GitHub Pages 站点（会被发布到公网）
+│   ├── index.html                    # 在线演示页
+│   ├── manual.html                   # 项目说明书（零基础版，单文件自包含）
+│   └── media/                        # 站点用的图与视频（演示拼图、评估图表、跟踪视频）
+├── .github/workflows/pages.yml       # 站点自动部署（push 后自动更新在线版）
 ├── weights/yolo26n.pt                # 预训练权重
 ├── requirements.txt                  # 依赖清单（版本已固定）
 └── LICENSE                           # 代码 MIT；数据集 CC BY 4.0（须署名）
@@ -511,10 +521,27 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
       （现在目录里那个是合成片段，只能验证链路能跑通，不能当效果演示）
 - [ ] 阶段四：ONNX 导出与 TensorRT 推理优化 —— **本次暂缓**，是下一步计划
 
-详细的代码逐行解析、面试问答、项目原理说明见解析文档（**不在本仓库内**，2026-10-14 起统一放在）：
+## 9. 相关文档
+
+**在线版**（不用下载仓库，点开就能看）：
+
+- 演示页 —— https://dourenchi.github.io/YOLO_Road_Detection/
+- 项目说明书（零基础版）—— https://dourenchi.github.io/YOLO_Road_Detection/manual.html
+
+这两份由 `site/` 目录发布；push 到 `main` 之后由 `.github/workflows/pages.yml` 自动更新，
+所以在线版永远和仓库里的内容一致，不需要手动同步。
+
+**《项目说明书》**（零基础版）按「是什么 → 为什么 → 怎么做 → 结果怎样 → 局限在哪 → 面试怎么讲」
+组织，从零建立八个核心概念（检测框、损失函数、IoU、精确率/召回率、mAP、过拟合……）。
+每个概念都配了生活类比、本项目的真实数字，以及“被问到该怎么答”的说法。
+看完一遍，就能把整个项目从头讲出来。
+
+**《代码解析》** 是按文件组织的逐行代码解读，面向“想知道每一行在写什么”的读者。
+它**不在本仓库内**——里面包含大量自我评估和学习痕迹，不适合随仓库公开。
+它和说明书的 PDF 版一起放在：
 
 ```
 D:\工程\方向与规划\项目\YOLO_Road_Detection\
-├── YOLO_Road_Detection_代码解析.html    # 主文档（自带图表，单文件可离线打开）
-└── YOLO_Road_Detection_代码解析.pdf     # 同内容 PDF，便于打印或发给别人
+├── YOLO_Road_Detection_项目说明书.html / .pdf    # 零基础版（在线也有）
+└── YOLO_Road_Detection_代码解析.html / .pdf      # 逐行解析（仅本地）
 ```
