@@ -1,0 +1,178 @@
+YOLO 道路检测 · C++ 分发包清单
+
+模式：GPU（TensorRT / CUDA EP 可用）
+生成方式：python cpp/collect_deps.py --gpu
+
+文件名                                                大小(MB)  sha256 前 16 位                                                    来源
+------------------------------------------------------------------------------------------------------------------------------------------------------
+avcodec-63.dll                                       19.7  073ad5f013f15c0c                                                 D:\msys64\ucrt64\bin
+avdevice-63.dll                                       0.2  b9dfc4aa507a81f7                                                 D:\msys64\ucrt64\bin
+avfilter-12.dll                                       6.5  64b896b74b67e6a5                                                 D:\msys64\ucrt64\bin
+avformat-63.dll                                       2.9  d878d8b3aa12368e                                                 D:\msys64\ucrt64\bin
+avutil-61.dll                                         1.2  333840039d2b9274                                                 D:\msys64\ucrt64\bin
+cublas64_12.dll                                     108.4  9513540e4ec4c51e                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cublasLt64_12.dll                                   643.4  b199d1ff892a81b7                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudart64_12.dll                                       0.5  c2c9a9c22a9bcba9                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudnn64_9.dll                                         0.3  c6de55089c4759a5                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudnn_adv64_9.dll                                   256.6  a8aed3390144ea20                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudnn_cnn64_9.dll                                     2.8  acac8bf8f924ecd6                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudnn_engines_precompiled64_9.dll                   458.7  3a97df241beb2b75                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudnn_engines_runtime_compiled64_9.dll               26.5  81c5e5475e386269                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudnn_graph64_9.dll                                   2.4  f5453cb541402218                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudnn_heuristic64_9.dll                              56.1  3b1cb10835204fb7                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cudnn_ops64_9.dll                                   100.7  922897bd15a66ace                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+cufft64_11.dll                                      263.3  f4fea9227b148438                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+ggml-0.dll                                            0.1  d9bdd05d8bfe2050                                                 D:\msys64\ucrt64\bin
+ggml-base-0.dll                                       0.9  76160eb294c21aae                                                 D:\msys64\ucrt64\bin
+libIex-3_5.dll                                        0.3  2749f498c3ba5971                                                 D:\msys64\ucrt64\bin
+libIlmThread-3_5.dll                                  0.0  6c6ce9c730da8668                                                 D:\msys64\ucrt64\bin
+libImath-3_2.dll                                      0.3  9e0cab959b32bebb                                                 D:\msys64\ucrt64\bin
+libLerc.dll                                           0.8  1ffee78579c25b07                                                 D:\msys64\ucrt64\bin
+libOpenEXR-3_5.dll                                    1.2  1b0f61e308fdbc34                                                 D:\msys64\ucrt64\bin
+libOpenEXRCore-3_5.dll                                0.5  153d56e8c72c01ba                                                 D:\msys64\ucrt64\bin
+libSvtAv1Enc-4.dll                                    7.2  34f015c70ac283ba                                                 D:\msys64\ucrt64\bin
+libaom.dll                                            9.2  61c2c12b0fd9fb42                                                 D:\msys64\ucrt64\bin
+libass-9.dll                                          0.3  cb2b46133b3bd963                                                 D:\msys64\ucrt64\bin
+libavif-16.dll                                        0.3  9986e8a1d6735c93                                                 D:\msys64\ucrt64\bin
+libbluray-4.dll                                       0.4  24870a1b32ff8b36                                                 D:\msys64\ucrt64\bin
+libbrotlicommon.dll                                   0.1  7b0047dc16dd92a7                                                 D:\msys64\ucrt64\bin
+libbrotlidec.dll                                      0.1  c4c987a01597ddf9                                                 D:\msys64\ucrt64\bin
+libbrotlienc.dll                                      0.8  03f9a82d293caf5b                                                 D:\msys64\ucrt64\bin
+libbz2-1.dll                                          0.1  1790bf6473c9d48d                                                 D:\msys64\ucrt64\bin
+libcaca-0.dll                                         0.8  4ab7b69e156b77a7                                                 D:\msys64\ucrt64\bin
+libcairo-2.dll                                        1.2  be391428fd305983                                                 D:\msys64\ucrt64\bin
+libcairo-gobject-2.dll                                0.0  060e586a23bc07d8                                                 D:\msys64\ucrt64\bin
+libcrypto-3-x64.dll                                   5.2  97308feea369b305                                                 D:\msys64\ucrt64\bin
+libdatrie-1.dll                                       0.0  40aee3ae9a62a774                                                 D:\msys64\ucrt64\bin
+libdav1d-7.dll                                        1.8  bbe67862f77c22f6                                                 D:\msys64\ucrt64\bin
+libdeflate.dll                                        0.1  61a60665da9fd15a                                                 D:\msys64\ucrt64\bin
+libdovi.dll                                           1.3  75988509f0d2166e                                                 D:\msys64\ucrt64\bin
+libexpat-1.dll                                        0.2  8a10cf7e89524b62                                                 D:\msys64\ucrt64\bin
+libffi-8.dll                                          0.0  f96cf79b75f33a10                                                 D:\msys64\ucrt64\bin
+libfontconfig-1.dll                                   0.5  be30a200fa4000d0                                                 D:\msys64\ucrt64\bin
+libfreetype-6.dll                                     0.8  19604dde573cbb8a                                                 D:\msys64\ucrt64\bin
+libfribidi-0.dll                                      0.1  14bd0ed4c24d0068                                                 D:\msys64\ucrt64\bin
+libgcc_s_seh-1.dll                                    0.1  791ebf66e99c7c1b                                                 D:\msys64\ucrt64\bin
+libgdk_pixbuf-2.0-0.dll                               0.3  0f51ba434b2080ab                                                 D:\msys64\ucrt64\bin
+libgio-2.0-0.dll                                      1.8  1256cbd7cb48df5e                                                 D:\msys64\ucrt64\bin
+libglib-2.0-0.dll                                     1.5  3a1abec0184b238d                                                 D:\msys64\ucrt64\bin
+libgme.dll                                            0.4  98e306bc1443f4f5                                                 D:\msys64\ucrt64\bin
+libgmodule-2.0-0.dll                                  0.0  5833f90d3c7a627d                                                 D:\msys64\ucrt64\bin
+libgmp-10.dll                                         0.6  c2567ccf3f410c34                                                 D:\msys64\ucrt64\bin
+libgnutls-30.dll                                      2.2  f7f05c96572506c8                                                 D:\msys64\ucrt64\bin
+libgobject-2.0-0.dll                                  0.3  d12b1c34335cf605                                                 D:\msys64\ucrt64\bin
+libgomp-1.dll                                         0.3  ccaf59dc8cff15ac                                                 D:\msys64\ucrt64\bin
+libgraphite2.dll                                      0.2  93953e4744bcfce9                                                 D:\msys64\ucrt64\bin
+libgsm.dll                                            0.1  b3446b547f8894bc                                                 D:\msys64\ucrt64\bin
+libgstapp-1.0-0.dll                                   0.1  5f5abf822f72100f                                                 D:\msys64\ucrt64\bin
+libgstaudio-1.0-0.dll                                 0.6  aaee4162cc972391                                                 D:\msys64\ucrt64\bin
+libgstbase-1.0-0.dll                                  0.5  da49ec0fae902d12                                                 D:\msys64\ucrt64\bin
+libgstpbutils-1.0-0.dll                               0.3  95e34772164c9201                                                 D:\msys64\ucrt64\bin
+libgstreamer-1.0-0.dll                                1.4  6d5a7cb07d226e1c                                                 D:\msys64\ucrt64\bin
+libgstriff-1.0-0.dll                                  0.1  7d18094e3a09c470                                                 D:\msys64\ucrt64\bin
+libgsttag-1.0-0.dll                                   0.3  ec5207aad6013a71                                                 D:\msys64\ucrt64\bin
+libgstvideo-1.0-0.dll                                 0.9  f1afb0d1ca493792                                                 D:\msys64\ucrt64\bin
+libharfbuzz-0.dll                                     1.7  574ef797d2480d73                                                 D:\msys64\ucrt64\bin
+libhogweed-7.dll                                      0.3  b48e33181b78d715                                                 D:\msys64\ucrt64\bin
+libhwy.dll                                            0.1  9ba0ac7bad82c4c8                                                 D:\msys64\ucrt64\bin
+libiconv-2.dll                                        1.1  94ec68fb8d342b6c                                                 D:\msys64\ucrt64\bin
+libidn2-0.dll                                         0.2  a054a6bb69aaf466                                                 D:\msys64\ucrt64\bin
+libintl-8.dll                                         0.3  0e5a178731e6be6d                                                 D:\msys64\ucrt64\bin
+libjbig-0.dll                                         0.1  36b6155be36d24a1                                                 D:\msys64\ucrt64\bin
+libjpeg-8.dll                                         0.9  c63acd5a3231725a                                                 D:\msys64\ucrt64\bin
+libjxl.dll                                            5.9  f0db8ef57af445a5                                                 D:\msys64\ucrt64\bin
+libjxl_cms.dll                                        0.1  da3bf1847c40b66f                                                 D:\msys64\ucrt64\bin
+libjxl_threads.dll                                    0.0  b065e2464cf13626                                                 D:\msys64\ucrt64\bin
+liblc3-1.dll                                          0.2  970f6d805e215cc1                                                 D:\msys64\ucrt64\bin
+liblcms2-2.dll                                        0.4  03314471fadd04cd                                                 D:\msys64\ucrt64\bin
+liblzma-5.dll                                         0.2  d97a260b8bb4f6af                                                 D:\msys64\ucrt64\bin
+libmodplug-1.dll                                      0.4  d1425827ff8c5cc8                                                 D:\msys64\ucrt64\bin
+libmp3lame-0.dll                                      0.3  d28ee2c6d87346e3                                                 D:\msys64\ucrt64\bin
+libmpg123-0.dll                                       0.4  bd63359e95781ce1                                                 D:\msys64\ucrt64\bin
+libnettle-9.dll                                       0.3  9b9f8bffca94d3cc                                                 D:\msys64\ucrt64\bin
+libogg-0.dll                                          0.0  2f102fba6f2a4951                                                 D:\msys64\ucrt64\bin
+libopenal-1.dll                                       2.6  cb33f3a9505f38b4                                                 D:\msys64\ucrt64\bin
+libopencore-amrnb-0.dll                               0.2  9d36d5661fd002f8                                                 D:\msys64\ucrt64\bin
+libopencore-amrwb-0.dll                               0.1  54341e49eab692d7                                                 D:\msys64\ucrt64\bin
+libopencv_core-500.dll                                6.7  e81b6ca4f2454d1e                                                 D:\msys64\ucrt64\bin
+libopencv_flann-500.dll                               0.6  ac7052375ce39609                                                 D:\msys64\ucrt64\bin
+libopencv_geometry-500.dll                            2.2  535714ef52bd530e                                                 D:\msys64\ucrt64\bin
+libopencv_imgcodecs-500.dll                           0.8  6ec4938ac123029e                                                 D:\msys64\ucrt64\bin
+libopencv_imgproc-500.dll                            12.0  2414fa4e3e2d7d55                                                 D:\msys64\ucrt64\bin
+libopencv_videoio-500.dll                             0.8  7988483c2df6b8bc                                                 D:\msys64\ucrt64\bin
+libopenjp2-7.dll                                      0.5  94f9507828d391cf                                                 D:\msys64\ucrt64\bin
+libopenjph-0.32.dll                                   0.6  df855ffad9c18824                                                 D:\msys64\ucrt64\bin
+libopus-0.dll                                         0.5  e747edad6bf02cf5                                                 D:\msys64\ucrt64\bin
+liborc-0.4-0.dll                                      0.6  c61ef2525f47cddd                                                 D:\msys64\ucrt64\bin
+libp11-kit-0.dll                                      1.5  c24fcbd4d67f6f83                                                 D:\msys64\ucrt64\bin
+libpango-1.0-0.dll                                    0.4  fd92503a3fcab12f                                                 D:\msys64\ucrt64\bin
+libpangocairo-1.0-0.dll                               0.1  0af768e57c0aaf8f                                                 D:\msys64\ucrt64\bin
+libpangoft2-1.0-0.dll                                 0.1  27620f9c84210969                                                 D:\msys64\ucrt64\bin
+libpangowin32-1.0-0.dll                               0.1  152832e8add30312                                                 D:\msys64\ucrt64\bin
+libpcre2-8-0.dll                                      0.7  1f609cde2ce432ef                                                 D:\msys64\ucrt64\bin
+libpixman-1-0.dll                                     0.7  12e693d94829f013                                                 D:\msys64\ucrt64\bin
+libplacebo-360.dll                                    1.2  8eb2c3fe24a124d9                                                 D:\msys64\ucrt64\bin
+libpng16-16.dll                                       0.2  28db7a8c6fcc579c                                                 D:\msys64\ucrt64\bin
+librav1e.dll                                          3.4  bc549e2178589f37                                                 D:\msys64\ucrt64\bin
+librsvg-2-2.dll                                      11.2  4fe1479c791a604f                                                 D:\msys64\ucrt64\bin
+librtmp-1.dll                                         0.1  f9fecc5ce88e647c                                                 D:\msys64\ucrt64\bin
+libshaderc_shared.dll                                10.2  331df8a45983735b                                                 D:\msys64\ucrt64\bin
+libsharpyuv-0.dll                                     0.0  d29380c7056383f3                                                 D:\msys64\ucrt64\bin
+libsoxr.dll                                           0.3  47f6a0fbaa08f7ba                                                 D:\msys64\ucrt64\bin
+libspeex-1.dll                                        0.1  70517dd82e962c09                                                 D:\msys64\ucrt64\bin
+libspirv-cross-c-shared.dll                           3.3  bc4bdcf63b9bbf60                                                 D:\msys64\ucrt64\bin
+libsrt.dll                                            0.8  6ad77ab5b1a9dc3d                                                 D:\msys64\ucrt64\bin
+libssh.dll                                            0.6  dbaf4b60ccbcef6a                                                 D:\msys64\ucrt64\bin
+libstdc++-6.dll                                       2.5  4e4822dc4aaa9938                                                 D:\msys64\ucrt64\bin
+libtasn1-6.dll                                        0.1  9793128fa5028fe8                                                 D:\msys64\ucrt64\bin
+libtbb12.dll                                          0.3  38c5b0e88ebd3164                                                 D:\msys64\ucrt64\bin
+libthai-0.dll                                         0.1  d8d8b87e9089a811                                                 D:\msys64\ucrt64\bin
+libtheoradec-2.dll                                    0.1  0b9877e581421abe                                                 D:\msys64\ucrt64\bin
+libtheoraenc-2.dll                                    0.2  ed0fb82d04220070                                                 D:\msys64\ucrt64\bin
+libtiff-6.dll                                         0.6  d047260c3d456f84                                                 D:\msys64\ucrt64\bin
+libunibreak-7.dll                                     0.1  f1f4bb5b5bb3dbf8                                                 D:\msys64\ucrt64\bin
+libunistring-5.dll                                    2.2  ee39258fa1086269                                                 D:\msys64\ucrt64\bin
+libva.dll                                             0.3  20591e45edfcbf7f                                                 D:\msys64\ucrt64\bin
+libva_win32.dll                                       0.0  2721e9c28099699b                                                 D:\msys64\ucrt64\bin
+libvidstab.dll                                        0.1  6980084b957f32cf                                                 D:\msys64\ucrt64\bin
+libvorbis-0.dll                                       0.2  d1b40d7f33171ccb                                                 D:\msys64\ucrt64\bin
+libvorbisenc-2.dll                                    0.6  971cfa7c8866653a                                                 D:\msys64\ucrt64\bin
+libvpl-2.dll                                          0.5  88bd6fece68ebad0                                                 D:\msys64\ucrt64\bin
+libvpx-1.dll                                          4.2  759bb95b0cd6c75b                                                 D:\msys64\ucrt64\bin
+libwebp-7.dll                                         0.7  8dfe40c4e0abc90d                                                 D:\msys64\ucrt64\bin
+libwebpdemux-2.dll                                    0.0  d9ac8b88387cea7a                                                 D:\msys64\ucrt64\bin
+libwebpmux-3.dll                                      0.1  9bd85116a22923d6                                                 D:\msys64\ucrt64\bin
+libwhisper-1.dll                                      0.5  3066e34a27164981                                                 D:\msys64\ucrt64\bin
+libwinpthread-1.dll                                   0.1  6a5b2d360cd46dc3                                                 D:\msys64\ucrt64\bin
+libx264-165.dll                                       1.9  a58995b5af6d0fcf                                                 D:\msys64\ucrt64\bin
+libx265-217.dll                                      21.6  48a6c942cab3196d                                                 D:\msys64\ucrt64\bin
+libxml2-16.dll                                        1.2  2c971559c9bedb54                                                 D:\msys64\ucrt64\bin
+libyuv.dll                                            1.0  ecba917cb08e6208                                                 D:\msys64\ucrt64\bin
+libzimg-2.dll                                         0.6  99625f39de8de654                                                 D:\msys64\ucrt64\bin
+libzstd.dll                                           1.2  48368ab0ca622d0e                                                 D:\msys64\ucrt64\bin
+libzvbi-0.dll                                         0.4  8389bdf0a8b482cb                                                 D:\msys64\ucrt64\bin
+nvJitLink_120_0.dll                                  74.3  959d3cb44527ec88                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+nvinfer_10.dll                                      417.8  99ed7bb3c071c1fd                                                 D:\TensorRT\TensorRT-10.8.0.43\lib
+nvinfer_plugin_10.dll                                48.6  d2830d57d4eca347                                                 D:\TensorRT\TensorRT-10.8.0.43\lib
+nvonnxparser_10.dll                                   2.8  68d84905535e6bc4                                                 D:\TensorRT\TensorRT-10.8.0.43\lib
+nvrtc64_120_0.dll                                    82.7  02d2d7ef4690bf1a                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\torch\lib
+onnxruntime.dll                                      14.0  acf62daff6c31a9e                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\onnxruntime\capi
+onnxruntime_providers_cuda.dll                      306.6  61340fae5ddb2b22                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\onnxruntime\capi
+onnxruntime_providers_shared.dll                      0.0  0119c0d4a6a68d54                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\onnxruntime\capi
+onnxruntime_providers_tensorrt.dll                    0.8  9186a11514a45ab9                                                 D:\Miniconda\envs\yolo_road\Lib\site-packages\onnxruntime\capi
+swresample-7.dll                                      0.2  293a1a9786b8e037                                                 D:\msys64\ucrt64\bin
+swscale-10.dll                                        2.1  fb120b345443d59d                                                 D:\msys64\ucrt64\bin
+vulkan-1.dll                                          0.7  31862137c4179dcd                                                 D:\msys64\ucrt64\bin
+xvidcore.dll                                          0.7  5107ab029f4f06a5                                                 D:\msys64\ucrt64\bin
+yolo_cpp.exe                                          0.4  0c1bd37c61346468                                                 D:\VC Code\YOLO_Road_Detection\cpp\build
+zlib1.dll                                             0.1  8ae7aeb0467763a1                                                 D:\msys64\ucrt64\bin
+------------------------------------------------------------------------------------------------------------------------------------------------------
+共 161 个文件，合计 3066.3 MB
+
+用法：把 exe 与本目录所有 DLL 放在同一目录，直接运行 exe。
+不需要设置 PATH，也不需要安装 CUDA / cuDNN / TensorRT / Python。
+
+校验方式（换机器后先跑这个）：
+  yolo_cpp.exe --model best.onnx --image test.jpg --ep trt --runs 20 --warmup 5
+  看输出里是否有「EP：TensorRT（FP16）+ CUDA 兜底」，且中位延迟应在 3 ms 量级。
+  若显示「TensorRT EP 不可用」或延迟 > 20 ms，说明缺库，对照本清单逐个核。

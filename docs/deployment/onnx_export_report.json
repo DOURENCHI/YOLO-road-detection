@@ -1,0 +1,65 @@
+{
+ "生成时间": "2026-10-27 09:38:15",
+ "环境": {
+  "python": "3.11.16",
+  "torch": "2.11.0+cu128",
+  "ultralytics": "8.4.176",
+  "onnx": "1.23.2",
+  "onnxruntime": "1.31.0",
+  "cuda_build": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU"
+ },
+ "导出参数": {
+  "format": "onnx",
+  "imgsz": 640,
+  "opset": null,
+  "dynamic": false,
+  "simplify": true
+ },
+ "源权重": {
+  "path": "D:\\VC Code\\YOLO_Road_Detection\\runs\\detect\\runs\\road_baseline\\weights\\best.pt",
+  "size_mb": 5.22,
+  "sha256": "a5cdefaa39d43fa4a8d72fe811d71ecd0f3a63f15a8a0d0606f484f51529fdd8"
+ },
+ "产物": {
+  "path": "D:\\VC Code\\YOLO_Road_Detection\\weights\\best.onnx",
+  "size_mb": 9.41,
+  "sha256": "c676ea9adfc0029379f64def6123b63c6dcaa0ae9d952e18544b0df2b13bf7b6",
+  "导出耗时_s": 3.6
+ },
+ "结构": {
+  "ir_version": 8,
+  "opset_import": [
+   {
+    "domain": "ai.onnx",
+    "version": 18
+   }
+  ],
+  "producer": "pytorch 2.11.0",
+  "inputs": [
+   {
+    "name": "images",
+    "dtype": "FLOAT",
+    "shape": [
+     1,
+     3,
+     640,
+     640
+    ]
+   }
+  ],
+  "outputs": [
+   {
+    "name": "output0",
+    "dtype": "FLOAT",
+    "shape": [
+     1,
+     16,
+     8400
+    ]
+   }
+  ],
+  "node_count": 368,
+  "initializer_count": 223
+ }
+}

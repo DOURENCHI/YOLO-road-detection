@@ -1,0 +1,46 @@
+{
+ "生成时间": "2026-10-27 11:14:45",
+ "源权重": {
+  "path": "runs\\detect\\runs\\road_baseline\\weights\\best.pt",
+  "sha256": "a5cdefaa39d43fa4a8d72fe811d71ecd0f3a63f15a8a0d0606f484f51529fdd8"
+ },
+ "环境": {
+  "tensorrt": "10.8.0.43",
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "cudnn": 91900,
+  "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "compute_capability": "12.0",
+  "tensorrt_home": "D:\\TensorRT\\TensorRT-10.8.0.43"
+ },
+ "产物": [
+  {
+   "精度": "fp32",
+   "文件": "weights\\best_fp32.engine",
+   "size_mb": 17.91,
+   "构建耗时_s": 111.7,
+   "sha256": "89250b728d6b058d2cbab10ce4dd11f67e88509d077bcf1c97568d0466e7ccd4",
+   "参数": {
+    "imgsz": 640,
+    "batch": 1,
+    "workspace_GB": 4,
+    "half": false,
+    "device": 0
+   }
+  },
+  {
+   "精度": "fp16",
+   "文件": "weights\\best_fp16.engine",
+   "size_mb": 11.79,
+   "构建耗时_s": 616.7,
+   "sha256": "8140972822aa649bafb3e79ca9301e7457b2a7e0897c2710eec3a882b139efa0",
+   "参数": {
+    "imgsz": 640,
+    "batch": 1,
+    "workspace_GB": 4,
+    "half": true,
+    "device": 0
+   }
+  }
+ ]
+}

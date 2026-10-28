@@ -1,0 +1,75 @@
+{
+ "生成时间": "2026-10-27 21:42:38",
+ "目的": "把 C++ 程序做成能交给别人的分发包，并实测它是否真的自包含",
+ "结论先放前面": [
+  "CPU 版自包含可行：143 个文件 / 212.9 MB，干净 PATH 下验证通过（回落 CPU，19.03 ms）",
+  "GPU 版自包含不可行：161 个 DLL / 3.0 GB，补齐全部依赖后仍 0xC0000005 访问冲突。同类工程普遍做法是「轻包 + 目标机自行安装 CUDA/cuDNN/TensorRT」，而不是打包 3 GB 运行时",
+  "手工拷 DLL 一定会漏。本次实测漏了两处：dist 里的 exe 是加 --ep 之前的旧版；加视频模式后缺 libopencv_videoio。现在用 cpp/collect_deps.py 从导入表递归收集"
+ ],
+ "CPU 分发包（已验证）": {
+  "路径": "cpp/dist/",
+  "文件数": 143,
+  "体积_MB": 212.9,
+  "其中_DLL数": 141,
+  "生成命令": "python cpp/collect_deps.py",
+  "验证方式": "PATH 只留 System32 + Windows + dist，不放 MSYS2 / TensorRT / torch",
+  "验证结果": {
+   "退出码": 0,
+   "CUDA_EP": "不可用（缺 providers_cuda，按预期回落 CPU）",
+   "检出": 6,
+   "纯推理中位_ms": 19.03,
+   "说明": "数值是从 JSON 读的：docs/deployment/_dcpu.json"
+  },
+  "变化": "原来是 45 个文件 / 79 MB，但缺 videoio 与 FFmpeg 链，视频模式跑不了；递归收集后 143 个 / 212.9 MB"
+ },
+ "GPU 分发包（打包成功 · 验证失败）": {
+  "路径": "cpp/dist_gpu/（已删除，清单存证于 docs/deployment/dist_gpu_manifest.txt）",
+  "文件数": 163,
+  "体积_MB": 3066.3,
+  "生成命令": "python cpp/collect_deps.py --gpu",
+  "失败链": [
+   "① 旧 exe 不认 --ep：dist 里是 387 KB 的旧版，程序静默走 CUDA EP，实测 5.25 ms 而非 TRT 的 2.35–3.22 ms。换成 build 版（443 KB）才暴露后面所有问题",
+   "② 0xC0000135（STATUS_DLL_NOT_FOUND）：新 exe 链接了 libopencv_videoio，dist 里没有",
+   "③ CUDA EP 加载失败（Error 126）：缺 onnxruntime_providers_cuda.dll",
+   "④ 仍失败：缺 cufft64_11.dll（导入表里没写，是 providers_cuda 的间接依赖）",
+   "⑤ 0xC0000409（STATUS_STACK_BUFFER_OVERRUN）：报 Cannot load symbol cudnnCreate。原因是 cudnn64_9.dll 只是 0.3 MB 的加载器，必须配 7 个 cudnn_*64_9.dll 子库",
+   "⑥ TRT 不生效：TRT 自报 Could not locate nvrtc64_120_0.dll（运行时 JIT 需要）",
+   "⑦ 补齐 nvrtc + nvJitLink 后：0xC0000005（ACCESS_VIOLATION），移除 nvrtc 后仍崩，未定位到单一 DLL"
+  ],
+  "对照基线": {
+   "条件": "build/yolo_cpp.exe + PATH 含 MSYS2 / TensorRT lib / torch lib",
+   "EP": "TensorRT（FP16）+ CUDA 兜底",
+   "纯推理中位_ms": 2.35,
+   "p95_ms": 3.66,
+   "说明": "同一时刻测得，证明机器与模型都正常，问题只在自包含打包"
+  },
+  "为什么不该打包 3 GB": [
+   "依赖体积：nvinfer 418 MB + cublasLt 643 MB + cudnn 全套 904 MB + cufft 263 MB + providers_cuda 307 MB …",
+   "版本必须严格匹配：nvrtc 缺失时 TRT 直接失效；cudnn 子库缺一个就崩溃。手工维护这套组合的成本远高于让目标机装官方运行时",
+   "engine 本来就不能跨机器拷（绑显卡架构 / TRT 版本 / 驱动），GPU 场景的正确交付方式一直是「到目标机重建」"
+  ]
+ },
+ "推荐的两种交付形态": [
+  {
+   "形态": "CPU 自包含包",
+   "体积": "212.9 MB / 143 文件",
+   "适用": "目标机没有 GPU，或只做功能验证",
+   "命令": "python cpp/collect_deps.py",
+   "状态": "已验证"
+  },
+  {
+   "形态": "轻包 + 目标机装运行时",
+   "体积": "exe + onnx + 约 10 个 ORT DLL（约 40 MB）",
+   "适用": "GPU / TensorRT 场景",
+   "做法": "目标机装 CUDA 12.8 + cuDNN 9.x + TensorRT 10.8，只分发 exe、best.onnx、onnxruntime*.dll、OpenCV 少数几个 DLL；engine 在目标机用 14_export_engine.py 重建",
+   "状态": "推荐（未打包，因为依赖由目标机安装包管理，不容易版本漂移）"
+  }
+ ],
+ "换机器后的验收步骤": [
+  "1. 先跑 CPU 路径：yolo_cpp.exe --model best.onnx --image test.jpg --runs 20 --warmup 5",
+  "2. 看检出数量是否与源机一致（本项目基准图是 6 个框）",
+  "3. 再跑 GPU：加 --ep trt，看输出是否有「EP：TensorRT（FP16）+ CUDA 兜底」",
+  "4. 延迟落在 2–4 ms 才算 TRT 真的生效；> 15 ms 说明回落到 CPU 或 CUDA EP",
+  "5. 最后跑 --video 1000 帧，确认视频链路也能用（这条以前在旧包里是坏的）"
+ ]
+}

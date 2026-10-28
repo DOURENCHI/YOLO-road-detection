@@ -1,0 +1,74 @@
+{
+ "生成时间": "2026-10-27 09:46:38",
+ "条件": {
+  "硬件": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "输入尺寸": "640x640，batch=1",
+  "预热次数": 30,
+  "重复次数": 200,
+  "固定图片数": 40,
+  "DLL目录": "D:\\Miniconda\\envs\\yolo_road\\Lib\\site-packages\\torch\\lib",
+  "计时方式": "perf_counter + cuda.synchronize（端到端）；ORT 仅 run()（纯推理）"
+ },
+ "pytorch": {
+  "纯前向_ms": {
+   "n": 200,
+   "mean": 12.253,
+   "median": 11.696,
+   "min": 7.467,
+   "p95": 17.46,
+   "max": 24.656,
+   "std": 3.256
+  },
+  "端到端_ms": {
+   "n": 200,
+   "mean": 16.113,
+   "median": 14.956,
+   "min": 11.978,
+   "p95": 23.192,
+   "max": 30.989,
+   "std": 3.627
+  },
+  "框架计时_ms": {
+   "preprocess": 1.282,
+   "inference": 11.854,
+   "postprocess": 1.143
+  }
+ },
+ "onnxruntime": {
+  "版本": "1.22.0",
+  "实际生效的EP": [
+   "CUDAExecutionProvider",
+   "CPUExecutionProvider"
+  ],
+  "纯推理_ms": {
+   "n": 200,
+   "mean": 7.752,
+   "median": 7.101,
+   "min": 5.775,
+   "p95": 11.082,
+   "max": 16.212,
+   "std": 1.816
+  },
+  "端到端_ms": {
+   "n": 200,
+   "mean": 12.92,
+   "median": 12.706,
+   "min": 9.253,
+   "p95": 16.434,
+   "max": 20.714,
+   "std": 2.23
+  },
+  "框架计时_ms": {
+   "preprocess": 1.285,
+   "inference": 12.647,
+   "postprocess": 1.287
+  }
+ },
+ "对比": {
+  "纯推理_ONNX除以PT": 0.607,
+  "端到端_ONNX除以PT": 0.85,
+  "注意": "比值 <1 表示 ONNX 更快。同一台机器同一次运行内比较才有意义。"
+ }
+}

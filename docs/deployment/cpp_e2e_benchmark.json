@@ -1,0 +1,136 @@
+{
+ "生成时间": "2026-10-27 13:26:54",
+ "说明": "C++ 端到端：每轮重新读图，画框只到内存不写盘；n=200（预热按 warmup/4，最少 3 次）",
+ "条件": {
+  "repeat": 200,
+  "runs_pure_infer": 50,
+  "warmup": 20,
+  "imgsz": 640,
+  "image": "docs/deployment/_test_odd.jpg (400x640)"
+ },
+ "明细": [
+  {
+   "ep": "cuda",
+   "backend": "opencv",
+   "file": "docs/deployment\\_e2e_cuda",
+   "pure_infer_ms": 6.55,
+   "e2e_ms": 13.31,
+   "p95_ms": 16.42,
+   "load": 1.562,
+   "pre": 2.4,
+   "infer": 8.76,
+   "post": 0.071,
+   "draw": 0.007,
+   "stage_sum": 12.8
+  },
+  {
+   "ep": "trt",
+   "backend": "opencv",
+   "file": "docs/deployment\\_e2e_trt",
+   "pure_infer_ms": 2.69,
+   "e2e_ms": 8.12,
+   "p95_ms": 11.23,
+   "load": 1.504,
+   "pre": 2.657,
+   "infer": 3.198,
+   "post": 0.068,
+   "draw": 0.005,
+   "stage_sum": 7.431
+  },
+  {
+   "ep": "trt",
+   "backend": "opencv",
+   "file": "docs/deployment\\_e2e_trt_opencv_r2",
+   "pure_infer_ms": 3.05,
+   "e2e_ms": 7.73,
+   "p95_ms": 10.64,
+   "load": 1.439,
+   "pre": 2.553,
+   "infer": 2.939,
+   "post": 0.064,
+   "draw": 0.005,
+   "stage_sum": 6.999
+  },
+  {
+   "ep": "trt",
+   "backend": "opencv",
+   "file": "docs/deployment\\_e2e_trt_opencv_r3",
+   "pure_infer_ms": 2.54,
+   "e2e_ms": 7.98,
+   "p95_ms": 10.31,
+   "load": 1.492,
+   "pre": 2.623,
+   "infer": 3.019,
+   "post": 0.066,
+   "draw": 0.005,
+   "stage_sum": 7.205
+  },
+  {
+   "ep": "trt",
+   "backend": "stb",
+   "file": "docs/deployment\\_e2e_trt_stb_r2",
+   "pure_infer_ms": 2.73,
+   "e2e_ms": 11.79,
+   "p95_ms": 17.24,
+   "load": 1.738,
+   "pre": 6.286,
+   "infer": 3.007,
+   "post": 0.064,
+   "draw": 0.006,
+   "stage_sum": 11.102
+  },
+  {
+   "ep": "trt",
+   "backend": "stb",
+   "file": "docs/deployment\\_e2e_trt_stb_r3",
+   "pure_infer_ms": 2.71,
+   "e2e_ms": 11.69,
+   "p95_ms": 15.77,
+   "load": 1.723,
+   "pre": 6.226,
+   "infer": 2.97,
+   "post": 0.064,
+   "draw": 0.005,
+   "stage_sum": 10.989
+  }
+ ],
+ "分组均值": {
+  "trt+opencv": {
+   "pure_infer_ms": 2.76,
+   "e2e_ms": 7.94,
+   "load": 1.48,
+   "pre": 2.61,
+   "infer": 3.05,
+   "post": 0.07,
+   "stage_sum": 7.21,
+   "n": 3
+  },
+  "trt+stb": {
+   "pure_infer_ms": 2.72,
+   "e2e_ms": 11.74,
+   "load": 1.73,
+   "pre": 6.26,
+   "infer": 2.99,
+   "post": 0.06,
+   "stage_sum": 11.05,
+   "n": 2
+  },
+  "cuda+opencv": {
+   "pure_infer_ms": 6.55,
+   "e2e_ms": 13.31,
+   "load": 1.56,
+   "pre": 2.4,
+   "infer": 8.76,
+   "post": 0.07,
+   "stage_sum": 12.8,
+   "n": 1
+  }
+ },
+ "关键结论": [
+  "TRT EP 端到端 7.94 ms，纯推理 2.76 ms —— 端到端是纯推理的 2.9 倍",
+  "推理只占 38%；预处理 2.61 ms 占 33%；读图 1.48 ms 占 19%",
+  "纯推理快 2.37 倍，但端到端只快 1.68 倍（阿姆达尔定律）",
+  "换图像后端 stb → opencv：预处理 6.26 → 2.61 ms，端到端 11.74 → 7.94 ms",
+  "端到端减去分段和约 0.73 ms，是每轮 Image/vector 的分配与释放（约 7 MB）"
+ ]
+}

@@ -1,0 +1,187 @@
+{
+ "生成时间": "2026-10-27 09:46:22",
+ "权重": "D:\\VC Code\\YOLO_Road_Detection\\runs\\detect\\runs\\road_baseline\\weights\\best.pt",
+ "onnx": "D:\\VC Code\\YOLO_Road_Detection\\weights\\best.onnx",
+ "结构": {
+  "opset": [
+   {
+    "domain": "ai.onnx",
+    "version": 18
+   }
+  ],
+  "inputs": [
+   {
+    "name": "images",
+    "dtype": "FLOAT",
+    "shape": [
+     1,
+     3,
+     640,
+     640
+    ]
+   }
+  ],
+  "outputs": [
+   {
+    "name": "output0",
+    "dtype": "FLOAT",
+    "shape": [
+     1,
+     16,
+     8400
+    ]
+   }
+  ],
+  "node_count": 368
+ },
+ "数值": {
+  "torch_shape": [
+   1,
+   16,
+   8400
+  ],
+  "onnx_shape": [
+   1,
+   16,
+   8400
+  ],
+  "max_abs_diff": 0.9072265625,
+  "p99_9_abs_diff": 0.19187679886817932,
+  "mean_abs_diff": 0.0054704309441149235,
+  "frac_above_1e-2": 0.13797619047619047,
+  "相对误差_mean除均值": 0.00010698549158405513,
+  "输出量级_均值": 51.1324577331543,
+  "说明": "原始输出张量未过 sigmoid，个别单元差值会被放大；判定以结果层为准"
+ },
+ "ORT实际EP": [
+  "CUDAExecutionProvider",
+  "CPUExecutionProvider"
+ ],
+ "DLL目录": "D:\\Miniconda\\envs\\yolo_road\\Lib\\site-packages\\torch\\lib",
+ "结果": {
+  "图片数": 16,
+  "conf": 0.25,
+  "iou": 0.7,
+  "pt_总框数": 70,
+  "onnx_总框数": 70,
+  "框数差": 0,
+  "框数差比例": 0.0,
+  "逐类一致": true,
+  "最大分数差": 0.001,
+  "逐图": [
+   {
+    "image": "1653344879953_jpg.rf.981fba40a0df77b35721afc1c4ce69dc.jpg",
+    "pt_boxes": 8,
+    "onnx_boxes": 8,
+    "class_matches": 8,
+    "max_conf_diff": 0.0007253587245941162
+   },
+   {
+    "image": "1653344983450_jpg.rf.1cc746ba0d7ccf40b5e6e0be4f19751d.jpg",
+    "pt_boxes": 2,
+    "onnx_boxes": 2,
+    "class_matches": 2,
+    "max_conf_diff": 0.00019234418869018555
+   },
+   {
+    "image": "1653345012928_jpg.rf.1d25f9bb245263239071777d0dcb5581.jpg",
+    "pt_boxes": 4,
+    "onnx_boxes": 4,
+    "class_matches": 4,
+    "max_conf_diff": 0.0005202293395996094
+   },
+   {
+    "image": "1653345265965_jpg.rf.8533151d9659af6bac9184da7f743b64.jpg",
+    "pt_boxes": 5,
+    "onnx_boxes": 5,
+    "class_matches": 5,
+    "max_conf_diff": 0.0008762478828430176
+   },
+   {
+    "image": "1653345326013_jpg.rf.f707332f8df4ca8b320f0976ca3784aa.jpg",
+    "pt_boxes": 1,
+    "onnx_boxes": 1,
+    "class_matches": 1,
+    "max_conf_diff": 3.147125244140625e-05
+   },
+   {
+    "image": "1653345733065_jpg.rf.07886b204c3bd962d3f7f8ee587df359.jpg",
+    "pt_boxes": 2,
+    "onnx_boxes": 2,
+    "class_matches": 2,
+    "max_conf_diff": 0.0002084970474243164
+   },
+   {
+    "image": "1653345752691_jpg.rf.d31adcc925dac999336b44a4c63e8af7.jpg",
+    "pt_boxes": 7,
+    "onnx_boxes": 7,
+    "class_matches": 7,
+    "max_conf_diff": 0.0002802610397338867
+   },
+   {
+    "image": "1653385191647_jpg.rf.780693d7dfbcc663c6d9c86a4bbed5e0.jpg",
+    "pt_boxes": 1,
+    "onnx_boxes": 1,
+    "class_matches": 1,
+    "max_conf_diff": 0.00010007619857788086
+   },
+   {
+    "image": "1653385290697_jpg.rf.621ff093c612679284d6f6584025845c.jpg",
+    "pt_boxes": 2,
+    "onnx_boxes": 2,
+    "class_matches": 2,
+    "max_conf_diff": 5.513429641723633e-05
+   },
+   {
+    "image": "1653385314753_jpg.rf.ba3f87f3ded297b2a648858e9a6ccc6c.jpg",
+    "pt_boxes": 6,
+    "onnx_boxes": 6,
+    "class_matches": 6,
+    "max_conf_diff": 0.0006951987743377686
+   },
+   {
+    "image": "1653385407548_jpg.rf.5bd52aac17dbed9c95099241ed781e5f.jpg",
+    "pt_boxes": 7,
+    "onnx_boxes": 7,
+    "class_matches": 7,
+    "max_conf_diff": 0.00048297643661499023
+   },
+   {
+    "image": "1653385860854_jpg.rf.21df6e844cb1fc22556108b937879d80.jpg",
+    "pt_boxes": 14,
+    "onnx_boxes": 14,
+    "class_matches": 14,
+    "max_conf_diff": 0.0008612275123596191
+   },
+   {
+    "image": "1653387172359_jpg.rf.e0c2b6cd47f38bb0e5f5d6352304584e.jpg",
+    "pt_boxes": 1,
+    "onnx_boxes": 1,
+    "class_matches": 1,
+    "max_conf_diff": 5.072355270385742e-05
+   },
+   {
+    "image": "1653388815176_jpg.rf.cf94997e4b297c9a53d9971b34e4e3af.jpg",
+    "pt_boxes": 5,
+    "onnx_boxes": 5,
+    "class_matches": 5,
+    "max_conf_diff": 0.0005858540534973145
+   },
+   {
+    "image": "1653388947601_jpg.rf.76385790cb249750da4027953de7be63.jpg",
+    "pt_boxes": 1,
+    "onnx_boxes": 1,
+    "class_matches": 1,
+    "max_conf_diff": 0.000904083251953125
+   },
+   {
+    "image": "1653408748228_jpg.rf.c21b3ccc4f135a2a224b966d5d36cad7.jpg",
+    "pt_boxes": 4,
+    "onnx_boxes": 4,
+    "class_matches": 4,
+    "max_conf_diff": 0.0010004043579101562
+   }
+  ]
+ },
+ "结论": "通过"
+}
