@@ -232,6 +232,21 @@ yolo_cpp.exe --video clip.mp4 --frames 1000 --ep trt
 | `--out` | — | 输出前缀，会生成 `<前缀>_boxes.png` |
 | `--json` | — | 结果与耗时写成 JSON（路径会做转义） |
 
+### 视频模式的输出字段
+
+除延迟与分段耗时外，`--video` 还会输出两组内存数据到 JSON：
+
+| 字段 | 采集方式 | 说明 |
+|---|---|---|
+| `memory_mb` | `GetProcessMemoryInfo`（Windows）/ 待补（Linux） | 进程 RSS，看有没有泄漏 |
+| `vram_mb` | 运行时 `cudaMemGetInfo` | GPU 显存，包含 `available` / `at_start` / `first_sample` / `last_sample` / `peak` / `delta` / `samples` |
+
+`vram_mb` 是通过 `LoadLibrary`（Windows）或 `dlopen`（Linux）动态取 `cudaMemGetInfo`，
+**不增加编译期依赖**：找不到 `cudart` 时 `available=false`，终端显示「显存不可用」，程序照常跑完。
+
+之所以不用 `nvidia-smi` 前后各读一次：单次调用实测 **101–107 ms**，而一帧推理只有 2–3 ms；
+且程序退出时显存全释放，前后差值约等于 0，会得出错误结论。详见 `docs/deployment/README.md` §8.9。
+
 ## 输出形状说明
 
 `--classes 12` 对应输出 `[1, 16, 8400]`：

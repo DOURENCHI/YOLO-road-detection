@@ -54,6 +54,9 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <psapi.h>
+#else
+#include <dlfcn.h>
+
 #endif
 
 namespace {
@@ -423,6 +426,54 @@ double percentile(std::vector<double> v, double p) {
     return v[idx];
 }
 
+// 显存采样：运行时动态加载 cudaMemGetInfo，不引入编译期依赖。
+//
+// 为什么不用 nvidia-smi：实测单次调用 101–107 ms，而一帧推理只有 2–3 ms。
+// 放计时区间里会污染测量，放区间外则两个读数相隔上百毫秒，中间的 3 ms 事件定位不到。
+// 更关键的是「推理前后各读一次」的差值几乎为 0（实测 1621 → 1612 MB）——
+// 程序退出时 CUDA 全部释放，读的是整卡而不是进程。
+// cudaMemGetInfo 是驱动内的查询（微秒级），可以直接放进循环里每 N 帧采一次。
+class VramSampler {
+  public:
+    bool available() { init(); return fn_ != nullptr; }
+
+    // 当前已用显存 MB；不可用返回 -1
+    double used_mb() {
+        init();
+        if (!fn_) return -1.0;
+        size_t free_b = 0, total_b = 0;
+        if (fn_(&free_b, &total_b) != 0) return -1.0;
+        return static_cast<double>(total_b - free_b) / 1048576.0;
+    }
+
+  private:
+    using Fn = int (*)(size_t*, size_t*);
+    Fn fn_ = nullptr;
+    bool tried_ = false;
+
+    void init() {
+        if (tried_) return;
+        tried_ = true;
+#ifdef _WIN32
+        const char* names[] = {"cudart64_12.dll", "cudart64_13.dll", "cudart64_11.dll"};
+        for (const char* n : names) {
+            if (HMODULE h = LoadLibraryA(n)) {
+                fn_ = reinterpret_cast<Fn>(reinterpret_cast<void*>(GetProcAddress(h, "cudaMemGetInfo")));
+                if (fn_) return;
+            }
+        }
+#else
+        const char* names[] = {"libcudart.so.12", "libcudart.so.13", "libcudart.so"};
+        for (const char* n : names) {
+            if (void* h = dlopen(n, RTLD_NOW)) {
+                fn_ = reinterpret_cast<Fn>(dlsym(h, "cudaMemGetInfo"));
+                if (fn_) return;
+            }
+        }
+#endif
+    }
+};
+
 // 当前进程的常驻内存（MB）。稳定性测试每 100 帧采一次，看有没有泄漏。
 size_t rss_mb() {
 #ifdef _WIN32
@@ -590,10 +641,13 @@ int main(int argc, char** argv) {
         const char* vin[] = {in_name.c_str()};
         const char* vout[] = {out_name.c_str()};
         const unsigned long long mem0 = static_cast<unsigned long long>(rss_mb());
+        VramSampler vram;
+        const double vram0 = vram.used_mb();   // 首次调用会触发 cudart 加载
 
         std::vector<double> v_tot, v_dec, v_pre, v_inf, v_post, v_draw;
         std::vector<int> mem_at;
         std::vector<size_t> mem_val;
+        std::vector<double> vram_val;
 
         auto now = [] { return std::chrono::steady_clock::now(); };
         auto span = [](auto d) { return std::chrono::duration<double, std::milli>(d).count(); };
@@ -641,7 +695,11 @@ int main(int argc, char** argv) {
                 v_draw.push_back(span(c5 - c4));
                 ++valid;
             }
-            if (done % 100 == 0) { mem_at.push_back(done); mem_val.push_back(rss_mb()); }
+            if (done % 100 == 0) {
+                mem_at.push_back(done);
+                mem_val.push_back(rss_mb());
+                vram_val.push_back(vram.used_mb());
+            }
             ++done;
         }
         cap.release();
@@ -659,6 +717,16 @@ int main(int argc, char** argv) {
         for (auto v : mem_val) m_max = std::max(m_max, static_cast<unsigned long long>(v));
         const long long m_delta = static_cast<long long>(m_last) - static_cast<long long>(m_first);
 
+        // 显存：不可用时全是 -1，统一用 vr_ok 判定
+        bool vr_ok = false;
+        double vr_first = 0, vr_last = 0, vr_max = 0;
+        for (double v : vram_val) {
+            if (v < 0) continue;
+            if (!vr_ok) { vr_ok = true; vr_first = vr_last = vr_max = v; continue; }
+            vr_last = v;
+            vr_max = std::max(vr_max, v);
+        }
+
         std::printf("\n稳定性测试：共处理 %d 帧（其中 %d 帧计入统计）\n", done, valid);
         std::printf("  吞吐      %.1f FPS\n", 1000.0 * valid / total_ms);
         std::printf("  每帧延迟  中位 %.2f ms　p95 %.2f　p99 %.2f　最大 %.2f\n",
@@ -672,6 +740,18 @@ int main(int argc, char** argv) {
         std::cout << "  采样     ";
         for (size_t i = 0; i < mem_val.size(); ++i)
             std::cout << mem_val[i] << (i + 1 < mem_val.size() ? " → " : " MB\n");
+        if (vr_ok) {
+            std::printf("  显存     起始 %.0f MB　结束 %.0f MB　峰值 %.0f MB　净增 %+.0f MB\n",
+                        vr_first, vr_last, vr_max, vr_last - vr_first);
+            std::cout << "  显存采样 ";
+            for (size_t i = 0; i < vram_val.size(); ++i) {
+                if (vram_val[i] < 0) std::cout << "n/a";
+                else std::cout << static_cast<long long>(vram_val[i]);
+                std::cout << (i + 1 < vram_val.size() ? " → " : " MB\n");
+            }
+        } else {
+            std::printf("  显存     不可用（未找到 cudart，或当前不是 CUDA 场景）\n");
+        }
         std::cout << "  最后一帧 检出 " << last_count << " 个目标\n";
         std::cout << "  判读　　";
         if (m_delta > 50 && mem_val.size() >= 3 && mem_val.back() > mem_val.front())
@@ -702,6 +782,18 @@ int main(int argc, char** argv) {
                << ",\n    \"samples\": [";
             for (size_t i = 0; i < mem_val.size(); ++i)
                 jf << (i ? ", " : "") << mem_val[i];
+            jf << "]}"
+               << ",\n  \"vram_mb\": {\"available\": " << (vr_ok ? "true" : "false")
+               << ", \"at_start\": " << (vram0 >= 0 ? static_cast<long long>(vram0) : -1)
+               << ", \"first_sample\": " << static_cast<long long>(vr_first)
+               << ", \"last_sample\": " << static_cast<long long>(vr_last)
+               << ", \"peak\": " << static_cast<long long>(vr_max)
+               << ", \"delta\": " << static_cast<long long>(vr_last - vr_first)
+               << ",\n    \"samples\": [";
+            for (size_t i = 0; i < vram_val.size(); ++i) {
+                jf << (i ? ", " : "")
+                   << (vram_val[i] < 0 ? -1 : static_cast<long long>(vram_val[i]));
+            }
             jf << "]}\n}\n";
             std::cout << "结果：" << json_path << "\n";
         }
