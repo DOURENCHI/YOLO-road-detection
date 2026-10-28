@@ -63,3 +63,30 @@ docs/RESUME_PROJECT.md
 # 所以不要把它加进忽略列表。
 # 说明一下体积取舍：site/ 约 2.9 MB（说明书 html 1.7 MB + 演示素材 1.2 MB），
 # 这部分是仓库里唯一"为了展示而留的大文件"，属于有意为之。
+
+# ---------------------------------------------------------------- C++ 构建
+# cpp/build 里除了 exe 还有 onnxruntime 的三个 DLL（其中 CUDA 插件 307 MB），
+# 全都可以重新生成，绝不能进仓库。
+cpp/build/
+
+# 手动下载的 ONNX Runtime 官方包（65 MB，本项目最终没用它，头文件直接取的源码树）
+cpp/third_party/ort.zip
+
+# C++ 分发包（exe + 142 个 DLL，212.9 MB，用 cpp/collect_deps.py 重新生成）
+cpp/dist/
+
+# 部署脚本的中间产物（报告才是需要留的）
+docs/deployment/_backend_*
+
+# TensorRT EP 的引擎缓存（首次构建 10 分钟，可重新生成）
+weights/trt_cache/
+
+# 合成的稳定性测试视频（69 MB，可用 scripts/17_make_test_video.py 重新生成）
+assets/videos/_stability_test.mp4
+
+# 真实测试视频（69.8 MB，CC0，可按 README 里的 URL 重新下载）
+assets/videos/dashcam_cc0_720p.ogv
+
+# 真实测试视频（大文件，可重新从 Wikimedia Commons 下载，见 assets/videos/README.md）
+assets/videos/dashcam_cc0_720p.ogv
+assets/videos/road_traffic_cobblestone.webm
