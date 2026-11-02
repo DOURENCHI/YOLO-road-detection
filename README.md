@@ -18,7 +18,7 @@
 
 ```
 YOLO_Road_Detection/
-├── scripts/                          # 全部脚本（可在任意目录下运行）
+├── scripts/                          # 全部脚本（共 21 个，可在任意目录下运行）
 │   ├── dataset_config.py             # 共享配置：路径 + 类别，从 data.yaml 读
 │   ├── 01_check_dataset.py           # 结构检查（图片/标签配对、格式、数值）
 │   ├── 02_inspect_label_formats.py   # 标注格式分类统计
@@ -32,7 +32,16 @@ YOLO_Road_Detection/
 │   ├── 09_evaluate.py                # 正式评估 + 自动生成评估报告
 │   ├── benchmark_inference.py        # 推理性能测试（三档计时 + 6 项口径）
 │   ├── check_data_leakage.py         # 数据泄漏检查（md5 + 感知哈希 + 时间戳）
-│   └── _backup_2026-10-14/           # 改造前的脚本原件（留档）
+│   │
+│   │   # ↓ 以下 8 个属于部署阶段，详见第 7 节
+│   ├── 10_export_onnx.py             # 导出 ONNX，并留痕（环境快照 / sha256 / 读回结构）
+│   ├── 11_verify_onnx.py             # ONNX 三层验证：结构 / 数值 / 结果
+│   ├── 12_benchmark_pt_vs_onnx.py    # PyTorch 与 ONNX Runtime 同条件性能对比
+│   ├── 13_compare_cpp_backends.py    # C++ 两种图像后端对比（手写双线性 vs OpenCV）
+│   ├── 14_export_engine.py           # 构建 TensorRT FP32 / FP16 引擎
+│   ├── 15_verify_engine.py           # 引擎四层验证（结构/数值/结果/精度）+ 性能
+│   ├── 16_eval_valid_split.py        # valid 上对比四种格式精度（刻意不碰 test）
+│   └── 17_make_test_video.py         # 合成测试视频（仅验证链路，不用于报延迟）
 ├── datasets/
 │   ├── road-traffic/                 # 原始数据集（Roboflow 导出）
 │   │   ├── train/ valid/ test/       # 各自含 images/ 与 labels/
@@ -41,10 +50,24 @@ YOLO_Road_Detection/
 │   └── road-traffic-detect/          # 04 号脚本生成的检测框数据集
 │       ├── train/ valid/ test/
 │       └── data.yaml                 # 训练实际使用的配置
+├── cpp/                              # C++ 推理工程（Windows + MSYS2，见 cpp/README.md）
+│   ├── src/main.cpp                  # 三种模式：单图 / 端到端（--repeat）/ 视频流（--video）
+│   ├── experiments/trt_abi_probe.cpp # ABI 探测：证明 MinGW 不能直接调用 TensorRT 虚函数
+│   ├── collect_deps.py               # 递归读导入表收依赖 + sha256 体检 + --gpu 选项
+│   ├── third_party/                  # ONNX Runtime C/C++ 头文件 + stb
+│   ├── build/                        # 开发态构建产物（.gitignore）
+│   └── dist/                         # 分发包 143 文件 / 212.9 MB（.gitignore）
+├── ros2/                             # ROS2 封装（WSL2 + Humble，尚未在 Linux 编译验证）
+│   └── src/yolo_trt_ros/             # 节点 + 自定义消息 + launch + 单元测试 + fake_camera
 ├── docs/                             # 各类记录
-│   ├── label_conversion_report.txt        # 04 号脚本生成的转换报告（审计日志）
-│   ├── inference_benchmark.json           # 性能测试原始统计量 + 完整测量条件
-│   ├── data_leakage_report.json           # 数据泄漏检查的完整结果
+│   ├── architecture.md               # 架构：模块职责与调用关系
+│   ├── workflow.md                   # 端到端流程：输入到输出
+│   ├── code_notes.md                 # 关键函数、参数、数据结构
+│   ├── debug_log.md                  # 问题、原因、解法、验证结果
+│   ├── deployment/                   # 部署阶段：实施记录 + 12 份实测 JSON + 两份分包清单
+│   ├── label_conversion_report.txt   # 04 号脚本生成的转换报告（审计日志）
+│   ├── inference_benchmark.json      # 性能测试原始统计量 + 完整测量条件
+│   ├── data_leakage_report.json      # 数据泄漏检查的完整结果
 │   └── args_failed_run_2026-10-13.yaml    # 那次失败运行的参数快照（证据）
 ├── runs/detect/runs/road_baseline/   # 正式训练产物（曲线、混淆矩阵、权重）
 ├── results/
@@ -53,13 +76,18 @@ YOLO_Road_Detection/
 │   ├── demo/demo_grid.png            # 07 号脚本的对照拼图（三档示例）
 │   ├── track/                        # 08 号脚本的跟踪视频与轨迹统计
 │   └── eval_report/                  # 09 号脚本的评估报告与图表
-├── assets/                           # 演示素材（示例图；自己录的视频放 assets/videos/）
+├── assets/                           # 演示素材（videos/ 下是稳定性测试用的真实视频，不入库）
 ├── site/                             # GitHub Pages 站点（会被发布到公网）
 │   ├── index.html                    # 在线演示页
 │   ├── manual.html                   # 项目说明书（零基础版，单文件自包含）
 │   └── media/                        # 站点用的图与视频（演示拼图、评估图表、跟踪视频）
+├── weights/
+│   ├── yolo26n.pt                    # 预训练权重
+│   ├── best.onnx                     # 导出产物 9.4 MB，部署链路的起点
+│   ├── best_fp32.engine              # TensorRT FP32 17.9 MB（绑本机显卡与 TRT 版本）
+│   ├── best_fp16.engine              # TensorRT FP16 11.8 MB（同上，不能跨机器拷）
+│   └── trt_cache/                    # ORT TensorRT EP 的引擎缓存（.gitignore）
 ├── .github/workflows/pages.yml       # 站点自动部署（push 后自动更新在线版）
-├── weights/yolo26n.pt                # 预训练权重
 ├── requirements.txt                  # 依赖清单（版本已固定）
 └── LICENSE                           # 代码 MIT；数据集 CC BY 4.0（须署名）
 ```
@@ -385,6 +413,9 @@ python scripts/08_track.py --source assets/videos/你录的视频.mp4 --name rea
 
 ---
 
+> **部署阶段另有 8 个脚本（10–17 号）**，用途和运行顺序见第 7 节。
+> 它们不属于「训练与评估」这条线，所以没排在上面的 1–12 步里。
+
 ## 5. 训练
 
 ```bash
@@ -482,7 +513,124 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 
 ---
 
-## 7. 复现说明
+## 7. 部署：从 best.pt 到能交付的程序
+
+训练和评估回答"模型准不准"，部署回答"它在系统里能不能用"。这条链路有四个独立的验收点，
+**不能跳着做**——因为"没有框"这一个症状，可能是通信配错、格式转换错、后端没生效、或者模型在这个场景里真检测不到。
+
+| 段落 | 产出 | 验收标准 | 详细记录 |
+|---|---|---|---|
+| ONNX 导出 | `weights/best.onnx`（9.4 MB） | 结构 / 数值 / 结果三层验证 | `docs/deployment/` |
+| TensorRT | `best_fp32.engine` / `best_fp16.engine` | 四层验证 + 精度对照 | 同上 |
+| C++ 工程 | `cpp/`（单图 / 端到端 / 视频流） | 与 Python 侧结果一致 + 延迟 | 同上 |
+| ROS2 封装 | `ros2/src/yolo_trt_ros` | **尚未在 Linux 编译验证** | `ros2/src/yolo_trt_ros/README.md` |
+
+每一步的逐步操作、每个数字怎么读、踩过的 27 个坑，都在 **`docs/deployment/README.md`**。
+下面是结论。
+
+### 7.1 四档性能：同一个模型，差 11 倍
+
+同一张图、预热 30 次、n=200、每次前后同步：
+
+| 路径 | 纯推理中位 | 相对 ONNX |
+|---|---|---|
+| PyTorch（框架计时） | 12.65 ms | — |
+| ONNX Runtime FP32 | 8.19 ms | 1.00× |
+| TensorRT FP32 引擎 | 2.88 ms | 2.84× |
+| TensorRT FP16 引擎 | **1.97 ms** | **4.16×** |
+| C++ + ORT CUDA EP | 6.23 ms | 1.31× |
+| C++ + ORT TensorRT EP | **3.22 ms** | 2.54× |
+
+**跨表比较绝对值没有意义**：ONNX 这一项在不同时段测到过 7.10 和 8.19，差的 15% 是机器状态
+（GPU 频率、后台负载），不是代码。**只比同一次测出来的相对值。**
+
+### 7.2 精度：两个落差必须分开算
+
+在 **valid** 上比（test 只评过一次，全程不碰）：
+
+| 格式 | mAP50 | mAP50-95 |
+|---|---|---|
+| best.pt | 0.6407 | 0.4169 |
+| best.onnx | 0.6329 | 0.4111 |
+| engine FP32 | 0.6327 | 0.4111 |
+| engine FP16 | **0.6323** | 0.4103 |
+
+- **pt → ONNX 掉 0.0078**：这部分**不该全算作 ONNX 的精度损失**。pt 走的是训练时那条原生前向 + NMS，
+  onnx/engine 走的是另一条解码 + 后处理路径——这是「换了一条推理路径」，不是「算错了」。
+- **FP32 → FP16 只掉 0.0004（−0.06%）**：这才是 FP16 的净代价，小到可以忽略。
+
+**所以判断 FP16 能不能用，基准必须是「同路径的 FP32 引擎」，不能拿 pt 的 0.641。**
+拿 0.641 当基准，会把格式转换的代价误算到 FP16 头上，得出「FP16 不能用」的错误结论。
+
+### 7.3 端到端：推理只占 38%
+
+`--repeat` 模式跑完整链路（每轮重新读图），拆五段：
+
+| 配置 | 纯推理 | **端到端** | 读图 | 预处理 | 推理 | 后处理 |
+|---|---|---|---|---|---|---|
+| TRT + OpenCV | 2.76 ms | **7.94 ms** | 1.48 | 2.61 | 3.02 | 0.065 |
+| TRT + 手写双线性 | 2.72 ms | 11.74 ms | 1.73 | 6.26 | 2.99 | 0.064 |
+| CUDA + OpenCV | 6.55 ms | 13.31 ms | 1.56 | 2.40 | 8.76 | 0.071 |
+
+三条结论：
+
+1. **端到端是纯推理的 2.9 倍。** 只报 2.76 ms，被问一句"含不含读图"就答不上来。
+2. **推理只占 38%，预处理 33%，读图 19%。** 后处理才 0.8%——直觉上以为 NMS 很贵，实测不是。
+3. **阿姆达尔定律的实例**：CUDA→TRT 纯推理快 2.37 倍，端到端只快 1.68 倍，因为另外 62% 没变。
+
+另外换图像后端比换推理引擎更划算：手写双线性 → `cv::resize`，预处理 6.26 → 2.61 ms，一次省 3.80 ms。
+
+### 7.4 视频流与 1000 帧稳定性
+
+用两段真实公开视频（Wikimedia Commons，CC0 / CC BY 3.0），各跑两轮 1000 帧：
+
+| 输入 | 吞吐 | 中位 | p99 | 预处理 |
+|---|---|---|---|---|
+| 1280×720 | 100.5–101.6 FPS | 9.82–9.90 ms | 13.25–14.11 ms | 5.16–5.48 ms |
+| 1920×1080 | 72.5–75.4 FPS | 13.15–13.73 ms | 17.63–18.08 ms | 7.87–8.36 ms |
+
+- **p99 比中位高 22%–34%**。按 10 ms 设计控制回路的话，100 帧里就有 1 帧超时。
+- **内存与显存都不涨**：RSS 1000 帧净增 4–6 MB、显存 `1691 → 1691`（净增 0），两三次采样内持平。
+- **分辨率是主要成本项**：像素涨 8 倍（400×640 → 1920×1080），预处理涨约 3 倍，推理几乎不变。
+- 合成视频（图片拼接）会把 p99 抬高 3–4 ms，**报延迟必须用真实视频**，合成只用来验链路。
+
+显存是运行时动态加载 `cudaMemGetInfo` 采的。**不能用 `nvidia-smi` 前后各读一次求差值**——
+单次调用 101–107 ms（比一帧推理大 30–50 倍），而且程序退出时显存全释放，
+实测前后差 **−9 MB**，会得出"模型几乎不占显存"的错误结论。
+
+### 7.5 交付：什么能交，什么不该交
+
+| 形态 | 体积 | 状态 |
+|---|---|---|
+| **CPU 自包含包**（`cpp/dist/`） | 143 文件 / 212.9 MB | ✅ 干净 PATH 下验证通过（回落 CPU，19 ms） |
+| GPU 自包含包 | 163 文件 / 3.0 GB | ❌ 补齐全部依赖后仍 `0xC0000005`，已放弃 |
+| **轻包 + 目标机装运行时** | ≈ 40 MB | ✅ 推荐用于 GPU / TRT 场景 |
+
+**为什么不打包 GPU 运行时**：`nvinfer` 418 + `cublasLt` 643 + cuDNN 全套 904 + `cufft` 263 +
+`providers_cuda` 307 ≈ 3 GB，而且版本必须严丝合缝——缺 `nvrtc` 时 TensorRT 会**静默回落**
+（你还以为在用），cudnn 子库少一个就直接崩、报错还不提"缺文件"。
+
+打包用 `cpp/collect_deps.py`（递归读导入表 + 生成 sha256 MANIFEST + `--check` 体检），
+**不要手工拷 DLL**——本项目实测手工拷漏过两次，其中一次是包里的 exe 是旧版，
+跑 `--ep trt` 静默走了 CUDA EP（5.25 ms 而非 2.35 ms），完全不报错。
+
+### 7.6 ROS2：还没跑起来的那一步
+
+`ros2/src/yolo_trt_ros` 已写好：订阅图像话题、发布结构化检测结果与分段延迟，
+`depth=1` 背压、双时钟分离、启动自检抓静默回落。
+
+**但它从未在 Linux 上编译过。** 分阶段验收路径 A1–A5（dummy → CPU → CUDA → TRT → 线程对比）
+和逐步操作见 `ros2/src/yolo_trt_ros/README.md`，以及配套教程《YOLO_ROS2部署教程》。
+
+### 7.7 报数字的三条纪律
+
+1. **一律带条件**：哪个划分（test / valid）、哪台机器、batch 多少、含不含后处理。
+2. **跨时点不比绝对值**：只在同一次测量里比相对值。
+3. **精度基准用同路径**：判断 FP16 的好坏，跟同路径 FP32 比，不跟 pt 比。
+
+---
+
+## 8. 复现说明
 
 `args.yaml` 记录了训练参数，是复现的重要依据。但**要复现整个实验，光有它不够**，
 还需要同时固定：
@@ -495,7 +643,7 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 
 ---
 
-## 8. 待办
+## 9. 待办
 
 - [x] 人工核对 `empty_label_check.png` —— 已核实：画面里有一辆载两人的摩托车没被标，
       **判定为漏标**（见解析文档 6.8 ③）
@@ -516,10 +664,18 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
       均已完成并实跑验证
 - [x] 工程基线 —— `requirements.txt`（版本已固定）、`LICENSE`（代码 MIT + 数据集 CC BY 4.0）
 - [ ] **录一段 20~30 秒的真实道路视频**放进 `assets/videos/`，跑一次真正的跟踪演示
-      （现在目录里那个是合成片段，只能验证链路能跑通，不能当效果演示）
-- [ ] 阶段四：ONNX 导出与 TensorRT 推理优化 —— **本次暂缓**，是下一步计划
+      —— 稳定性测试已用两段 Wikimedia 的 CC0 / CC BY 视频完成（见 7.4 节），
+      但那两段是为了测延迟，**帧间连续不等于适合做跟踪效果演示**；跟踪演示仍在等一段自己拍的
+- [x] 阶段四：ONNX 导出 → TensorRT → C++ 部署 —— **已完成**，详见第 7 节。
+      四档性能对比、精度对照、端到端五段拆解、1000 帧稳定性、CPU 分发包都有实测数据
+- [ ] **ROS2 包在 WSL2 里编译跑通** —— 代码已写完（`ros2/src/yolo_trt_ros`），
+      但**从未在 Linux 上编译过**。分阶段路径 A1–A5 见该包 README
+- [ ] **GPU 轻包**（`≈40 MB`：exe + onnx + ORT/OpenCV 少数 DLL）——
+      3 GB 的自包含方案实测崩溃已放弃，轻包本身还没打出来
+- [ ] **INT8 校准** —— 需要校准集（只能用 valid），且要接受「某一类突然全没了」的风险，
+      端到端收益约 1 ms，性价比不高，暂缓
 
-## 9. 相关文档
+## 10. 相关文档
 
 **在线版**（不用下载仓库，点开就能看）：
 

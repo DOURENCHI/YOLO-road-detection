@@ -192,7 +192,66 @@ for value in (pixels[:, 1:] > pixels[:, :-1]).flatten():
 **可能存在轻度场景重叠，测试指标要按偏乐观理解**。
 时间戳靠得近只是弱证据，不等于画面重复——这句边界必须一起说。
 
-## 5. 参数速查
+## 5. 部署链条的三处关键实现
+
+这一节只记"容易写错、且错了不报错"的地方。完整的部署脚本说明见 `docs/deployment/README.md`。
+
+### `letterbox` / `unletterbox`（`cpp/src/main.cpp` 与 `ros2/.../letterbox.cpp` 各有一份）
+
+```cpp
+scale  = min(T / W, T / H)          // T = 640 目标边长
+new_w  = round(W * scale),  new_h = round(H * scale)
+pad_x  = (T - new_w) / 2.0,  pad_y = (T - new_h) / 2.0    // 必须是浮点
+```
+
+反变换（把 canvas 坐标换回原图）：
+
+```cpp
+x_orig = (x_canvas - pad_x) / scale
+y_orig = (y_canvas - pad_y) / scale
+```
+
+**三处常见错误，都不报错、只让框偏移**：
+
+| 写错的地方 | 症状 |
+|---|---|
+| `pad` 用整数除法（`(T-new_w)/2`） | 宽高为奇数时**偏 0.5 像素**，小目标上肉眼可见 |
+| 反变换写成 `* scale` 而不是 `/ scale` | 框按比例放大/缩小，位置看着"大概对" |
+| 忘记减 `pad` | 框整体平移，偏移量正好等于 `pad` |
+
+**故意不裁剪**：落在填充区的框会算出负坐标。`unletterbox` 不做 clamp，
+由调用方决定（检测器里统一 clamp 到图像边界）——这样单元测试能明确验证"负坐标确实被算出来了"。
+
+**为什么 640×640 的图测不出上面任何一个**：`scale = 1.0`、`pad = 0`，整个变换是恒等映射。
+见 `debug_log.md` 2026-10-29 那条。
+
+### `to_blob`：HWC uint8 → CHW float32
+
+```cpp
+canvas.convertTo(f, CV_32FC3, 1.0 / 255.0);   // 归一化 + 转 float
+cv::split(f, ch.data());                       // 三平面，直接写进预分配缓冲
+```
+
+用 `Mat*` 重载而不是 `OutputArrayOfArrays`：后者的 `create()` 语义依赖"尺寸相同即不重分配"，
+显式传首地址才能保证写进**调用方预分配的那块内存**，不会静默换一块新的。
+这个坑在优化预处理时踩过——每帧多分配 7.3 MB，20 ms 就这么没了。
+
+### `collect_deps.py`：递归读导入表
+
+```python
+objdump -p <dll> | grep "DLL Name"     # 只拿直接依赖
+```
+
+从 exe 出发 BFS，跳过系统 DLL 白名单（`KERNEL32` / `api-ms-win-*` 等），
+把命中的 DLL 加进队列继续展开。**必须递归**：
+`libopencv_videoio` 会拉进 FFmpeg 一整套，`providers_cuda` 会拉进 `cufft`——
+后者在 `providers_cuda` 的导入表里都查不到，是间接依赖。
+
+**为什么不能手工列清单**：本项目手工维护的 `dist/` 漂移过两次，
+一次是缺 `libopencv_videoio`（视频模式直接用不了），
+一次是 exe 本身是旧版（`--ep trt` 被静默忽略）。见 `debug_log.md` 2026-10-28。
+
+## 6. 参数速查
 
 ### 数据集
 
@@ -218,12 +277,23 @@ for value in (pixels[:, 1:] > pixels[:, :-1]).flatten():
 | `seed` / `deterministic` | 0 / true | 便于复现 |
 | `workers` | 0 | Windows 上便于看报错 |
 
+### 部署
+| 项 | 值 | 说明 |
+|---|---|---|
+| `ORT_ROOT` | `~/onnxruntime-linux-x64-1.22.0` | C++ 头与 CPU 用 `.so` 的来源 |
+| `onnxruntime-gpu` 版本 | 必须与 release 包**同版本**（1.22.0） | 头来自 release、GPU 的 `.so` 来自 pip，不同版会段错误 |
+| `trt_cache_dir` | WSL 内部路径（如 `~/trt_cache`） | **不能用 Windows 侧那份**，engine 跨平台失效 |
+| `--ep` | `cpu` / `cuda` / `trt` | 只对 `cpp/` 有效；ROS2 节点用参数 `ep` |
+| `--repeat` | 200（建议） | 端到端分段计时，每轮重新读图 |
+| `--legacy-pre` | 开关 | 走旧预处理，用于一致性对比 |
+| 判定 TRT 是否真生效 | `infer p50 ≤ 4 ms` | 8 ms 是 CUDA 的，别当成功 |
+
 ### 环境
 
 Python 3.11.16 / PyTorch 2.11.0+cu128 / CUDA 12.8 / Ultralytics 8.4.176 /
 RTX 5060 Laptop 8 GB。训练耗时 660.4 s（约 11 分钟）。
 
-## 6. 原理补充
+## 7. 原理补充
 
 ### 为什么改标签后必须删 `.cache`
 
@@ -245,6 +315,33 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 `best.pt` 和 `last.pt` 都是 5,469,061 字节，但 md5 不同
 （`974c53ee…` / `e56d3064…`）。第 48 轮指标最好，之后又跑了 2 轮，
 权重数值变了、序列化后大小没变。比较必须用哈希。
+
+### 为什么 engine 不能跨机器 / 跨系统拷
+
+TensorRT engine 是**针对这张显卡编译好的机器码**：里面选定的 kernel、tiling 参数、workspace 布局
+都是在这块卡上实测出来的。它绑死三件事——**显卡计算能力（如 sm_120）、TensorRT 版本、驱动版本**。
+
+所以 TensorRT 的交付方式一直是「**到目标机现场构建**」，不是分发 engine。
+本项目 Windows 构建的 engine 在 WSL 里加载不了，反之亦然。
+
+### 为什么精度判据要用相对误差，不用绝对差
+
+engine 与 ONNX 的输出最大绝对差测到过 **24.66**，看着像"模型坏了"。
+但那个输出的量级本身是 47.5（单位是像素坐标），相对误差只有 **7.09e-04**。
+
+绝对差还受**累加顺序**影响：不同 kernel 的加法和顺序不同，个别 anchor 的框坐标就会差几个像素。
+所以看**平均值和相对量**，不看最大值。
+
+### 为什么"能加载"不等于"生效"
+
+ORT 请求的 EP 加载失败时**不抛异常、不报错**，安静地用下一个可用 EP 跑。
+缺 `nvrtc` 时 TensorRT EP 就是这样：`ep` 字段显示 TensorRT，实际速度是 CUDA 的。
+
+判据只能是**量级**：TRT ≈ 2–4 ms、CUDA ≈ 5–8 ms、CPU ≈ 15–25 ms。
+所以两个 C++/ROS2 程序里都有启动自检，跑几十帧看延迟落不落在该后端的区间。
+
+和 Windows 侧的「MinGW 能链接 nvinfer 但调用返回垃圾值」是同一类问题的两个版本：
+**链接/加载成功，不等于调用正确。**
 
 ### 为什么 dHash 比 md5 更适合查"重复图片"
 

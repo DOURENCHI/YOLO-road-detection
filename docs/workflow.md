@@ -15,7 +15,11 @@ flowchart TD
     V --> T["训练 50 epochs"]
     T --> E["09 测试集评估（只跑一次）"]
     T --> D["06/07/08 推理与演示"]
+    D --> P["10–17 部署<br/>详见 §7"]
 ```
+
+上面这张图只画到"演示"。**部署是另一条支线**，从 `best.pt` 出发，走 ONNX → TensorRT → C++，
+见 §7。
 
 ## 2. 逐步输入 / 输出 / 判据
 
@@ -96,7 +100,33 @@ flowchart TD
 
 **"模型敢不敢报"和"它报得对不对"是两件事**，文档里必须分开说。
 
-## 7. 一次完整复现需要固定什么
+## 7. 部署流程（Windows 侧，8 步）
+
+接在 §5 训练之后。它不只是"再跑几个脚本"——真正的难点是**换运行时的同时保持结果不变**。
+
+| # | 步骤 | 需要什么 | 产出 | 判据 |
+|---|---|---|---|---|
+| 1 | `10_export_onnx.py` | `best.pt` | `weights/best.onnx` | 9.4 MB；读回结构（opset / 节点数 / 368 个算子）与预期一致 |
+| 2 | `11_verify_onnx.py` | onnx + pt | `onnx_verify_report.json` | 三层全过：结构一致、数值相对误差 ~1e-4、**16 图 70 对 70、最小 IoU ≥ 0.99** |
+| 3 | `12_benchmark_pt_vs_onnx.py` | 同一张图 | `benchmark_pt_vs_onnx.json` | 同条件、n ≥ 100、每次前后同步；记录三档口径 |
+| 4 | `14_export_engine.py` | onnx + TensorRT | `best_fp32.engine` / `best_fp16.engine` | FP32 ≈ 18 MB（~2 min）；FP16 ≈ 12 MB（**~10 min**） |
+| 5 | `15_verify_engine.py` | 两个引擎 + onnx | `engine_verify_report.json` | 四层验证（结构/数值/结果/精度）+ 三档性能同表 |
+| 6 | `16_eval_valid_split.py` | 四种格式 | `valid_precision_compare.json` | 只评 valid；**FP32 → FP16 的 mAP50 差 < 0.005** |
+| 7 | 构建 `cpp/` 并跑 | onnx + ORT | `cpp_result.json` / 端到端 / 视频报告 | 与 Python 侧逐框配对 IoU ≥ 0.98；端到端拆五段 |
+| 8 | `cpp/collect_deps.py` | build 产物 | `cpp/dist/` + `MANIFEST.txt` | 把 PATH 清成只剩系统目录，仍能跑出正确结果 |
+
+四个不能省的点：
+
+- **第 2 步不能跳。** 跳过它，后面所有对比都没有可信基线——你不知道差异是"格式转换"带来的还是"本来就坏了"。
+- **第 4 步的 engine 绑死本机。** 显卡架构 + TensorRT 版本 + 驱动三者任一变化都得重建。
+  **Windows 构建的 engine 在 Linux 上加载不了**，反之亦然。
+- **第 6 步只用 valid。** test 已经在 §5 用过一次，不再碰——第二次看它就不再是"没见过的数据"。
+- **第 8 步不要手工拷 DLL。** 本项目手工拷漏过两次，其中一次是包里的 exe 是旧版，
+  `--ep trt` 被静默忽略、走了 CUDA EP，全程不报错。
+
+部署阶段的更细步骤（含每个数字怎么读、27 个坑）见 `docs/deployment/README.md`。
+
+## 8. 一次完整复现需要固定什么
 
 只有 `args.yaml` 不够，必须同时固定五项：
 
