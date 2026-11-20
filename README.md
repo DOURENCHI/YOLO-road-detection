@@ -18,7 +18,7 @@
 
 ```
 YOLO_Road_Detection/
-├── scripts/                          # 全部脚本（共 21 个，可在任意目录下运行）
+├── scripts/                          # 全部脚本（共 23 个，可在任意目录下运行）
 │   ├── dataset_config.py             # 共享配置：路径 + 类别，从 data.yaml 读
 │   ├── 01_check_dataset.py           # 结构检查（图片/标签配对、格式、数值）
 │   ├── 02_inspect_label_formats.py   # 标注格式分类统计
@@ -40,8 +40,10 @@ YOLO_Road_Detection/
 │   ├── 13_compare_cpp_backends.py    # C++ 两种图像后端对比（手写双线性 vs OpenCV）
 │   ├── 14_export_engine.py           # 构建 TensorRT FP32 / FP16 引擎
 │   ├── 15_verify_engine.py           # 引擎四层验证（结构/数值/结果/精度）+ 性能
-│   ├── 16_eval_valid_split.py        # valid 上对比四种格式精度（刻意不碰 test）
-│   └── 17_make_test_video.py         # 合成测试视频（仅验证链路，不用于报延迟）
+│   ├── 16_eval_valid_split.py        # valid 上对比五种格式精度（含 INT8，刻意不碰 test）
+│   ├── 17_make_test_video.py         # 合成测试视频（仅验证链路，不用于报延迟）
+│   ├── 18_export_engine_int8.py      # 构建 INT8 引擎（PTQ，校准集用 train）
+│   └── 19_verify_int8.py             # INT8 四层验证 + 量化覆盖率 + 延迟对照
 ├── datasets/
 │   ├── road-traffic/                 # 原始数据集（Roboflow 导出）
 │   │   ├── train/ valid/ test/       # 各自含 images/ 与 labels/
@@ -86,6 +88,7 @@ YOLO_Road_Detection/
 │   ├── best.onnx                     # 导出产物 9.4 MB，部署链路的起点
 │   ├── best_fp32.engine              # TensorRT FP32 17.9 MB（绑本机显卡与 TRT 版本）
 │   ├── best_fp16.engine              # TensorRT FP16 11.8 MB（同上，不能跨机器拷）
+│   ├── best_int8.engine              # TensorRT INT8 11.8 MB（PTQ；实测不推荐，见 7.2.1）
 │   └── trt_cache/                    # ORT TensorRT EP 的引擎缓存（.gitignore）
 ├── .github/workflows/pages.yml       # 站点自动部署（push 后自动更新在线版）
 ├── requirements.txt                  # 依赖清单（版本已固定）
@@ -523,6 +526,7 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 | ONNX 导出 | `weights/best.onnx`（9.4 MB） | 结构 / 数值 / 结果三层验证 | `docs/deployment/` |
 | TensorRT | `best_fp32.engine` / `best_fp16.engine` | 四层验证 + 精度对照 | 同上 |
 | C++ 工程 | `cpp/`（单图 / 端到端 / 视频流） | 与 Python 侧结果一致 + 延迟 | 同上 |
+| **INT8 量化** | `weights/best_int8.engine`（11.8 MB） | 四层验证 + 覆盖率 + 五格式精度 | 同上（结论见 7.2.1） |
 | ROS2 封装 | `ros2/src/yolo_trt_ros` | **尚未在 Linux 编译验证** | `ros2/src/yolo_trt_ros/README.md` |
 
 每一步的逐步操作、每个数字怎么读、踩过的 27 个坑，都在 **`docs/deployment/README.md`**。
@@ -554,6 +558,7 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 | best.onnx | 0.6329 | 0.4111 |
 | engine FP32 | 0.6327 | 0.4111 |
 | engine FP16 | **0.6323** | 0.4103 |
+| engine INT8 | 0.6048 | 0.3935 |
 
 - **pt → ONNX 掉 0.0078**：这部分**不该全算作 ONNX 的精度损失**。pt 走的是训练时那条原生前向 + NMS，
   onnx/engine 走的是另一条解码 + 后处理路径——这是「换了一条推理路径」，不是「算错了」。
@@ -561,6 +566,33 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 
 **所以判断 FP16 能不能用，基准必须是「同路径的 FP32 引擎」，不能拿 pt 的 0.641。**
 拿 0.641 当基准，会把格式转换的代价误算到 FP16 头上，得出「FP16 不能用」的错误结论。
+
+### 7.2.1 INT8：测过了，结论是不值得
+
+| 指标 | FP32 | FP16 | INT8 |
+|---|---|---|---|
+| mAP50（valid） | 0.6327 | 0.6323 | **0.6048（−4.41%）** |
+| mAP50-95 | 0.4111 | 0.4103 | 0.3935 |
+| 精确率 P / 召回率 R | 0.6255 / 0.6020 | 0.6249 / 0.5925 | 0.5673 / 0.5840 |
+| 纯推理 p50（两次运行） | 2.61–2.70 ms | 1.86–1.94 ms | **1.83–1.91 ms（只快 1.5%–3%）** |
+| 卷积层 INT8 覆盖 | — | — | 83/102（81%） |
+
+**结论：掉 4.41% 的 mAP，换 1.5%–3% 的延迟，本机不值得。** 三个必须说清的点：
+
+0. **延迟差小于测量波动**（两次运行各自差 1.5%–3%，而运行间本身波动 ±5%），
+   所以只能说"看不出加速"；而 mAP 的 −4.41% 是可重复的。这两件事的可信度不一样。
+
+1. **量化确实生效了**（81% 卷积是 INT8），所以"不快"不能赖"没量化下去"。
+   但引擎里仍有 41 个 Float / 50 个 Half 张量，层间精度切换本身有开销。
+2. **失效方式是弥散的，不是某一类崩掉**：buses −0.120、bicycles −0.069、vehicles 只 −0.008。
+   如果某一类掉到 0，才说明校准范围被压坏；现在是量化噪声的正常表现。
+3. **P 掉 5.8 点、R 只掉 1.8 点**：主要是置信度分布被压低，不是大面积漏检。
+
+原因**推测**（未验证）：2.39 M 参数的小模型在桌面 GPU 上是访存/调度受限，不是算力受限，
+INT8 的算力优势用不上。要验证只有两条路——换更大的模型，或换 Jetson 这类算力受限设备。
+
+⚠️ 上表的延迟是**另一次测量**（与 7.1 的四档不同场次），跨场次不比绝对值，只比同场内的相对关系。
+校准集用的是 **train**（不是 valid）：用 valid 校准会让 mAP 偏乐观。
 
 ### 7.3 端到端：推理只占 38%
 

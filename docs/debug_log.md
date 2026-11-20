@@ -412,6 +412,33 @@ pad_x = pad_y = 0
 ⚠️ 已知边界。**用正方形输入验证不了 letterbox** 这件事本身不会"修好"，
 只能在验证流程里记住：改坐标相关代码，必须用非方形输入复测。
 
+---
+
+## 2026-11-20 · 报告里写"熵校准"，实际是 MinMax
+
+**现象**
+
+构建 INT8 引擎时脚本注释写的是"PTQ + 熵校准（IInt8EntropyCalibrator2）"，构建成功、指标也正常。
+但 TensorRT 日志里有一行：`Writing Calibration Cache for calibrator: TRT-100800-MinMaxCalibration`。
+
+**原因**
+
+ultralytics 的导出器把校准算法**写死**成 `MINMAX_CALIBRATION`（只有 DLA 场景才切 `ENTROPY_CALIBRATION_2`），
+校准器还是函数内部的嵌套类，外部没有开关。**代码里没有传校准算法的地方，注释写的不算数。**
+
+**处理**
+
+报告与文档改成实际值（MinMax），并把日志原文一起记进 JSON，便于以后核对。
+
+**验证**
+
+`docs/deployment/engine_int8_export_report.json` 的「量化方式」与「校准日志关键行」两个字段。
+
+**现状**
+
+✅ 已修正。**教训：凡是"用了什么算法/开了什么开关"的结论，必须去日志或产物里找证据，
+不能凭注释或参数名推断。**
+
 ## 记录规范（后续沿用）
 
 每条记录五段：**现象 / 原因 / 处理 / 验证 / 现状**。

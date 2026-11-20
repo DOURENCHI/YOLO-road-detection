@@ -1,5 +1,5 @@
 {
- "生成时间": "2026-10-27 11:21:32",
+ "生成时间": "2026-11-20 14:15:08",
  "划分": "val（data.yaml 里键名是 val，目录叫 valid）",
  "说明": "test 只评一次（mAP50 0.680），本表不涉及 test",
  "参数": {
@@ -17,7 +17,21 @@
    "mAP50_95": 0.4169,
    "精确率": 0.6724,
    "召回率": 0.6048,
-   "耗时_s": 26.5
+   "耗时_s": 25.0,
+   "逐类_mAP50_95": {
+    "bicycles": 0.3679,
+    "bridges": 0.0937,
+    "buses": 0.7597,
+    "chimneys": 0.2002,
+    "crosswalks": 0.2518,
+    "fire hydrants": 0.8115,
+    "motorcycles": 0.5653,
+    "stairs": 0.1944,
+    "taxis": 0.6466,
+    "tractors": 0.0,
+    "traffic lights": 0.4414,
+    "vehicles": 0.67
+   }
   },
   {
    "标签": "onnx",
@@ -27,7 +41,21 @@
    "mAP50_95": 0.4111,
    "精确率": 0.6235,
    "召回率": 0.6028,
-   "耗时_s": 23.3
+   "耗时_s": 22.7,
+   "逐类_mAP50_95": {
+    "bicycles": 0.3855,
+    "bridges": 0.0862,
+    "buses": 0.8074,
+    "chimneys": 0.1618,
+    "crosswalks": 0.2474,
+    "fire hydrants": 0.796,
+    "motorcycles": 0.5655,
+    "stairs": 0.1911,
+    "taxis": 0.5944,
+    "tractors": 0.0,
+    "traffic lights": 0.4299,
+    "vehicles": 0.6679
+   }
   },
   {
    "标签": "engine_fp32",
@@ -37,7 +65,21 @@
    "mAP50_95": 0.4111,
    "精确率": 0.6255,
    "召回率": 0.602,
-   "耗时_s": 21.6
+   "耗时_s": 21.4,
+   "逐类_mAP50_95": {
+    "bicycles": 0.3855,
+    "bridges": 0.0862,
+    "buses": 0.8074,
+    "chimneys": 0.1616,
+    "crosswalks": 0.2442,
+    "fire hydrants": 0.796,
+    "motorcycles": 0.5693,
+    "stairs": 0.1909,
+    "taxis": 0.5949,
+    "tractors": 0.0,
+    "traffic lights": 0.43,
+    "vehicles": 0.6677
+   }
   },
   {
    "标签": "engine_fp16",
@@ -47,7 +89,45 @@
    "mAP50_95": 0.4103,
    "精确率": 0.6249,
    "召回率": 0.5925,
-   "耗时_s": 21.4
+   "耗时_s": 21.0,
+   "逐类_mAP50_95": {
+    "bicycles": 0.3889,
+    "bridges": 0.0864,
+    "buses": 0.8074,
+    "chimneys": 0.1619,
+    "crosswalks": 0.2446,
+    "fire hydrants": 0.796,
+    "motorcycles": 0.5676,
+    "stairs": 0.1969,
+    "taxis": 0.5717,
+    "tractors": 0.0,
+    "traffic lights": 0.433,
+    "vehicles": 0.6689
+   }
+  },
+  {
+   "标签": "engine_int8",
+   "说明": "TensorRT INT8（PTQ，校准集 train）",
+   "文件": "best_int8.engine",
+   "mAP50": 0.6048,
+   "mAP50_95": 0.3935,
+   "精确率": 0.5673,
+   "召回率": 0.584,
+   "耗时_s": 21.3,
+   "逐类_mAP50_95": {
+    "bicycles": 0.3167,
+    "bridges": 0.1169,
+    "buses": 0.6872,
+    "chimneys": 0.1684,
+    "crosswalks": 0.2442,
+    "fire hydrants": 0.858,
+    "motorcycles": 0.5532,
+    "stairs": 0.1579,
+    "taxis": 0.5487,
+    "tractors": 0.0,
+    "traffic lights": 0.4115,
+    "vehicles": 0.6598
+   }
   }
  ]
 }

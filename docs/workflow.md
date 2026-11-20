@@ -111,9 +111,10 @@ flowchart TD
 | 3 | `12_benchmark_pt_vs_onnx.py` | 同一张图 | `benchmark_pt_vs_onnx.json` | 同条件、n ≥ 100、每次前后同步；记录三档口径 |
 | 4 | `14_export_engine.py` | onnx + TensorRT | `best_fp32.engine` / `best_fp16.engine` | FP32 ≈ 18 MB（~2 min）；FP16 ≈ 12 MB（**~10 min**） |
 | 5 | `15_verify_engine.py` | 两个引擎 + onnx | `engine_verify_report.json` | 四层验证（结构/数值/结果/精度）+ 三档性能同表 |
-| 6 | `16_eval_valid_split.py` | 四种格式 | `valid_precision_compare.json` | 只评 valid；**FP32 → FP16 的 mAP50 差 < 0.005** |
+| 6 | `16_eval_valid_split.py` | **五种**格式（含 INT8） | `valid_precision_compare.json` | 只评 valid；**FP32 → FP16 的 mAP50 差 < 0.005**；INT8 记逐类 |
 | 7 | 构建 `cpp/` 并跑 | onnx + ORT | `cpp_result.json` / 端到端 / 视频报告 | 与 Python 侧逐框配对 IoU ≥ 0.98；端到端拆五段 |
 | 8 | `cpp/collect_deps.py` | build 产物 | `cpp/dist/` + `MANIFEST.txt` | 把 PATH 清成只剩系统目录，仍能跑出正确结果 |
+| 9 | `18/19` INT8 量化 | onnx + train 校准集（494 张） | `best_int8.engine` + 两份 JSON | 覆盖率 ≥ 80%；**mAP50 掉 >0.03 或不快 → 不采用**（实测 −4.41% / +1.5–3%，不采用） |
 
 四个不能省的点：
 

@@ -1,0 +1,43 @@
+{
+ "生成时间": "2026-11-20 14:09:14",
+ "源权重": {
+  "path": "runs\\detect\\runs\\road_baseline\\weights\\best.pt",
+  "sha256": "a5cdefaa39d43fa4a8d72fe811d71ecd0f3a63f15a8a0d0606f484f51529fdd8"
+ },
+ "量化方式": "PTQ（训练后量化）+ TensorRT MinMax 校准器（日志原文 TRT-100800-MinMaxCalibration，由 ultralytics 调用）",
+ "校准集": {
+  "split": "train",
+  "路径": "datasets\\road-traffic-detect\\data.yaml",
+  "图片数": 494,
+  "fraction": 1.0,
+  "实际参与张数_约": 494,
+  "为什么用 train": "valid 是量化效果的评估集，用它校准会让分数偏乐观；train 与 valid/test 完全不相交"
+ },
+ "环境": {
+  "tensorrt": "10.8.0.43",
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "compute_capability": "12.0",
+  "tensorrt_home": "D:\\TensorRT\\TensorRT-10.8.0.43"
+ },
+ "产物": {
+  "文件": "weights\\best_int8.engine",
+  "size_mb": 11.83,
+  "构建耗时_s": 379.0,
+  "sha256": "13e527a69265b2efe3a1a6351897f406d1a0b0b57f9579ad359ed136088d14ef",
+  "参数": {
+   "imgsz": 640,
+   "batch": 1,
+   "workspace_GB": 4,
+   "quantize": 8
+  }
+ },
+ "校准缓存": "未生成独立缓存文件（框架内联处理）",
+ "限制": "engine 绑定 TensorRT 10.8.0.43 + NVIDIA GeForce RTX 5060 Laptop GPU + 校准缓存，换显卡或换 TRT 版本必须重建",
+ "校准日志关键行": [
+  "Calibration completed in 101.8 seconds",
+  "Writing Calibration Cache for calibrator: TRT-100800-MinMaxCalibration",
+  "Engine generation completed in 250.207 seconds"
+ ]
+}
