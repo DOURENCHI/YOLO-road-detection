@@ -16,8 +16,7 @@
   "为什么不再继续": [
     "ORT provider 需要 SONAME 为 .so.10 的 TRT 10.x 库；PyPI 官方 tensorrt-cu12 的 10.x 只有源码包，11.x 才有 manylinux wheel 但 SONAME 是 .so.11，对不上",
     "TRT 10 Linux 库要从 NVIDIA 官方 pip 索引或 tar 包下载，几百 MB，需再花 20–40 分钟",
-    "更关键：Windows 侧已完整验证 TensorRT（docs/deployment/：FP32/FP16 引擎四层验证、C++ 接 TRT EP 3.22 ms）。"
-    "WSL 的 A4 是同一张 RTX 5060、同一个 best.onnx、同一个 TRT 10.8 ——数字高度重复，边际收益低",
+    "更关键：Windows 侧已完整验证 TensorRT（docs/deployment/：FP32/FP16 引擎四层验证、C++ 接 TRT EP 3.22 ms）。WSL 的 A4 是同一张 RTX 5060、同一个 best.onnx、同一个 TRT 10.8 ——数字高度重复，边际收益低",
     "取舍：把时间投在缺口③（边缘设备 profiling）比重复 TRT 数字更有价值"
   ],
   "如果要补完（留给未来）": [
