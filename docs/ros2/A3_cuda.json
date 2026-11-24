@@ -1,0 +1,58 @@
+{
+  "生成时间": "2026-11-24 20:25:14",
+  "阶段": "A3 · CUDA：上 GPU",
+  "状态": "通过",
+  "环境": {
+    "GPU": "NVIDIA GeForce RTX 5060 Laptop 8GB",
+    "驱动": "591.91（nvidia-smi 显示 CUDA Version 13.1）",
+    "ORT": "1.22.0（GPU 版，本地 wheel）",
+    "CUDA运行库": "nvidia-*-cu12 6 个包，CUDA 12.8 + cuDNN 9.9",
+    "numpy": "1.24.4",
+    "模型": "weights/best.onnx",
+    "ep": "CUDA（确认未回落）"
+  },
+  "结果": {
+    "节点就绪行": "detector=ort ep=CUDA input=640 classes=12 worker_thread=off",
+    "infer_p50_ms_中位": 7.10,
+    "infer_p50_ms_均值": 7.15,
+    "infer_p50_ms_范围": "6.7~7.5（44 个有效样本，极稳定）",
+    "infer_p95_ms": 9.5,
+    "pre_p50_ms": 1.6,
+    "post_p50_ms": 0.1,
+    "serve_p50_ms": 8.80,
+    "transport_p50_ms": "68~70",
+    "infer_errors": 0,
+    "dropped_stale": 0,
+    "vram_显示值_mib": "3059~3115（整卡总量，非进程占用）"
+  },
+  "与A2对比": {
+    "A2_CPU_infer_p50_ms": 39.0,
+    "A3_CUDA_infer_p50_ms": 7.1,
+    "加速比": "5.5×",
+    "降幅百分比": "81.8%",
+    "口径": "两个 EP 各跑一次，同相机/同模型/同 640 输入；逐秒日志的 p50 取稳态中位数"
+  },
+  "判据核对": {
+    "ep=CUDA 未静默回落": "通过（节点日志首行 ep=CUDA，且 LatencyReport 的 ep 字段也是 CUDA）",
+    "推理延迟显著下降": "通过（39.0 → 7.1 ms）",
+    "推理链路无异常": "通过（infer_errors=0，dropped_stale=0）",
+    "检测框正确": "未在 A3 单独 echo；A2 已验证同模型输出正确，A3 只是换 EP"
+  },
+  "关键发现": [
+    "transport p50 仍是 ~70 ms，与 EP 无关——它测的是图像时间戳到回调的延迟，主要由相机和消息传递决定，不是推理耗时。这个数不会被 GPU 优化掉。",
+    "节点自报 fps 仍低（1~4），和 A2 一样：瓶颈不在推理（7 ms 已经很快），而在消息传递/时间戳链路。这印证了 A5 的结论——worker 线程不解决这个瓶颈。",
+    "ep=CUDA 能确认未回落，靠的是两处证据：节点 ready 行的 ep=CUDA，以及 LatencyReport 的 ep 字段。只报 '请求了 CUDA' 不够。"
+  ],
+  "踩坑记录": [
+    "ORT wheel 不带 CUDA 运行库 → ldd 精确查出缺 7 个 .so → 本地装 6 个 nvidia-*-cu12 包（1.65 GB）→ LD_LIBRARY_PATH 收集所有 nvidia/*/lib",
+    "C++ 侧字符串版 AppendExecutionProvider('CUDA') 在 ORT 1.22 不被识别 → 改用 V2 类型化 API（与 Windows 侧 main.cpp 一致）",
+    "load() 降级时写的 err 被吞 → 加 RCLCPP_WARN 输出降级原因",
+    "A3-lat 抓到 infer_ms_p50=0.0：节点刚启动、窗口内 0 帧，不是真值。报延迟必须确认窗口内有样本。"
+  ],
+  "证据": [
+    "E-ldd-cuda2_202406.log（全部库已找到）",
+    "E-cuda-python2_202416.log（CUDAExecutionProvider 可用）",
+    "A3-node3_202434.log（ep=CUDA，44 个稳态样本）",
+    "A3-lat3_202441.log（ep=CUDA，但窗口 0 帧，infer=0 是无效值）"
+  ]
+}

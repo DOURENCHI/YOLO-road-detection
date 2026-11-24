@@ -1,0 +1,75 @@
+{
+  "生成时间": "2026-11-24 16:28:13",
+  "阶段": "A2 · ORT CPU：接真模型",
+  "状态": "通过（但检测到关键性能瓶颈，见下）",
+  "环境": {
+    "WSL": "Ubuntu 22.04",
+    "ROS2": "Humble",
+    "ORT": "1.22.0（pip 本地 wheel 安装）",
+    "numpy": "1.24.4（从 2.2.6 降下来）",
+    "模型": "weights/best.onnx（9.4 MB，YOLO26n）",
+    "检测后端": "ort",
+    "ep": "CPU",
+    "worker_thread": false
+  },
+  "参数": {
+    "image_topic": "/camera/image_raw",
+    "fps_相机": 10,
+    "input_size": 640,
+    "num_classes": 12,
+    "conf_thres": 0.25,
+    "iou_thres": 0.45
+  },
+  "结果": {
+    "节点启动": "detector=ort ep=CPU input=640 classes=12 worker_thread=off",
+    "真实检测框_样例": [
+      {"class": "vehicles", "id": 11, "score": 0.8708, "x1": 136.9, "y1": 428.6, "x2": 209.1, "y2": 493.4},
+      {"class": "traffic lights", "id": 10, "score": 0.8308, "x1": 156.3, "y1": 271.1}
+    ],
+    "infer_ms_p50": 35.05,
+    "infer_ms_p95": 46.46,
+    "infer_ms_p99": 47.34,
+    "pre_ms_p50": 1.05,
+    "post_ms_p50": 0.073,
+    "serve_ms_p50": 36.16,
+    "serve_ms_p99": 59.91,
+    "transport_ms_p50": 66.44,
+    "transport_ms_p99": 143.49,
+    "detections_hz_实测": "1.2~6.1（目标 10，A1 dummy 是 ~10）",
+    "dropped_stale": 0,
+    "dropped_bad_encoding": 0,
+    "infer_errors": 0,
+    "empty_streak_max": 0,
+    "vram_mib_显示值": 2718
+  },
+  "判据核对": {
+    "真模型而非 dummy": "通过（检测框是 vehicles 0.87 / traffic lights 0.83，非固定框）",
+    "ep=CPU 未静默回落": "通过（日志与 LatencyReport 都写 CPU）",
+    "推理链路无异常": "通过（infer_errors=0，empty_streak_max=0）",
+    "帧率达到相机帧率": "不通过（1~6 Hz vs 10 Hz）—— 见下"
+  },
+  "关键发现_单线程阻塞": {
+    "现象": "A1 dummy 稳态 ~10 Hz，A2 掉到 1~6 Hz；但 dropped_stale=0，说明 DDS 没丢帧，是节点自己慢",
+    "算术核对": "infer p50 35 ms + transport 65 ms ≈ 100 ms/帧 → 理论上限 ~10 Hz；实测更低，说明回调串行执行，推理期间新帧堆在 DDS 队列（depth=1，只留最新）",
+    "这不是故障": "这是 A5 要量化的现象：v1 回调里推理 vs v2 worker 线程推理",
+    "下一步": "在 A5 用 use_worker_thread:=true 跑一遍，对比 detections_hz 与 serve_ms",
+    "实例外话": "这个现象本身就是面试可讲的『我发现了什么、怎么用数据解释』——不是跑通就完事"
+  },
+  "观察到的其他现象": [
+    "transport p50 从 A1 的 ~58 ms 升到 ~66 ms：图像时间戳到回调的延迟含排队时间，节点处理慢会推高它",
+    "vram 2718 MiB 仍是整卡总量；dummy 和 ort 两档读数接近，不能用来判断模型是否加载",
+    "首帧 pre 12.5 ms、infer 47.3 ms 是冷启动，稳态 pre 1.05 / infer 35.05"
+  ],
+  "证据": [
+    "B-colcon-ort4_160501.log（带 ORT 干净编译，退出码 0）",
+    "A2-camera2_162724.log",
+    "A2-node2_162729.log",
+    "A2-hz2_162752.log",
+    "A2-echo_162736.log（真实检测框）",
+    "A2-lat_162739.log（逐段延迟）"
+  ],
+  "启动阶段修的两个坑": [
+    "libonnxruntime.so.1 找不到：SONAME 是 .so.1，必须再建一条软链（已有 .so 那条只给链接器用）",
+    "numpy _ARRAY_API not found：pip 装 ORT 顺带升到 numpy 2.2.6，ROS2 Humble 要 1.x，降到 1.24.4"
+  ]
+}

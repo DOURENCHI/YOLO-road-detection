@@ -1,0 +1,40 @@
+yolo_trt_node:
+  ros__parameters:
+    # ---- 模型 ----
+    # detector: dummy 只用固定框，验证通信层；ort 走真推理
+    detector: "dummy"
+    model_path: "/mnt/d/VC Code/YOLO_Road_Detection/weights/best.onnx"
+    ep: "cpu"                      # cpu | cuda | trt
+    trt_cache_dir: "/mnt/d/VC Code/YOLO_Road_Detection/weights/trt_cache"
+    device_id: 0
+    intra_threads: 2
+    input_size: 640
+    num_classes: 12
+
+    # 顺序必须与训练时的 data.yaml 一致，索引即 class_id
+    class_names:
+      - "bicycles"
+      - "bridges"
+      - "buses"
+      - "chimneys"
+      - "crosswalks"
+      - "fire hydrants"
+      - "motorcycles"
+      - "stairs"
+      - "taxis"
+      - "tractors"
+      - "traffic lights"
+      - "vehicles"
+
+    # ---- 后处理 ----
+    conf_thres: 0.25
+    iou_thres: 0.45
+
+    # ---- 运行时 ----
+    image_topic: "/camera/image_raw"
+    publish_debug_image: true
+    stats_window: 200              # 滑窗帧数，用于算 P50/P95/P99
+    max_transport_ms: 200.0        # 超过则丢弃该帧（过期帧保护）
+    use_worker_thread: false       # v2 优化项，打开后需重新对比 queue 行为
+    display_rate_hz: 1.0
+    read_vram: true                # 每秒调一次 nvidia-smi，追求极简可关掉

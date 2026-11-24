@@ -1,0 +1,11 @@
+# 大文件和运行产物，不进仓库
+# 1.8 GB 的 pip wheel（本地离线安装用）
+_wheelhouse/
+# 原始日志（数字已摘录进 docs/ros2/ 的 JSON）
+runlogs/
+**/__pycache__/
+**/*.pyc
+build/
+install/
+log/
+*.log

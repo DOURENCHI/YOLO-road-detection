@@ -1,0 +1,4 @@
+# WSL 里执行的脚本必须是 LF，否则 bash 报 $'\r': command not found
+*.sh text eol=lf
+*.py text eol=lf
+# 其他文本文件保持默认

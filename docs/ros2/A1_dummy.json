@@ -1,0 +1,80 @@
+{
+  "生成时间": "2026-11-24 15:16:53",
+  "阶段": "A1 · dummy 检测器：只验证通信",
+  "状态": "通过",
+  "环境": {
+    "宿主": "Windows 11",
+    "WSL": "Ubuntu 22.04",
+    "ROS2": "Humble",
+    "ORT": "未启用（HAVE_ORT=FALSE，头文件有但缺 lib）",
+    "检测后端": "dummy",
+    "Python": "系统 python3"
+  },
+  "参数": {
+    "相机": "fake_camera.py --fps 10",
+    "image_topic": "/camera/image_raw",
+    "detector": "dummy",
+    "use_sim_time": false,
+    "worker_thread": false,
+    "RMW": "默认"
+  },
+  "结果": {
+    "话题清单": [
+      "/camera/image_raw",
+      "/parameter_events",
+      "/rosout",
+      "/yolo_trt_node/debug_image",
+      "/yolo_trt_node/detections",
+      "/yolo_trt_node/latency"
+    ],
+    "detections_hz_稳态": "9.6~10.4（目标 10）",
+    "detections_hz_启动期": "2.3~7.5（前几秒，滑动窗口未填满）",
+    "transport_p50_ms": "56.7~61.0",
+    "transport_p99_ms": "86.5~129.4",
+    "dropped_stale_终值": 2,
+    "dropped_bad_encoding": 0,
+    "dummy推理耗时_ms": 0.0,
+    "错误或异常": "无"
+  },
+  "判据核对": {
+    "话题名带节点名": "通过（/yolo_trt_node/detections，不是 /yolo/detections）",
+    "发布频率接近相机帧率": "通过（稳态 ~10 Hz）",
+    "dropped_stale 可控": "通过（3 分钟运行累计 2 帧，属启动期抖动）",
+    "无 error/exception": "通过"
+  },
+  "观察到的现象": [
+    "节点自报 fps 在 1~9 之间波动，而 topic hz 稳态 ~10 —— 两者统计口径不同：节点是每秒一次的瞬时计数，hz 是滑动窗口平均。以后报数字要说明口径。",
+    "transport p50 约 58 ms，明显高于预期；dummy 模式下推理为 0，这个值全来自时间戳传递链路。下一步需要查 fake_camera 的 stamp 设置。",
+    "vram 显示 2766→3219 MiB 且缓慢变化，但 dummy 模式不加载模型——这是 nvidia-smi 读整卡总量（Windows 侧桌面也在用），不是进程占用。与项目已有的『显存测量』坑一致。",
+    "dropped_stale 从 0 涨到 2 发生在启动期，稳态后不再增长，属 depth=1 背压的正常表现。"
+  ],
+  "证据": [
+    "B-colcon3_150910.log（编译通过，退出码 0）",
+    "A1-camera_151401.log",
+    "A1-node_151413.log",
+    "A1-list_151424.log",
+    "A1-hz_151425.log"
+  ],
+  "遗留": [
+    "A1-echo / A1-lat 两条命令未执行（日志缺失），固定框坐标未实测确认。不影响通信层判定，但补跑后可作为更完整的证据。",
+    "ORT 未启用：A2 前必须提供 libonnxruntime.so。实测清华 PyPI 源返回 403、files.pythonhosted.org 不通，已从 Windows 侧下载 cp310 manylinux wheel 到 ros2/_wheelhouse/（15.6 MB，ZIP 完整性 OK，内含 libonnxruntime.so.1.22.0），改走本地 pip install 离线安装"
+  ],
+  "新增坑": [
+    {
+      "现象": "pip install onnxruntime==1.22.0 -i 清华源 报 from versions: none",
+      "真因": "清华源 HTTP 403（实测），pip 拿不到版本列表；不是版本不存在",
+      "验证": "curl -o /dev/null -w %{http_code} https://pypi.tuna.tsinghua.edu.cn/simple/onnxruntime/ → 403；官方 pypi.org 索引 200 但 files.pythonhosted.org 000",
+      "处理": "从可联网侧下载 wheel 到 ros2/_wheelhouse/，WSL 里 pip install 本地文件"
+    },
+    {
+      "现象": "CMake 报 CMAKE_C_COMPILE_OBJECT / CMAKE_C_CREATE_SHARED_LIBRARY 缺失",
+      "真因": "project() 只声明 CXX，但 rosidl 生成的类型支持内部需要 C",
+      "处理": "改为 project(yolo_trt_ros C CXX)，并删除 build/install/log 清缓存后重编"
+    },
+    {
+      "现象": "CMake 报 target_link_libraries 签名混用",
+      "真因": "ament_target_dependencies 内部用 plain 签名，代码 82/85 行用 keyword(PRIVATE)",
+      "处理": "统一改成 plain 签名（去掉 PRIVATE）"
+    }
+  ]
+}

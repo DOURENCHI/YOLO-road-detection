@@ -59,7 +59,7 @@ YOLO_Road_Detection/
 │   ├── third_party/                  # ONNX Runtime C/C++ 头文件 + stb
 │   ├── build/                        # 开发态构建产物（.gitignore）
 │   └── dist/                         # 分发包 143 文件 / 212.9 MB（.gitignore）
-├── ros2/                             # ROS2 封装（WSL2 + Humble，尚未在 Linux 编译验证）
+├── ros2/                             # ROS2 封装（WSL2 + Humble，已实测；实录见 docs/ros2/）
 │   └── src/yolo_trt_ros/             # 节点 + 自定义消息 + launch + 单元测试 + fake_camera
 ├── docs/                             # 各类记录
 │   ├── architecture.md               # 架构：模块职责与调用关系
@@ -527,7 +527,7 @@ rm datasets/road-traffic-detect/valid/labels/val.cache
 | TensorRT | `best_fp32.engine` / `best_fp16.engine` | 四层验证 + 精度对照 | 同上 |
 | C++ 工程 | `cpp/`（单图 / 端到端 / 视频流） | 与 Python 侧结果一致 + 延迟 | 同上 |
 | **INT8 量化** | `weights/best_int8.engine`（11.8 MB） | 四层验证 + 覆盖率 + 五格式精度 | 同上（结论见 7.2.1） |
-| ROS2 封装 | `ros2/src/yolo_trt_ros` | **尚未在 Linux 编译验证** | `ros2/src/yolo_trt_ros/README.md` |
+| ROS2 封装 | `ros2/src/yolo_trt_ros` | **WSL2 实测通过**（A1/A2/A3/A5；A4 缺 nvinfer） | `docs/ros2/README.md` |
 
 每一步的逐步操作、每个数字怎么读、踩过的 27 个坑，都在 **`docs/deployment/README.md`**。
 下面是结论。
@@ -646,13 +646,25 @@ INT8 的算力优势用不上。要验证只有两条路——换更大的模型
 **不要手工拷 DLL**——本项目实测手工拷漏过两次，其中一次是包里的 exe 是旧版，
 跑 `--ep trt` 静默走了 CUDA EP（5.25 ms 而非 2.35 ms），完全不报错。
 
-### 7.6 ROS2：还没跑起来的那一步
+### 7.6 ROS2：已在 WSL2 跑通四关
 
-`ros2/src/yolo_trt_ros` 已写好：订阅图像话题、发布结构化检测结果与分段延迟，
-`depth=1` 背压、双时钟分离、启动自检抓静默回落。
+`ros2/src/yolo_trt_ros` 订阅图像话题、发布结构化检测结果与分段延迟，
+`depth=1` 背压、双时钟分离、启动自检抓静默回落——这些机制都已实测。
 
-**但它从未在 Linux 上编译过。** 分阶段验收路径 A1–A5（dummy → CPU → CUDA → TRT → 线程对比）
-和逐步操作见 `ros2/src/yolo_trt_ros/README.md`，以及配套教程《YOLO_ROS2部署教程》。
+2026-11-24 在 WSL2 + Humble 上完成分阶段验收：
+
+| 关卡 | 状态 | infer p50 |
+|---|---|---|
+| A1 dummy | ✅ | 0 ms |
+| A2 CPU | ✅ | 39.0 ms |
+| A3 CUDA | ✅ | **7.1 ms（5.5×）** |
+| A4 TensorRT | 根因已定位，依赖未装 | 回落 CUDA |
+| A5 worker 对比 | ✅ 负结果（无收益） | 37.7 vs 39.0 ms |
+
+编译阶段修了 6 个坑（CMake 签名混用、`project()` 缺 C、`find_path` 不递归、
+`printf` 类型、头文件 namespace 位置等），运行阶段修了 4 个（SONAME、numpy 2.x、
+ORT 字符串 API 过期、CUDA 运行库缺失）。
+**完整实录、原始日志与取舍说明见 `docs/ros2/README.md`**，配套教程《YOLO_ROS2部署教程》。
 
 ### 7.7 报数字的三条纪律
 
@@ -700,8 +712,8 @@ INT8 的算力优势用不上。要验证只有两条路——换更大的模型
       但那两段是为了测延迟，**帧间连续不等于适合做跟踪效果演示**；跟踪演示仍在等一段自己拍的
 - [x] 阶段四：ONNX 导出 → TensorRT → C++ 部署 —— **已完成**，详见第 7 节。
       四档性能对比、精度对照、端到端五段拆解、1000 帧稳定性、CPU 分发包都有实测数据
-- [ ] **ROS2 包在 WSL2 里编译跑通** —— 代码已写完（`ros2/src/yolo_trt_ros`），
-      但**从未在 Linux 上编译过**。分阶段路径 A1–A5 见该包 README
+- [x] **ROS2 包在 WSL2 里编译跑通** —— A1/A2/A3/A5 已实测通过，A4 TRT 定位到缺
+      `libnvinfer.so.10` 后按取舍停止（Windows 侧 TRT 已有完整实测）。见 `docs/ros2/`
 - [ ] **GPU 轻包**（`≈40 MB`：exe + onnx + ORT/OpenCV 少数 DLL）——
       3 GB 的自包含方案实测崩溃已放弃，轻包本身还没打出来
 - [ ] **INT8 校准** —— 需要校准集（只能用 valid），且要接受「某一类突然全没了」的风险，

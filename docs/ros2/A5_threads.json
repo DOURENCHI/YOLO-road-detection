@@ -1,0 +1,64 @@
+{
+  "生成时间": "2026-11-24 16:31:00",
+  "阶段": "A5 · 线程对比：v1 回调推理 vs v2 worker 线程",
+  "状态": "通过（但结论是负结果：worker 线程未带来实质提升）",
+  "对比条件": {
+    "相同": "相机 10 fps / best.onnx / ep=CPU / 640 输入 / dummy 之外的同一模型",
+    "唯一变量": "use_worker_thread: A2=false（回调里同步推理）→ A5=true（回调存最新帧，worker 线程推理）"
+  },
+  "结果对比": {
+    "v1_A2": {
+      "worker_thread": false,
+      "infer_p50_ms": 39.00,
+      "transport_p50_ms": 69.00,
+      "transport_p99_ms": 143.49,
+      "serve_p50_ms": 36.16,
+      "detections_hz_topic": "1.2~9.7（波动大）",
+      "dropped_stale": 0,
+      "证据": "A2-node2_162729.log / A2-lat_162739.log / A2-hz2_162752.log"
+    },
+    "v2_A5": {
+      "worker_thread": true,
+      "infer_p50_ms": 37.70,
+      "transport_p50_ms": 67.60,
+      "transport_p99_ms": 151.4,
+      "serve_p50_ms": "约 36~40",
+      "detections_hz_topic": "0.7~10.3（波动同样大）",
+      "dropped_stale": 1,
+      "证据": "A5-node_163012.log / A5-hz_163017.log"
+    },
+    "差异": {
+      "infer_p50_改善_ms": 1.3,
+      "transport_p50_改善_ms": 1.4,
+      "结论": "在测量波动内，_worker 线程没有实质收益_"
+    }
+  },
+  "为什么没有提升_分析": [
+    "相机侧不是瓶颈：A2 相机日志显示 1396 帧 / 141.1 s = 9.9 fps，稳定达到目标 10 fps",
+    "推理耗时两档几乎相同（39.0 vs 37.7 ms），说明 worker 线程没有加速推理本身——它只改变调用位置",
+    "相机用 best_effort + depth=1：worker 推理期间到达的新帧在 DDS 队列里只保留最新一帧，"
+    "worker 模式的 pending_ 覆盖也是同一逻辑（dropped_overrun 计数未暴露到 LatencyReport，外部看不到）",
+    "最终帧率上限由『推理耗时 + 传输 + 调度』决定，而不是由『回调是否被堵』决定——"
+    "把推理挪到另一个线程只是换了等待的位置"
+  ],
+  "结论与取舍": {
+    "事实": "v2 在本场景（CPU 推理 35~39 ms、相机 10 fps）没有提升，还多了线程同步复杂度",
+    "判断": "v1 更简单，默认 false 是合理选择；worker 线程不是万能药",
+    "什么时候才有用_推断未验证": "若推理耗时远大于帧间隔（例如 TRT 前的重预处理）且需要并行流水，"
+    "或回调里还有其他阻塞操作时，worker 才可能带来收益。本项目当前数据不支持这个结论",
+    "面试价值": "能讲出『我做了对比实验，发现优化无效，并用数据解释为什么』，"
+    "比『我加了 worker 线程所以更快』强得多"
+  },
+  "观测性缺口": {
+    "问题": "代码里 dropped_overrun_ 和 processed_by_worker_ 有计数，但没有放进 LatencyReport.msg，"
+    "外部无法量化 worker 模式的覆盖式丢帧",
+    "影响": "A5 只能对比帧率和延迟，无法直接证明『覆盖发生了多少次』",
+    "建议后续": "给 LatencyReport 增加两个 uint32 字段并重新生成消息——但那会改变接口，本次不做"
+  },
+  "证据": [
+    "A5-camera_163007.log",
+    "A5-node_163012.log（首行 worker_thread=on 已确认）",
+    "A5-hz_163017.log",
+    "A2-node2_162729.log / A2-lat_162739.log / A2-hz2_162752.log（v1 基线）"
+  ]
+}
