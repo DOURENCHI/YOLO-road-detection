@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YOLO 道路场景多类别目标检测 · 项目演示</title>
-<meta name="description" content="基于 YOLO26n 的道路场景 12 类目标检测项目：814 张标注图像，测试集 mAP50 0.680，单张端到端 16.4 ms。数据检查 → 标注统一 → 训练 → 评估 → 演示，全链路可复现。">
+<meta name="description" content="基于 YOLO26n 的道路场景 12 类目标检测项目：814 张标注图像，测试集 mAP50 0.680，PyTorch 单张 16.4 ms、C++ 端到端 7.94 ms。数据 → 训练 → 评估 → 演示 → TensorRT 部署 → ROS2 落地，全链路可复现。">
 <meta property="og:title" content="YOLO 道路场景多类别目标检测 · 项目演示">
-<meta property="og:description" content="814 张标注图像 / 12 类目标 / 测试集 mAP50 0.680 / 单张 16.4 ms。完整的数据检查、训练、评估与演示链路。">
+<meta property="og:description" content="814 张标注图像 / 12 类目标 / 测试集 mAP50 0.680 / C++ 端到端 7.94 ms。数据、训练、评估、演示、TensorRT 部署与 ROS2 落地全链路可复现。">
 <meta property="og:type" content="website">
 <meta property="og:image" content="media/demo_grid.jpg">
 <style>
@@ -200,13 +200,14 @@ footer .row a{color:var(--ink2)}
     <span class="pill"><span class="d"></span>测试集结果已产出 · 全链路可复现</span>
     <h1>YOLO 道路场景多类别目标检测</h1>
     <p class="sub">Road-Scene Multi-Class Object Detection &nbsp;·&nbsp; YOLO26n &nbsp;·&nbsp; PyTorch &nbsp;·&nbsp; Ultralytics</p>
-    <p class="lede">把「数据检查 → 标注统一 → 训练 → 评估 → 演示」完整走通的道路场景目标检测项目。重点不只是把模型训出来，而是让整条链路<strong>可复现、可追溯、每个结论都标清成立的边界</strong>。</p>
+    <p class="lede">把「数据检查 → 标注统一 → 训练 → 评估 → 演示 → 部署 → ROS2 落地」完整走通的道路场景目标检测项目。重点不只是把模型训出来，而是让整条链路<strong>可复现、可追溯、每个结论都标清成立的边界</strong>。</p>
     <div class="tags">
       <span>12 类目标</span><span>814 张标注图像</span><span>3,165 个标注框</span>
       <span>测试集 mAP50 0.680</span><span>单张 16.4 ms</span>
     </div>
     <div class="cta">
       <a class="btn primary" href="manual.html">在线读项目说明书 →</a>
+      <a class="btn" href="manual.html#p7">部署与 ROS2 实测 →</a>
       <a class="btn" href="https://github.com/DOURENCHI/YOLO-road-detection">查看源码仓库</a>
     </div>
   </div>
@@ -568,7 +569,8 @@ footer .row a{color:var(--ink2)}
         <tr><td>能独立完成「数据检查 → 标注统一 → 训练 → 评估」的全链路</td><td>不能说明具备量产级感知系统的工程能力</td></tr>
         <tr><td>能定位数据层面的问题（格式混排、漏标、长尾、场景重叠）</td><td>不能说明每个标注框都准确——只抽检过一部分</td></tr>
         <tr><td>能读懂训练曲线并判断过拟合、判断瓶颈在哪</td><td>不能说明做过超参搜索、模型结构改进或集成</td></tr>
-        <tr><td>能给「延迟」这类指标配上完整测量条件，并发现自己的旧数据复现不出来</td><td>不能说明做过 TensorRT / ONNX 等部署优化（<strong>这一阶段明确暂缓</strong>）</td></tr>
+        <tr><td>能把模型导出为 ONNX / TensorRT，并用三层验证证明「没搞坏」；C++ 端到端 7.94 ms</td><td>不能说明做过 INT8 落地——实测掉 4.41% 精度、延迟只快 1.5%–3%，<strong>已主动放弃</strong></td></tr>
+        <tr><td>能把推理封装成 ROS2 节点，在 WSL2 + Humble 上编译通过并完成五关延迟实测</td><td>不能说明接入了真实相机或上了车端平台——用的是手写假相机，在笔记本上跑</td></tr>
         <tr><td>能按类别指出模型的弱项，并解释弱项与样本量的关系</td><td>不能说明解决了长尾问题——只发现了，没有做改进实验</td></tr>
         <tr><td>能明确列出做了什么、没做什么</td><td>不能说明接触过 3D 感知、多传感器融合、时序建模</td></tr>
       </tbody>

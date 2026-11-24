@@ -244,8 +244,30 @@
     <a href="#p6-3" class="sub">6.3 多目标跟踪</a>
     <a href="#p6-4" class="sub">6.4 延迟必须带条件</a>
 
-    <div class="grp">第七部分</div>
-    <a href="#p7">7 · 项目边界与已知局限</a>
+    <div class="grp">第七部分 · 部署</div>
+    <a href="#p7">7 · 部署：PyTorch → TensorRT</a>
+    <a href="#p7-1" class="sub">7.1 部署改变了什么</a>
+    <a href="#p7-2" class="sub">7.2 五个产物与构建成本</a>
+    <a href="#p7-3" class="sub">7.3 三层验证</a>
+    <a href="#p7-4" class="sub">7.4 六行延迟不能横比</a>
+    <a href="#p7-5" class="sub">7.5 导出与验证的坑</a>
+    <a href="#p7-6" class="sub">7.6 能链接≠能调用</a>
+    <a href="#p7-7" class="sub">7.7 三个设计决策</a>
+    <a href="#p7-8" class="sub">7.8 八条坑</a>
+
+    <div class="grp">第八部分 · ROS2 落地</div>
+    <a href="#p8">8 · ROS2 落地：包与实测</a>
+    <a href="#p8-1" class="sub">8.1 节点比程序多了什么</a>
+    <a href="#p8-2" class="sub">8.2 包的三层结构</a>
+    <a href="#p8-3" class="sub">8.3 延迟拆成五段</a>
+    <a href="#p8-4" class="sub">8.4 代码里五个位置</a>
+    <a href="#p8-5" class="sub">8.5 五关实测</a>
+    <a href="#p8-6" class="sub">8.6 十二条坑</a>
+    <a href="#p8-7" class="sub">8.7 三个不做的决策</a>
+    <a href="#p8-8" class="sub">8.8 这一站的边界</a>
+
+    <div class="grp">第九部分 · 边界</div>
+    <a href="#p9">9 · 项目边界与已知局限</a>
 
     <div class="grp">附录</div>
     <a href="#a1">A · 数字速查表</a>
@@ -293,7 +315,7 @@
   <tr>
     <td><strong>细读</strong><br><span class="muted">想看清方法与细节</span></td>
     <td class="c">2～3 小时</td>
-    <td>从 <a href="#p1">第 1 部分</a>顺序读到 <a href="#p7">第 7 部分</a>。<strong>第 2 部分（八个概念）是地基</strong>，别跳——后面所有数字都建立在这八个词上。</td>
+    <td>从 <a href="#p1">第 1 部分</a>顺序读到 <a href="#p9">第 9 部分</a>。<strong>第 2 部分（八个概念）是地基</strong>，别跳——后面所有数字都建立在这八个词上。</td>
   </tr>
   <tr class="hi">
     <td><strong>查证</strong><br><span class="muted">只想核对某个数字</span></td>
@@ -529,7 +551,7 @@
   <text x="34" y="302" font-size="11" fill="#4b5563">· 这不是本末倒置——真实项目里，数据决定上限，模型只是逼近这个上限</text>
   <text x="34" y="320" font-size="11" fill="#4b5563">· 工程投入集中在数据准备与验收，而不是训练本身</text>
 </svg>
-<figcaption>图 2 · 全流程六站：第 1～4 站已完成，第 5 站（演示）做了一部分，第 6 站（部署）Windows 侧已完成、ROS2 侧待在 Linux 上验证</figcaption>
+<figcaption>图 2 · 全流程六站：第 1～4 站已完成，第 5 站（演示）做了一部分，第 6 站（部署）Windows 侧与 ROS2 侧均已实测（ROS2 在 WSL2 + Humble 上跑通，未接真实相机）</figcaption>
 </figure>
 
 <div class="box tip">
@@ -2064,12 +2086,1232 @@ python scripts/06_predict.py --source 0</code></pre>
   <p>所以重做了实验：每种精度各两轮、进程分开启动。结果 FP32 两轮完全一致，FP16 两轮差了 57%。
   这里确认了一个原则：<strong>报数字必须连同测量条件一起报</strong>——
   机器是否空闲、测了几轮、测的是哪一档，这些不是细节，是数字的一部分。</p>
-</div> <!-- ==================== 7 ==================== --> <h2 id="p7"><span class="num">7</span>项目边界与已知局限</h2> <div class="lead"> <p>这一节列出这个项目<strong>已知的 9 条局限</strong>，以及后续可以往哪走。</p> <p>列出来不是自我否定——<strong>一个项目的可信度，取决于它的边界是不是清楚的</strong>。 只给一个总分，看不出它在哪里成立，这个总分就没有意义。</p> </div> <h3>9 条已知局限</h3> <table> <tr><th style="width:36px">#</th><th style="width:180px">局限</th><th>具体情况</th></tr> <tr class="hi"> <td>1</td><td><strong>不是车规数据集</strong></td> <td>12 类、814 张，含 bridges / chimneys / stairs 这些非道路目标，规模约为 nuScenes 的百万分之一。 用它跑通完整链路是合适的，但不能据此宣称做了自动驾驶感知；想更贴近道路场景，下一步应换 BDD100K 这类数据集。</td> </tr> <tr> <td>2</td><td><strong>类别严重不均衡</strong></td> <td>训练集 vehicles 有 763 个框，tractors 只有 1 个；测试集里 tractors 干脆没有标注。 这是真实数据的常态，也是<strong>本项目不只报总 mAP、一定同时给逐类结果和样本量</strong>的原因。</td> </tr> <tr class="hi"> <td>3</td><td><strong>测试集不是完全独立</strong></td> <td>三个划分的时间跨度完全重叠，跨划分最近两张只隔 4.9 秒，存在轻度场景重叠。 三层泄漏检查显示<strong>内容层面没有重复</strong>，但时间戳分析说明划分是按图随机切的—— 所以这个测试指标要按<strong>偏乐观</strong>来理解。</td> </tr> <tr> <td>4</td><td><strong>训练存在明显过拟合</strong></td> <td>训练集分类损失一路降到 0.75，验证集从第 20 轮起就卡在 1.08～1.14。 瓶颈判断在<strong>数据量</strong>而不在训练轮数，所以把 50 轮改成 100 轮不是这个项目的改进方向。</td> </tr> <tr class="hi"> <td>5</td><td><strong>定位精度是短板</strong></td> <td>mAP50-95 只有 0.423，比 mAP50 低了 0.26，小目标尤其明显。 这说明模型<strong>能找对位置、但框不够准</strong>，是小目标上的典型问题，不是分类能力的问题。</td> </tr> <tr> <td>6</td><td><strong>ROS2 未实测 · INT8 不划算</strong></td> <td>部署链路已完成（FP16 纯推理 1.97 ms，C++ 端到端 7.94 ms）；INT8 量化已实测，<strong>mAP50 掉 4.41%、延迟只快 1.5%–3%，未采用</strong>； ROS2 封装代码已写完，尚未在 Linux 上编译验证。</td> </tr> <tr class="hi"> <td>7</td><td><strong>没有动过模型结构</strong></td> <td>用的是现成的 YOLO26n 做迁移学习，没有改网络、没有写损失函数。 本项目的工作重点在<strong>数据与评估方法</strong>上。</td> </tr> <tr> <td>8</td><td><strong>训练集不是视频</strong></td> <td>相邻两张最小间隔 1.09 秒，是快照集不是连续帧。因此跟踪的定量评估做不了——没有 MOTA / IDF1， 只验证了跟踪链路能跑通、以及在什么情况下会失效。</td> </tr> <tr class="hi"> <td>9</td><td><strong>硬件是笔记本</strong></td> <td>RTX 5060 Laptop（8 GB 显存），和车载平台的性能没有可比性。 笔记本上的速度不能当作端侧性能来宣称——这也是为什么每个速度数字都带着硬件型号和测量条件。</td> </tr> </table> <h3>后续可以做的三件事</h3> <table> <tr><th style="width:230px">可以做的事</th><th>为什么值得做</th></tr> <tr class="hi"> <td><strong>按采集批次重新划分数据集</strong></td> <td>用文件名时间戳聚类，同一批次的图只进一个划分，彻底消除场景重叠。 <span class="muted">注意：重划之后现有指标不能直接对比，需要重新评估一次并注明"旧划分下的结果"。</span></td> </tr> <tr> <td><strong>补少数类的数据</strong></td> <td>垫底三类（bridges 7 个框、taxis 14 个、chimneys 19 个）训练样本都不足 20 个。 实验已经证明瓶颈在数据量上，所以这是优先级最高的一步。</td> </tr> <tr class="hi"> <td><strong>边缘设备与 ROS2 落地</strong></td> <td>部署链路与 INT8 都已实测；下一步是到 Jetson 这类算力受限设备上复测（桌面卡上 INT8 没收益，边缘可能反转），以及把 ROS2 节点在 Linux 上跑通、接真实相机。</td> </tr> </table> <div class="box note"> <span class="t">读数字之前，先看四条前提</span> <p>本项目的每个指标都建立在这四条前提上：</p> <ol> <li>这是 12 类的公开数据集，不是车规数据，含桥梁、烟囱这类非道路目标—— <strong>所以定位是检测基线，不是自动驾驶感知系统</strong>。</li> <li>类别严重不均衡，训练集里 tractors 只有 1 个框—— <strong>所以只看总 mAP 不够，逐类结果和样本量必须一起看</strong>。</li> <li>数据泄漏检查显示内容层面干净，但三个划分的时间跨度重叠—— <strong>所以测试指标要按偏乐观理解</strong>。</li> <li>训练存在明显过拟合，但瓶颈在数据量而不在训练轮数—— <strong>所以增加训练轮数不是有效的改进方向</strong>。</li> </ol> <p>部署链路与 INT8 量化均已实测（INT8 因精度代价未采用）；ROS2 的 Linux 实测未做。</p> </div> <!-- ==================== 附录 A ==================== --> <h2 id="a1"><span class="num">A</span>数字速查表</h2> <p>本项目全部关键数字，每个都能在项目里找到出处，可以直接翻文件核对。</p> <h3>数据集</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td>图片总数</td><td class="c"><strong>814 张</strong></td><td><code>datasets/road-traffic/</code></td></tr> <tr><td>划分</td><td class="c">train 494 / valid 187 / test 133</td><td><code>docs/label_conversion_report.txt</code></td></tr> <tr class="hi"><td>标注框总数</td><td class="c"><strong>3,165 个</strong></td><td>同左</td></tr> <tr><td>类别数</td><td class="c">12 类</td><td><code>datasets/road-traffic-detect/data.yaml</code></td></tr> <tr class="hi"><td>需要转换的多边形</td><td class="c">860 个（train 3 / valid 804 / test 53）</td><td>同左</td></tr> <tr><td>转换异常行数</td><td class="c"><strong>0</strong></td><td>同左</td></tr> <tr class="hi"><td>空标签文件</td><td class="c">1 个（valid 里，判定为漏标）</td><td><code>scripts/visualize_labels.py</code> 输出</td></tr> <tr><td>许可</td><td class="c">CC BY 4.0（须署名）</td><td><code>datasets/road-traffic/README.dataset.txt</code></td></tr> </table> <h3>训练</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td>模型 / 轮数</td><td class="c">yolo26n.pt / 50 epochs</td><td><code>runs/detect/runs/road_baseline/args.yaml</code></td></tr> <tr><td>batch / imgsz</td><td class="c">8 / 640</td><td>同左</td></tr> <tr class="hi"><td>学习率</td><td class="c">0.01 → 0.0001</td><td>同左（<code>lr0</code> / <code>lrf</code>）</td></tr> <tr><td><strong>总耗时</strong></td><td class="c"><strong>660.4 秒（约 11 分钟）</strong></td><td><code>results.csv</code> 末行</td></tr> <tr class="hi"><td>best.pt 对应轮次</td><td class="c">第 48 轮</td><td>按 <code>fitness = 0.1×mAP50 + 0.9×mAP50-95</code> 复算</td></tr> <tr><td>mAP50 最高点</td><td class="c">0.6440 @ 第 <strong>19</strong> 轮</td><td>同左</td></tr> <tr class="hi"><td>mAP50-95 最高点</td><td class="c">0.4160 @ 第 48 轮</td><td>同左</td></tr> <tr><td>过拟合证据</td><td class="c">训练 cls_loss 6.04→0.75，验证卡在 1.08~1.14，末轮差 <strong>0.34</strong></td><td>同左</td></tr> </table> <h3>评估（测试集，133 张）</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td><strong>mAP50</strong></td><td class="c"><strong>0.6797</strong></td><td><code>results/eval_report/metrics_overall.json</code></td></tr> <tr class="hi"><td><strong>mAP50-95</strong></td><td class="c"><strong>0.4228</strong></td><td>同左</td></tr> <tr><td>精确率 P</td><td class="c">0.7865</td><td>同左</td></tr> <tr><td>召回率 R</td><td class="c">0.6267</td><td>同左</td></tr> <tr class="hi"><td>最优置信度阈值</td><td class="c">0.30（平均 F1 = 0.654）</td><td>同左</td></tr> <tr><td>最优 / 最差类</td><td class="c">fire hydrants 0.9493 / bridges 0.0000（仅 1 个框）</td><td><code>metrics_per_class.csv</code></td></tr> <tr class="hi"><td>测试集里没有标注的类</td><td class="c">tractors（"没考"≠"考 0 分"）</td><td>同左</td></tr> <tr><td>验证集 mAP50（对照）</td><td class="c">0.6414</td><td><code>results.csv</code></td></tr> </table> <h3>性能与模型</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td><strong>单张端到端（FP32）</strong></td><td class="c"><strong>16.4 ms</strong>（约 61 FPS）</td><td><code>docs/inference_benchmark.json</code></td></tr> <tr><td>批量 8 时每张</td><td class="c">7.8 ~ 8.8 ms</td><td>同左</td></tr> <tr class="hi"><td>纯 GPU 前向（FP32 中位）</td><td class="c">13.76 ~ 15.78 ms</td><td>同左</td></tr> <tr><td>三档测法最大差异</td><td class="c"><strong>1.45 倍</strong></td><td>同左</td></tr> <tr class="hi"><td>FP16 两轮差异</td><td class="c"><strong>57%</strong>（故未采用）</td><td>同左</td></tr> <tr><td>参数量（融合后）</td><td class="c">2.39 M</td><td>同左</td></tr> <tr class="hi"><td>算力消耗 @640</td><td class="c">5.4 GFLOPs</td><td>同左</td></tr> <tr><td>冷启动首次推理</td><td class="c">约 36 秒</td><td>同左</td></tr> </table> <h3>部署（PC 侧，同机实测）</h3>
-<table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td>ONNX Runtime FP32 纯推理中位</td><td class="c">8.19 ms（基准 1.00×）</td><td><code>docs/deployment/benchmark_pt_vs_onnx.json</code></td></tr> <tr><td>TensorRT FP32 引擎</td><td class="c">2.88 ms（2.84×）</td><td><code>docs/deployment/engine_verify_report.json</code></td></tr> <tr class="hi"><td><strong>TensorRT FP16 引擎</strong></td><td class="c"><strong>1.97 ms（4.16×）</strong></td><td>同左</td></tr> <tr><td>C++ + ORT TensorRT EP</td><td class="c">3.22 ms</td><td><code>docs/deployment/</code> 下 C++ 实测 JSON</td></tr> <tr class="hi"><td>C++ 端到端（TRT+OpenCV）</td><td class="c"><strong>7.94 ms</strong>（纯推理仅占 38%）</td><td>端到端分段计时报告</td></tr> <tr><td>视频流 1280×720</td><td class="c">约 101 FPS，p99 13.3–14.1 ms</td><td>1000 帧稳定性报告 ×2 轮</td></tr> <tr class="hi"><td>精度 valid mAP50</td><td class="c">pt 0.6407 → onnx 0.6329 → FP16 0.6323</td><td><code>docs/deployment/valid_precision_compare.json</code></td></tr> <tr><td>FP32 → FP16 净代价</td><td class="c"><strong>−0.0004</strong>（可忽略）</td><td>同左</td></tr> <tr class="hi"><td>CPU 自包含分发包</td><td class="c">143 文件 / 212.9 MB，干净 PATH 验证通过</td><td><code>cpp/dist/MANIFEST.txt</code></td></tr> <tr><td>TensorRT INT8 引擎（另一场次实测）</td><td class="c">1.83–1.91 ms，但 mAP50 掉 4.41%</td><td><code>docs/deployment/engine_int8_verify_report.json</code></td></tr> <tr class="hi"><td>INT8 卷积覆盖率</td><td class="c">83 / 102（81%）</td><td>同上</td></tr> </table> <h3>数据泄漏检查</h3> <table> <tr><th style="width:230px">检查项</th><th class="c" style="width:130px">结果</th><th>出处</th></tr> <tr class="hi"><td>内容完全相同（md5）</td><td class="c">跨划分 <strong>0 对</strong></td><td><code>docs/data_leakage_report.json</code></td></tr> <tr class="hi"><td>画面近似（dHash 阈值 5）</td><td class="c">跨划分 <strong>0 对</strong></td><td>同左</td></tr> <tr><td>dHash 最接近距离</td><td class="c">15（阈值 3 倍，说明检查有区分度）</td><td>同左</td></tr> <tr class="hi"><td>时间戳邻域</td><td class="c">跨划分最近 <strong>4.9 秒</strong>；1 分钟内 158 对</td><td>同左</td></tr> <tr><td>图片相邻两张最小间隔</td><td class="c"><strong>1.09 秒</strong>（说明不是视频抽帧）</td><td>同左</td></tr> </table> <h3>环境</h3> <div class="chips"> <span class="chip">Python <b>3.11.16</b></span> <span class="chip">PyTorch <b>2.11.0+cu128</b></span> <span class="chip">Ultralytics <b>8.4.176</b></span> <span class="chip">CUDA <b>12.8</b></span> <span class="chip">GPU <b>RTX 5060 Laptop 8GB</b></span> <span class="chip">conda 环境 <b>yolo_road</b></span> </div> <!-- ==================== 附录 B ==================== --> <h2 id="a2"><span class="num">B</span>术语中英对照</h2> <p>下面这张表按出现频率排，中英对照。</p> <table> <tr><th style="width:170px">中文</th><th style="width:220px">英文 / 缩写</th><th>一句话解释</th></tr> <tr class="hi"><td>目标检测</td><td>Object Detection</td><td>找出图里有什么、在哪、有几个，输出矩形框</td></tr> <tr><td>标注 / 标注框</td><td>Annotation / Bounding Box</td><td>人工画的框，是模型学习的标准答案</td></tr> <tr class="hi"><td>迁移学习</td><td>Transfer Learning</td><td>从别人训好的模型继续训，而不是从零开始</td></tr> <tr><td>预训练权重</td><td>Pretrained Weights</td><td>别人在大数据集上训好的参数</td></tr> <tr class="hi"><td>训练轮数</td><td>Epoch</td><td>把全部训练数据过一遍叫 1 个 epoch</td></tr> <tr><td>批量大小</td><td>Batch Size</td><td>一次同时处理多少张图才更新一次参数</td></tr> <tr class="hi"><td>学习率</td><td>Learning Rate</td><td>每次调参数时"步幅"多大</td></tr> <tr><td>损失 / 损失函数</td><td>Loss / Loss Function</td><td>衡量"错得多离谱"的分数，训练就是把它降到最低</td></tr> <tr class="hi"><td>过拟合</td><td>Overfitting</td><td>训练集一直变好、验证集不再变好，说明在背答案</td></tr> <tr><td>数据增强</td><td>Data Augmentation</td><td>人为把训练图变形（翻转、调色、拼接），抗过拟合</td></tr> <tr class="hi"><td>交并比</td><td>IoU (Intersection over Union)</td><td>两个框重叠程度，0 到 1</td></tr> <tr><td>置信度</td><td>Confidence</td><td>模型有多确定这个框是对的，0 到 1</td></tr> <tr class="hi"><td>非极大值抑制</td><td>NMS</td><td>同一个目标被报了多个框时，只留下最好的那个</td></tr> <tr><td>命中 / 误报 / 漏报</td><td>TP / FP / FN</td><td>报对了 / 报了但错 / 该报没报</td></tr> <tr class="hi"><td>精确率</td><td>Precision</td><td>报出来的框里有多少是对的</td></tr> <tr><td>召回率</td><td>Recall</td><td>该报的目标里报出来了多少</td></tr> <tr class="hi"><td>平均精度</td><td>AP (Average Precision)</td><td>单个类的综合成绩，PR 曲线下面积</td></tr> <tr><td>平均精度均值</td><td>mAP (mean AP)</td><td>所有类的 AP 再取平均</td></tr> <tr class="hi"><td>精确率与召回率的调和平均</td><td>F1 Score</td><td>把 P 和 R 合成一个数，用来找最优阈值</td></tr> <tr><td>混淆矩阵</td><td>Confusion Matrix</td><td>模型的"错题本"：错成了什么</td></tr> <tr class="hi"><td>多目标跟踪</td><td>MOT (Multi-Object Tracking)</td><td>给跨帧的同一目标分配固定编号</td></tr> <tr><td>身份切换</td><td>ID Switch</td><td>同一目标被跟踪器当成两个不同编号</td></tr> <tr><td>数据泄漏</td><td>Data Leakage</td><td>测试数据混进了训练集，导致分数虚高</td></tr> <tr class="hi"><td>长尾分布</td><td>Long-tail Distribution</td><td>少数类样本极多、多数类样本极少</td></tr> </table> <!-- ==================== 附录 C ==================== --> <h2 id="a3"><span class="num">C</span>文件地图</h2> <p>项目里有 23 个脚本，分三组。<strong>下面是完整的脚本清单。</strong></p> <h3>第一组 · 数据准备与核查（7 个）</h3> <table> <tr><th style="width:250px">脚本</th><th>干什么</th></tr> <tr><td><code>dataset_config.py</code></td><td><strong>共享配置模块</strong>：自动定位项目根目录、读 data.yaml 拿类别和路径。所有脚本都从这里取，改数据集只需改一处</td></tr> <tr class="hi"><td><code>01_check_dataset.py</code></td><td>结构检查：图片与标签是否一一对应、字段数、类别越界、坐标范围</td></tr> <tr><td><code>02_inspect_label_formats.py</code></td><td>格式普查：按字段数分类，发现有 860 行是另一种格式</td></tr> <tr class="hi"><td><code>03_find_bad_coordinates.py</code></td><td>多边形数值专项排查，确认那些多边形本身没坏</td></tr> <tr><td><code>04_convert_labels_to_detection.py</code></td><td><strong>核心</strong>：多边形 → 最小外接矩形，生成新数据集 + 审计日志</td></tr> <tr class="hi"><td><code>05_validate_detection_dataset.py</code></td><td>转换后验收：六道校验 + 打印每类框数（长尾的直接证据）</td></tr> <tr><td><code>visualize_labels.py</code></td><td>把人工标注画回原图做抽检，<strong>抓到了那处漏标</strong></td></tr> </table> <h3>第二组 · 交付层（6 个）</h3> <table> <tr><th style="width:250px">脚本</th><th>干什么</th></tr> <tr class="hi"><td><code>06_predict.py</code></td><td>统一推理入口：单图 / 目录 / 视频 / 摄像头</td></tr> <tr><td><code>07_make_demo_figure.py</code></td><td>按规则自动挑图，生成"人工标注 vs 模型预测"对照拼图</td></tr> <tr class="hi"><td><code>08_track.py</code></td><td>视频多目标跟踪（ByteTrack），输出带轨迹 ID 的视频与统计</td></tr> <tr><td><code>09_evaluate.py</code></td><td><strong>正式评估</strong>：逐类指标 + 最优阈值 + 混淆矩阵，并自动生成评估报告</td></tr> <tr class="hi"><td><code>benchmark_inference.py</code></td><td>推理性能测试：三档计时口径 + 6 项测量条件</td></tr> <tr><td><code>check_data_leakage.py</code></td><td>数据泄漏三重检查：md5 + 感知哈希 + 时间戳邻域</td></tr> </table> <h3>第三组 · 部署层（10 个）</h3>
+</div> <!-- ==================== 7 ==================== -->
+<h2 id="p7"><span class="num">7</span>部署：从 PyTorch 到 TensorRT</h2>
+
+<div class="lead">
+  <p>前六站做完，你手上有数据、有模型、有一组可信的指标。但这些东西都还活在 Python 里——
+  <strong>要装两个多 GB 的 PyTorch，要敲一行 Python 才能跑一张图。</strong></p>
+  <p>这一站解决的问题是：<strong>怎么让这个模型变成"别人拿到就能用"的东西</strong>。
+  做法是把 <code>best.pt</code> 导出成 ONNX，编成 TensorRT 引擎，再用 C++ 接进程序。
+  单张端到端从 <strong>Python 侧的 14.96 ms</strong>，降到 <strong>C++ 侧的 7.94 ms</strong>——
+  但这两个数的测量条件不同，<strong>不能直接说"快了 1.9 倍"</strong>，理由见 <a href="#p7-4">7.4</a>。</p>
+  <p>但这一站最值得看的不是"快了多少"，而是<strong>两个容易被讲错的地方</strong>：
+  中间四组数字的条件完全不同（见 <a href="#p7-4">7.4</a>），
+  以及"能链接"和"能调用"是两件事（见 <a href="#p7-6">7.6</a>）。</p>
+</div>
+
+<h3 id="p7-1">7.1 部署到底改变了什么</h3>
+
+<div class="analogy">
+  <span class="t">💡 打比方：菜谱 vs 中央厨房</span>
+  <p>训练出来的模型像一份<strong>菜谱</strong>：写得清楚，但每次做菜都要现读、现切、现配。
+  PyTorch 就是那个"边看菜谱边做"的厨房——灵活，能改，但慢。</p>
+  <p>部署就像把这份菜谱交给<strong>中央厨房的流水线</strong>：切成固定几道工序、每道工序配好专用设备。
+  做出来的菜一样，但速度快得多、也不需要菜谱师傅在场。</p>
+  <p>代价是：<strong>流水线定死了</strong>。想换一道菜（换输入尺寸），整条线要重排。</p>
+</div>
+
+<p>训练时的 PyTorch 模型和部署时的引擎，<strong>数学上是同一个函数，工程上是两个东西</strong>：</p>
+
+<table>
+  <tr><th style="width:130px">方面</th><th style="width:200px">训练（PyTorch）</th><th>部署（ONNX / TensorRT）</th></tr>
+  <tr class="hi"><td>计算图</td><td>动态图，边跑边建</td><td><strong>静态图</strong>，先确定再跑</td></tr>
+  <tr><td>输入形状</td><td>可变</td><td>固定 640×640（本项目 <code>dynamic=False</code>）</td></tr>
+  <tr class="hi"><td>自动求导</td><td>有</td><td><strong>没有</strong>，也不需要</td></tr>
+  <tr><td>算子</td><td>PyTorch 算子</td><td>融合过的算子（Conv+BN+ReLU 合成一个）</td></tr>
+  <tr class="hi"><td>精度</td><td>FP32（AMP 时混合）</td><td>FP32 / FP16 / INT8 可选</td></tr>
+  <tr><td>依赖</td><td>torch + CUDA + cuDNN（几 GB）</td><td>ONNX Runtime 或 TensorRT 运行时（几百 MB）</td></tr>
+</table>
+
+<div class="box note">
+  <span class="t">为什么"算子融合"是免费提速</span>
+  <p>训练时 <code>Conv → BatchNorm → ReLU</code> 是三次独立计算：写一次显存、读一次、再写一次。
+  部署时它们被<strong>折成一个算子</strong>——数学上等价（BN 的均值方差在推理时是常数，可以直接折进卷积权重），
+  但<strong>显存带宽省了两次</strong>。</p>
+  <p>这个模型只有 2.39 M 参数，<strong>它主要不是算力受限，而是访存和 kernel 启动开销受限</strong>，
+  所以省掉两次显存读写是有意义的。一个能说明分量级的数字：
+  <strong>纯 TensorRT（Python，不打 ONNX Runtime 那层封装）1.97 ms，而 C++ 经 ONNX Runtime 的 TRT 接口是 3.22 ms</strong>
+  ——两者差的 1.25 ms 就是那层封装的成本。这个差距比大多数"优化手段"的收益都大。</p>
+</div>
+
+<h4>四档链路：每一档解决什么问题</h4>
+
+<figure>
+<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="depA" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#9aa3b2"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="680" height="300" rx="10" fill="#ffffff"/>
+  <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1d21">一档一档换掉"谁的封装"，速度就是这样下来的</text>
+
+  <!-- 四档盒子 -->
+  <rect x="26" y="52" width="146" height="112" rx="9" fill="#f8f9fb" stroke="#d8dde6"/>
+  <text x="99" y="76" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">① best.pt</text>
+  <text x="99" y="96" text-anchor="middle" font-size="10.5" fill="#64748b">PyTorch 训练态</text>
+  <text x="99" y="118" text-anchor="middle" font-size="11" fill="#0550ae">纯推理 11.70 ms</text>
+  <text x="99" y="134" text-anchor="middle" font-size="10" fill="#7a8290">端到端 14.96 ms</text>
+  <text x="99" y="152" text-anchor="middle" font-size="9.5" fill="#b91c1c">要装 2 GB 才能跑</text>
+
+  <rect x="192" y="52" width="146" height="112" rx="9" fill="#f8f9fb" stroke="#d8dde6"/>
+  <text x="265" y="76" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">② best.onnx</text>
+  <text x="265" y="96" text-anchor="middle" font-size="10.5" fill="#64748b">跨框架静态图</text>
+  <text x="265" y="118" text-anchor="middle" font-size="11" fill="#0550ae">9.41 MB</text>
+  <text x="265" y="134" text-anchor="middle" font-size="10" fill="#7a8290">导出 3.6 秒</text>
+  <text x="265" y="152" text-anchor="middle" font-size="9.5" fill="#7a8290">不是加速器</text>
+
+  <rect x="358" y="52" width="146" height="112" rx="9" fill="#eef3ff" stroke="#c7d8ff"/>
+  <text x="431" y="76" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d4ed8">③ ORT + CUDA</text>
+  <text x="431" y="96" text-anchor="middle" font-size="10.5" fill="#3b5bdb">通用 GPU 后端</text>
+  <text x="431" y="118" text-anchor="middle" font-size="11" fill="#0550ae">纯推理 7.10 ms</text>
+  <text x="431" y="134" text-anchor="middle" font-size="10" fill="#7a8290">端到端 12.71 ms</text>
+  <text x="431" y="152" text-anchor="middle" font-size="9.5" fill="#15803d">跨平台、好部署</text>
+
+  <rect x="524" y="52" width="130" height="112" rx="9" fill="#f0f9eb" stroke="#c9e9b0"/>
+  <text x="589" y="76" text-anchor="middle" font-size="12.5" font-weight="700" fill="#15803d">④ .engine</text>
+  <text x="589" y="96" text-anchor="middle" font-size="10.5" fill="#15803d">TensorRT FP16</text>
+  <text x="589" y="118" text-anchor="middle" font-size="11" fill="#0550ae">3.22 ms</text>
+  <text x="589" y="134" text-anchor="middle" font-size="10" fill="#7a8290">端到端 7.94 ms</text>
+  <text x="589" y="152" text-anchor="middle" font-size="9.5" fill="#b91c1c">换卡就失效</text>
+
+  <!-- 箭头 -->
+  <line x1="174" y1="108" x2="190" y2="108" stroke="#9aa3b2" stroke-width="1.6" marker-end="url(#depA)"/>
+  <line x1="340" y1="108" x2="356" y2="108" stroke="#9aa3b2" stroke-width="1.6" marker-end="url(#depA)"/>
+  <line x1="506" y1="108" x2="522" y2="108" stroke="#9aa3b2" stroke-width="1.6" marker-end="url(#depA)"/>
+
+  <!-- 说明条 -->
+  <rect x="26" y="186" width="420" height="92" rx="9" fill="#fffdf5" stroke="#f0dfa8"/>
+  <text x="42" y="208" font-size="11.5" font-weight="700" fill="#92400e">每一步都在换掉一样东西</text>
+  <text x="42" y="228" font-size="10.5" fill="#713f12">①→② 换掉框架绑定：模型不再属于 PyTorch，谁都能读</text>
+  <text x="42" y="246" font-size="10.5" fill="#713f12">②→③ 换掉执行后端：算子分给 GPU，但仍是通用 kernel</text>
+  <text x="42" y="264" font-size="10.5" fill="#713f12">③→④ 换掉 kernel 本身：针对这块卡重新编译，最快但不通用</text>
+
+  <rect x="462" y="186" width="192" height="92" rx="9" fill="#fef3f2" stroke="#f7c9c4"/>
+  <text x="558" y="208" text-anchor="middle" font-size="11.5" font-weight="700" fill="#b91c1c">别把这四个数连成一条线</text>
+  <text x="558" y="228" text-anchor="middle" font-size="10.5" fill="#7f1d1d">①② 是 640×640 Python</text>
+  <text x="558" y="246" text-anchor="middle" font-size="10.5" fill="#7f1d1d">④ 是 400×640 C++ 含画框</text>
+  <text x="558" y="264" text-anchor="middle" font-size="10.5" fill="#7f1d1d">条件不同，见 7.4</text>
+</svg>
+<figcaption>图 17 · 四档链路：每一档换掉的东西不同，所以它们的耗时不能直接连成一条"加速曲线"</figcaption>
+</figure>
+
+<div class="box warn">
+  <span class="t">⚠️ "ONNX 能加速"是个常见误解</span>
+  <p>ONNX 是<strong>格式</strong>，不是引擎。同一个 ONNX 用 ONNX Runtime 的 CPU 后端跑，可能比 PyTorch 还慢；
+  用 CUDA 后端跑差不多；只有换成 TensorRT 才真正快。</p>
+  <p><strong>本项目的顺序是"先证明等价，再谈加速"</strong>：ONNX 那一关的产出是"证明没搞坏"，不是"变快了"。
+  这个顺序很重要——如果先谈加速，你会跳过验证，然后用一个"跑得挺快但结果不一样"的模型去测性能。</p>
+</div>
+
+<h3 id="p7-2">7.2 五个产物，和它们的构建成本</h3>
+
+<table>
+  <tr><th style="width:150px">产物</th><th class="c" style="width:88px">体积</th><th class="c" style="width:96px">构建耗时</th><th>说明</th></tr>
+  <tr class="hi"><td><code>best.pt</code></td><td class="c">5.22 MB</td><td class="c">—</td><td>训练产物，脚本会记下 sha256</td></tr>
+  <tr><td><code>best.onnx</code></td><td class="c">9.41 MB</td><td class="c">3.6 s</td><td>opset 18、368 个节点、<code>simplify=True</code></td></tr>
+  <tr class="hi"><td><code>best_fp32.engine</code></td><td class="c">17.91 MB</td><td class="c">111.7 s</td><td>workspace 4 GB、batch 1</td></tr>
+  <tr><td><code>best_fp16.engine</code></td><td class="c"><strong>11.79 MB</strong></td><td class="c"><strong>616.7 s</strong></td><td>比 FP32 小 34%，<strong>构建慢 5.5 倍</strong></td></tr>
+  <tr class="hi"><td><code>best_int8.engine</code></td><td class="c">11.83 MB</td><td class="c">379.0 s</td><td>PTQ + MinMax 校准，校准集用 train 494 张</td></tr>
+</table>
+
+<div class="box note">
+  <span class="t">为什么 FP16 的构建比 FP32 慢 5.5 倍</span>
+  <p>因为 FP16 模式下 TensorRT 要<strong>在更大的候选 kernel 空间里搜索</strong>（每一层都有多种 FP16 策略），
+  还要做精度校验——某些层用 FP16 会溢出，得单独回退。</p>
+  <p><strong>构建时间不是推理时间。</strong>这 616 秒是一次性的，换来的是每次推理的稳定加速。
+  所以工程上会把 <code>.engine</code> 缓存起来，下次启动直接加载。
+  但这带来一个新问题：<strong>缓存和 GPU / TensorRT 版本绑定</strong>（见 7.8 第 5 条）。</p>
+</div>
+
+<h3 id="p7-3">7.3 三层验证：怎么证明"没搞坏"</h3>
+
+<p>"导出成功、能出框"不等于"输出一致"。所以要分三层查，<strong>层与层之间是"上一层不通过就不用看下一层"</strong>：</p>
+
+<figure>
+<svg viewBox="0 0 680 246" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="valB" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#9aa3b2"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="680" height="246" rx="10" fill="#ffffff"/>
+  <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1d21">三层验证：从"形状对不对"到"结果一模一样"</text>
+
+  <rect x="26" y="46" width="186" height="112" rx="9" fill="#eef3ff" stroke="#c7d8ff"/>
+  <text x="119" y="70" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d4ed8">第一层 · 结构</text>
+  <text x="119" y="92" text-anchor="middle" font-size="10.5" fill="#334155">输入输出名字 / 形状 / dtype</text>
+  <text x="119" y="110" text-anchor="middle" font-size="10.5" fill="#334155">节点数、opset</text>
+  <text x="119" y="136" text-anchor="middle" font-size="10" fill="#3b5bdb">查"导出有没有走样"</text>
+
+  <rect x="247" y="46" width="186" height="112" rx="9" fill="#f8f9fb" stroke="#d8dde6"/>
+  <text x="340" y="70" text-anchor="middle" font-size="12.5" font-weight="700" fill="#334155">第二层 · 数值</text>
+  <text x="340" y="92" text-anchor="middle" font-size="10.5" fill="#334155">同一输入喂两边</text>
+  <text x="340" y="110" text-anchor="middle" font-size="10.5" fill="#334155">比输出张量的差</text>
+  <text x="340" y="136" text-anchor="middle" font-size="10" fill="#64748b">查"算得一样吗"</text>
+
+  <rect x="468" y="46" width="186" height="112" rx="9" fill="#f0f9eb" stroke="#c9e9b0"/>
+  <text x="561" y="70" text-anchor="middle" font-size="12.5" font-weight="700" fill="#15803d">第三层 · 结果</text>
+  <text x="561" y="92" text-anchor="middle" font-size="10.5" fill="#334155">16 张图逐框比对</text>
+  <text x="561" y="110" text-anchor="middle" font-size="10.5" fill="#334155">框数 / IoU / 类别 / 分数</text>
+  <text x="561" y="136" text-anchor="middle" font-size="10" fill="#15803d">查"能不能用"</text>
+
+  <line x1="214" y1="102" x2="245" y2="102" stroke="#9aa3b2" stroke-width="1.6" marker-end="url(#valB)"/>
+  <line x1="435" y1="102" x2="466" y2="102" stroke="#9aa3b2" stroke-width="1.6" marker-end="url(#valB)"/>
+
+  <rect x="26" y="176" width="628" height="52" rx="9" fill="#fffdf5" stroke="#f0dfa8"/>
+  <text x="42" y="198" font-size="11" font-weight="700" fill="#92400e">判定顺序不能反</text>
+  <text x="42" y="216" font-size="10.5" fill="#713f12">数值层会出现"看起来很大"的差（本项目最大差 0.907）——但它在结果层被证明无关。反过来先看结果，就永远解释不了那个 0.907。</text>
+</svg>
+<figcaption>图 18 · 三层验证：结构查"走样"，数值查"算得一样"，结果查"能不能用"</figcaption>
+</figure>
+
+<table>
+  <tr><th style="width:70px">层</th><th style="width:210px">查什么</th><th style="width:230px">本项目结果</th><th>判定</th></tr>
+  <tr class="hi"><td><strong>结构</strong></td><td>输入输出名字 / 形状 / dtype、节点数</td>
+    <td><code>images [1,3,640,640] FLOAT</code><br>→ <code>output0 [1,16,8400] FLOAT</code></td>
+    <td>对得上</td></tr>
+  <tr><td><strong>数值</strong></td><td>同一输入，两边输出张量的差</td>
+    <td>ONNX vs PyTorch：max 0.907、mean 0.0055、<strong>相对误差 1.07e-4</strong>（量级 51.1）</td>
+    <td>相对误差可接受</td></tr>
+  <tr class="hi"><td><strong>结果</strong></td><td>16 张图逐框比对：框数、类别、分数</td>
+    <td>总数 <strong>70 = 70</strong>、框数差 <strong>0</strong>、逐类一致、最大分数差 0.001</td>
+    <td><strong>通过</strong></td></tr>
+</table>
+
+<p><span class="muted">注：这一层比的是"ONNX 与原 PyTorch 模型"。IoU 那一组数属于下一层的"引擎 vs ONNX"，两层的比对对象不同，不能混着引用。</span></p>
+
+<div class="box note">
+  <span class="t">口径：为什么"数值层最大差 0.907"不算问题</span>
+  <p>因为输出张量是<strong>未过 sigmoid 的原始 logits</strong>，量级均值是 <strong>51.1</strong>。
+  0.907 相对于 51 只有 1.8%，而且<strong>差异集中在"没有目标的格子"上</strong>——
+  那些格子在阈值筛选时会被整片丢掉，不影响任何一个框。</p>
+  <p>真正该看的是<strong>结果层</strong>：70 个框一个不差、框数差 0、逐类全对、最大分数差 0.001。
+  这就是为什么验证要分三层：<strong>数值层的"大差"可能来自无关格子，结果层的"小差"才是真问题。</strong></p>
+</div>
+
+<h4>三个引擎各自的验证结果</h4>
+
+<table>
+  <tr><th style="width:82px">引擎</th><th class="c" style="width:84px">框总数</th><th class="c" style="width:110px">完全一致页数</th>
+    <th class="c" style="width:86px">最小 IoU</th><th class="c" style="width:104px">坐标最大差</th><th>结论</th></tr>
+  <tr class="hi"><td>FP32</td><td class="c">70</td><td class="c">15 / 16</td><td class="c"><strong>0.9957</strong></td><td class="c">0.88 px</td><td>与 ONNX 等价</td></tr>
+  <tr><td>FP16</td><td class="c">70</td><td class="c">13 / 16</td><td class="c"><strong>0.9733</strong></td><td class="c">3.36 px</td><td>可接受（框有亚像素抖动）</td></tr>
+  <tr class="hi"><td>INT8</td><td class="c">70</td><td class="c">—</td><td class="c">—</td><td class="c">—</td><td><strong>精度损失 4.41%，不采用</strong></td></tr>
+</table>
+
+<div class="box warn">
+  <span class="t">⚠️ FP16 有 3 张图"不完全一致"，为什么还算通过</span>
+  <p>因为"不完全一致"指的是<strong>框坐标有 1–3 像素差异、分数差 0.011</strong>，
+  框数完全一样（70 = 70）、类别全对、<strong>最小 IoU 仍有 0.9733</strong>——远高于判定门槛 0.5。</p>
+  <p>FP16 的误差是"尾数从 23 位压到 10 位"带来的均匀小扰动，
+  <strong>它不该改变框的数量和类别</strong>，只该让坐标动零点几像素。
+  如果 FP16 少检出一个框，那就是真问题，不是"可接受误差"。</p>
+</div>
+
+<h4>精度全景：五档格式在验证集上的表现</h4>
+
+<table>
+  <tr><th style="width:170px">格式</th><th class="c" style="width:110px">mAP50</th><th class="c" style="width:120px">相对 FP32 引擎</th><th>说明</th></tr>
+  <tr class="hi"><td>PyTorch <code>.pt</code></td><td class="c">0.6407</td><td class="c">+0.80 点</td><td>训练产物本体的分数</td></tr>
+  <tr><td>ONNX</td><td class="c">0.6329</td><td class="c">+0.02 点</td><td>导出后几乎无损</td></tr>
+  <tr class="hi"><td>TensorRT FP32</td><td class="c"><strong>0.6327</strong></td><td class="c">基准</td><td>与 ONNX 等价</td></tr>
+  <tr><td>TensorRT FP16</td><td class="c">0.6323</td><td class="c">−0.04 点</td><td>可以忽略</td></tr>
+  <tr class="hi"><td>TensorRT INT8</td><td class="c">0.6048</td><td class="c"><strong>−4.41%</strong></td><td>延迟只快 1.5%–3%，不采用</td></tr>
+</table>
+
+<div class="box ok">
+  <span class="t">✅ 一条必须说清的规矩：精度对比全部用验证集，不碰测试集</span>
+  <p>上面这张表全部是 <strong>valid</strong>（187 张）上的结果，没有一次用 test。
+  原因见 <a href="#p5-1">5.1</a>：如果每换一个精度就评一次测试集，
+  那 0.680 就变成"从五个数里挑的最好的那个"，它就不再是"测试集指标"了。</p>
+  <p><strong>测试集只能用一次，这是它的价值所在。</strong></p>
+</div>
+
+<div class="box warn">
+  <span class="t">⚠️ INT8 为什么不用——这是本项目主动否掉的一个方案</span>
+  <p>INT8 量化实测过：mAP50 掉 <strong>4.41%</strong>，而延迟只快 <strong>1.5%–3%</strong>，
+  落在测量波动（±5%）之内。<strong>等于白掉精度。</strong></p>
+  <p>原因有两个：① 校准集用的是 train 494 张全量（没用 valid，避免分数偏乐观），
+  不是校准集选错，而是<strong>这个模型对量化本身就敏感</strong>——只有 2.39 M 参数，每层激活分布窄，
+  8 bit 的量化台阶相对更粗；② <strong>瓶颈不在算力</strong>，FP16 已经低到"启动 kernel + 访存"占主导，
+  把计算再压一半也省不出时间。</p>
+  <p><strong>还有一条证据值得记住</strong>：INT8 引擎共 230 层，其中卷积层 102 个——
+  真正量化成 INT8 的只有 <strong>83 个（占 81.4%）</strong>，另有 13 个留在 FP16、6 个留在 FP32。
+  TensorRT 会自动把"量化会明显掉精度"的层保留高精度，这是它的保护机制。
+  <strong>如果这个占比是 100%，反而要警惕</strong>——那说明没有回退保护，精度可能崩。</p>
+</div>
+
+<h3 id="p7-4">7.4 六行延迟数字，一行都不能和另一行直接比</h3>
+
+<p>这一节是整个项目<strong>最容易讲错</strong>的地方。先看表，再看下面的红线。</p>
+
+<table>
+  <tr><th style="width:186px">测量条件</th><th class="c" style="width:112px">纯推理</th><th class="c" style="width:126px">端到端</th><th>出处</th></tr>
+  <tr class="hi"><td>Python · PyTorch FP32 · 640×640 · 40 图</td><td class="c">11.70</td><td class="c">14.96</td>
+    <td><code>benchmark_pt_vs_onnx.json</code></td></tr>
+  <tr><td>Python · ORT CUDA · 同上</td><td class="c">7.10</td><td class="c">12.71</td><td>同上</td></tr>
+  <tr class="hi"><td>Python · ORT TRT 接口（FP16 引擎）</td><td class="c"><strong>3.32</strong></td><td class="c">—</td>
+    <td><code>ep_benchmark.json</code></td></tr>
+  <tr><td>C++ · ORT CUDA · <strong>400×640 单图</strong></td><td class="c">5.40–7.13<br><span class="muted">均值 6.23</span></td><td class="c">13.31</td>
+    <td><code>cpp_ep_compare.json</code></td></tr>
+  <tr class="hi"><td>C++ · ORT TRT 接口 · 同上</td><td class="c"><strong>3.22</strong></td><td class="c"><strong>7.94</strong></td><td>同上</td></tr>
+  <tr><td>C++ · 视频 720p · 1000 帧</td><td class="c">3.63</td><td class="c">中位 9.90 / <strong>p99 13.25</strong></td>
+    <td><code>video_stability.json</code></td></tr>
+</table>
+
+<div class="box warn">
+  <span class="t">⚠️ 这六行的条件差异，有四种</span>
+  <p><strong>① 输入分辨率不同</strong>：Python 用 640×640，C++ 单图用 <strong>400×640</strong>，视频用 <strong>1280×720</strong>
+  ——预处理量完全不同。</p>
+  <p><strong>② 计时边界不同</strong>：纯推理不含读图/预处理/后处理；端到端含。</p>
+  <p><strong>③ 端到端的定义不同</strong>：Python 的端到端<strong>不含画框</strong>，C++ 的含。</p>
+  <p><strong>④ 视频那行是逐帧真解码</strong>，不是复用同一个张量。</p>
+  <p style="margin-top:10px"><strong>唯一可以横比的两种情况</strong>：同一行内部"纯推理 vs 端到端"；
+  或者同一条件下换执行后端（C++ 内 CUDA 均值 6.23 → TRT 3.22，这个 <strong>1.93×</strong> 是有效的）。</p>
+</div>
+
+<div class="box note">
+  <span class="t">表里每一格用的是什么统计量</span>
+  <p><strong>Python 那三行取的是中位数</strong>——单次测量 n=200，分布右偏（有偶发的慢帧），
+  中位数比均值更能代表"典型一帧"。</p>
+  <p><strong>C++ 那三行取的是三轮均值</strong>——纯推理是三轮（7.13/6.15/5.40，均值 6.23）、
+  端到端也是三轮（8.12/7.73/7.98，均值 7.94）。C++ CUDA 那一格<strong>三轮之间波动就有 32%</strong>，
+  单给一个数会骗人，所以额外给范围。</p>
+  <p><strong>两类统计量不能混着比</strong>，但同一类内部可以——比如 C++ 内 CUDA 6.23 → TRT 3.22 是有效的。</p>
+  <p>顺带一个教训：<strong>第一次测出来的 23.7 ms 是错的</strong>——机器在跑别的任务、而且每组只测一次。
+  改成"空机、两轮、分开进程"之后才稳定。
+  <strong>这不是优化，这是测量方法。</strong></p>
+</div>
+
+<div class="box warn">
+  <span class="t">⚠️ 四轮基准：为什么基线取 15.889 而不是更好的那一轮</span>
+  <p>同一个配置（PyTorch FP32、640×640、Python 端到端）跑了四轮，两组结果：</p>
+  <p><strong>FP32 两轮：15.699 / 15.889，差 1.2%</strong>——可复现。<br>
+  <strong>FP16 两轮：16.89 / 26.944，差 59%</strong>——不可复现，26.94 是异常轮。</p>
+  <p><strong>基线取 FP32 两轮里较差的那一轮（15.889）</strong>，理由是同精度、可复现、且保守。
+  绝不取 26.94——那个数只是"测量不可复现"的证据，拿它当基线会得出"FP16 比 FP32 慢 70%"的假结论。</p>
+  <p><strong>规矩：优化开始之前，先把"基线取哪一组、什么精度、什么口径"写下来。</strong>
+  这件事没定，后面所有倍数都可以被随手调。</p>
+</div>
+
+<h3 id="p7-5">7.5 导出与验证：三行代码背后的两个坑</h3>
+
+<h4>为什么导出要单独写一个脚本，而不是敲一行命令</h4>
+
+<pre><code><span class="cmt"># scripts/10_export_onnx.py  文件头（原文）</span>
+<span class="st">"""10 号脚本：把 best.pt 导出成 ONNX，并把「导出这件事」本身记录成可复查的证据。
+
+为什么单独写一个脚本，而不是敲一行 yolo export
+-------------------------------
+导出成功、能出框，不等于输出一致。"""</span></code></pre>
+
+<p>它做的就是三件事：<strong>导出 → 算 sha256 → 把参数与环境写进 JSON</strong>。
+看起来多余，但正是这份 JSON 让"我导出过"变成"我能证明导出的是这个文件、用这套参数"。</p>
+
+<h4>三层验证的核心：先 fuse，再比</h4>
+
+<pre><code><span class="cmt"># scripts/11_verify_onnx.py  约 L120</span>
+<span class="cmt"># 用固定种子造输入：同一个张量分别喂给两边，排除预处理差异的干扰</span>
+rng = np.random.default_rng(<span class="num">0</span>)
+x = rng.random((<span class="num">1</span>, <span class="num">3</span>, <span class="num">640</span>, <span class="num">640</span>), dtype=np.float32)
+
+<span class="cmt"># 关键：先 fuse 再前向。导出的 ONNX 是 fused 的（BN 已折进卷积），</span>
+<span class="cmt"># 拿未 fuse 的模型去比，差异里会混进「BN 折叠的舍入」，看起来像导出错了</span>
+torch_model = YOLO(str(args.weights)).model.<span class="kw">eval</span>()
+<span class="kw">if</span> hasattr(torch_model, <span class="st">"fuse"</span>):
+    torch_model = torch_model.fuse()
+torch_model = torch_model.cuda()
+<span class="kw">with</span> torch.no_grad():
+    y_t = torch_model(torch.from_numpy(x).cuda())[<span class="num">0</span>].cpu().numpy()
+
+sess = ort.InferenceSession(str(args.onnx),
+        providers=[<span class="st">"CUDAExecutionProvider"</span>, <span class="st">"CPUExecutionProvider"</span>])
+y_o = sess.run(<span class="kw">None</span>, {sess.get_inputs()[<span class="num">0</span>].name: x})[<span class="num">0</span>]</code></pre>
+
+<div class="box note">
+  <span class="t">"先 fuse 再比"这句话值二十分钟的排查</span>
+  <p>PyTorch 在 <code>train()</code> 状态下 BatchNorm 用<strong>当前 batch 的统计量</strong>，
+  <code>eval()</code> 用<strong>滑动平均</strong>；而导出 ONNX 时 BN 会被<strong>折进卷积权重</strong>。</p>
+  <p>如果拿"没 fuse 的 <code>eval()</code> 模型"去比，两边算的是同一件事，
+  但<strong>浮点运算顺序不同</strong>，差异会混进来，让你以为是导出错了。</p>
+  <p><strong>正确做法：两边都在 fused 状态下比。</strong>差别只剩"用哪种后端算"，这才是一次干净的对比。</p>
+</div>
+
+<h4>结果层：逐框比对，而不是看总分</h4>
+
+<p>第三层用同一套 <code>predict</code>（两边都用 Ultralytics 的封装，差别只有后端），
+然后<strong>按 IoU 贪心匹配</strong>，统计四件事：框数、匹配数、最小 IoU、类别是否全对。
+判定标准是四个一起看：<strong>框数相同 + 类别全对 + 最小 IoU &gt; 0.9</strong>。</p>
+
+<div class="box tip">
+  <span class="t">💡 为什么不比较"总分"，而是逐框比</span>
+  <p>因为总分是个标量，它一样可能掩盖"张三换成李四"这种交换。
+  逐框匹配能回答"第 3 个框的 IoU 是多少"——<strong>出问题时能定位到具体哪一帧、哪一个框</strong>。</p>
+</div>
+
+<h3 id="p7-6">7.6 能链接 ≠ 能调用：ABI 墙</h3>
+
+<p>这是本项目部署阶段<strong>最值得单独讲</strong>的一个坑，因为它不报错。</p>
+
+<div class="box warn">
+  <span class="t">⚠️ 现象：链接通过，一调用就返回垃圾值</span>
+  <p>用 MinGW 编的 C++ 程序，链接 TensorRT 的 <code>.lib</code> / <code>.dll</code> 是<strong>能通过</strong>的——
+  因为导出的是 <code>extern "C"</code> 的工厂函数 <code>createInferRuntime</code>，
+  <strong>C 符号不做名字修饰</strong>，两边能对上。</p>
+  <p>但一旦调用<strong>返回的 C++ 对象</strong>的虚函数，就会用到<strong>虚表布局</strong>：
+  MSVC 与 GCC/MinGW 的 vtable 结构不同，<strong>调过去就是垃圾值</strong>，不崩、不报错。</p>
+  <p><strong>这就是"ABI 墙"</strong>——二进制接口不兼容。它不是"编译错误"，所以编译器帮不了你。</p>
+</div>
+
+<div class="box ok">
+  <span class="t">✅ 排查方法：一条 objdump 命令</span>
+  <p>用 <code>objdump -p</code> 列出 DLL 的<strong>导出表</strong>——
+  如果只有少数几个未修饰的 C 名字、其余全是 <code>?xxx@@</code> 这种修饰名，
+  就说明<strong>"只有 C 接口能用"</strong>。本项目就是这么定位的。</p>
+  <p>同一条命令还能顺手回答"这个 DLL 依赖谁"（看导入表，见 <a href="#p7-8">7.8</a>）——
+  一个工具解决两个问题。</p>
+</div>
+
+<div class="analogy">
+  <span class="t">💡 打比方：两个人都说"中文"，但方言不通</span>
+  <p>C 接口像"普通话"——名字固定、参数固定，谁都能对上。<br>
+  C++ 的类像"方言"——每个编译器对虚表怎么排、名字怎么修饰，都有自己的一套。</p>
+  <p>链接器只检查"这个名字有没有"（像只核对"你会不会说中文"），
+  它<strong>不检查"虚表第 3 个位置放的是不是同一个函数"</strong>。所以链接能过，调用就崩。</p>
+</div>
+
+<p>于是本项目的 C++ 侧走了另一条路：<strong>用 ONNX Runtime 的 TensorRT 接口，而不是原生 TensorRT</strong>。
+这样只需要碰 ONNX Runtime 的 C++ 接口（它是同一套编译器编的），完全不进 ABI 墙。
+代价是慢一点：<strong>纯 TensorRT 1.97 ms vs C++ 经 ONNX Runtime 3.22 ms</strong>，
+这 1.25 ms 就是封装成本。</p>
+
+<h3 id="p7-7">7.7 三个设计决策</h3>
+
+<h4>决策一：<code>dynamic=False</code>，固定 640×640</h4>
+
+<p><strong>选了什么：</strong>导出静态 shape，不做动态维度。</p>
+<p><strong>为什么：</strong>① 静态 shape 让 TensorRT 能<strong>充分优化</strong>（动态 shape 要为每个尺寸预编多套 kernel）；
+② 项目的输入本来就统一 letterbox 到 640；③ 简化 C++ 侧的内存分配。</p>
+<p><strong>代价：</strong>换分辨率必须重新导出。<strong>视频测试里 720p / 1080p 都是先 letterbox 到 640 再进的</strong>，
+所以<strong>预处理成本随源分辨率上升</strong>（2.61 → 5.32 → 8.12 ms），而<strong>推理不变</strong>（3.6–4.0 ms）。
+这是这个决策的直接后果，也是视频那组数字的解释。</p>
+
+<h4>决策二：用 FP16，不用 INT8</h4>
+
+<p><strong>选了什么：</strong>FP16 引擎作为交付精度。</p>
+<p><strong>为什么：</strong>FP16 只掉 0.04 个点（0.6327 → 0.6323），构建慢但推理快；
+INT8 掉 4.41% 而延迟只快 1.5%–3%——<strong>落在测量波动内</strong>，等于白掉精度。</p>
+<p><strong>代价：</strong>放弃了理论上的 2 倍算力。这个模型太小，<strong>INT8 的收益在桌面 GPU 上体现不出来</strong>。
+在 Jetson 这类算力受限设备上可能反转，<strong>但本项目没验证，所以只作为推断，不当结论</strong>。</p>
+
+<h4>决策三：C++ 侧只接 ONNX Runtime 的 TensorRT 接口，不接原生 TensorRT</h4>
+
+<p><strong>选了什么：</strong>C++ 里用 <code>SessionOptionsAppendExecutionProvider_TensorRT</code>，
+而不是自己写 TensorRT 的 C++ 推理代码。</p>
+<p><strong>为什么：</strong>原生 TensorRT 的 C++ 接口需要 MSVC 编译（本机是 MinGW），还要自己管
+<code>ICudaEngine</code> / <code>IExecutionContext</code> / 显存绑定；<strong>而 ONNX Runtime 的 TensorRT 接口已经把引擎交给它管理</strong>，
+只需要几行代码就能切过去，也自然绕开了 7.6 那堵 ABI 墙。</p>
+<p><strong>代价：</strong>比原生 TensorRT 慢一点（封装开销 1.25 ms，见 7.1）。
+这个差距<strong>没做进一步优化</strong>，因为端到端已经被其他地方卡住——
+在 7.94 ms 里，推理只占 3.05 ms，预处理 2.61 ms，读图 1.48 ms。
+<strong>把推理压到 2 ms，端到端也只到 6.9 ms。</strong></p>
+
+<h3 id="p7-8">7.8 八条坑，按踩到的概率排序</h3>
+
+<table>
+  <tr><th class="c" style="width:34px">#</th><th style="width:200px">症状</th><th style="width:210px">真因</th><th>修法 / 教训</th></tr>
+  <tr class="hi"><td class="c">1</td><td>两次测的延迟差一倍（23.7 vs 16.4）</td>
+    <td>机器不空闲 + 每组只测一次</td><td>空机、两轮、分开进程。<strong>这不是优化，是测量方法</strong></td></tr>
+  <tr><td class="c">2</td><td>导出成功、能出框，但结果和 PyTorch 不一致</td>
+    <td>没做三层验证，只看"能跑"</td><td>结构 → 数值 → 结果，三层都过才算等价</td></tr>
+  <tr class="hi"><td class="c">3</td><td>数值层最大差 24.66，看着像导出坏了</td>
+    <td>原始 logits 未归一化，差异集中在"无目标格子"</td><td>看相对误差 + 结果层，<strong>别看最大绝对差</strong></td></tr>
+  <tr><td class="c">4</td><td>链接 TensorRT 通过，一调用就返回垃圾值</td>
+    <td><strong>ABI 墙</strong>：MinGW 与 MSVC 的虚表布局不同</td>
+    <td>只走 <strong>C 接口</strong>；要调 C++ 类必须用 MSVC 编</td></tr>
+  <tr class="hi"><td class="c">5</td><td>engine 拷到另一台机器上加载失败</td>
+    <td>engine 绑定了<strong>GPU 架构 + TensorRT 版本 + 驱动</strong></td><td>目标机重建；缓存目录按机器分开</td></tr>
+  <tr><td class="c">6</td><td>缓存目录里有旧引擎，改了模型却还在跑旧结果</td>
+    <td>缓存命中不看模型 sha256</td><td>改模型就清缓存；或用带 hash 的目录名</td></tr>
+  <tr class="hi"><td class="c">7</td><td>构建 engine 时显存爆</td>
+    <td><code>workspace</code> 设得太大（本项目 4 GB）</td><td>降到 1–2 GB 试；<strong>workspace 只影响构建，不影响推理</strong></td></tr>
+  <tr><td class="c">8</td><td>ONNX 在别的机器上转换报"不支持的算子"</td>
+    <td>opset 与目标运行时版本不匹配</td><td>本项目 opset 18；旧运行时要降到 12–13</td></tr>
+</table>
+
+<div class="box warn">
+  <span class="t">⚠️ 第 5 条最容易被忽略：engine 不可移植</span>
+  <p>engine 里存的是<strong>为这块 GPU 的架构、这个 TensorRT 版本、这个驱动选定的 kernel 序列和策略</strong>，
+  换了任何一项都可能失效。</p>
+  <p>所以<strong>交付时给的是 ONNX + 构建脚本，engine 在目标机上生成</strong>。
+  这不是偷懒，是唯一正确的做法——把 engine 一起发出去，用户换台机器就得到一个"加载失败"。</p>
+</div>
+
+<div class="say">
+  <span class="t">💬 这一站的一句话总结</span>
+  <p>部署做了四步：导出 ONNX 并三层验证（结果层 70 个框一个不差、逐类全对）、
+  编 TensorRT 引擎（FP16 只掉 0.04 个点）、接 C++、最后测。
+  端到端从 Python 侧的 14.96 毫秒降到 C++ 侧的 7.94 毫秒，
+  但这两个数一个在 Python 640×640、一个在 C++ 400×640，条件不同，不能直接说"快了 1.9 倍"。
+  另外主动否掉了 INT8——掉 4.41% 的精度、延迟只快 1.5% 到 3%，落在波动里，等于白掉精度。</p>
+</div>
+<!-- ==================== 8 ==================== -->
+<h2 id="p8"><span class="num">8</span>ROS2 落地：包设计与五关实测</h2>
+
+<div class="lead">
+  <p>前面七站都是"一个进程处理一张图"。ROS2 这一层解决的是<strong>另一个问题</strong>——
+  这个进程怎么在一个正在跑的机器人系统里，<strong>被别人看见、被别人配置、被别人测</strong>。</p>
+  <p>做法是把推理能力封装成一个 ROS2 节点：包 <strong>20 个文件 / 1887 行</strong>
+  （其中 16 个有逻辑的文件共 1688 行），在 <strong>WSL2 + Ubuntu 22.04 + ROS2 Humble</strong> 上编译通过、零 warning。</p>
+  <p>实测按"五关"推进，每关只引入一个新变量：dummy 验通信 → CPU 验真推理 → CUDA 验 GPU →
+  TensorRT 验最后一档 → worker 线程做一次 A/B。
+  结果在 <a href="#p8-5">8.5</a>，踩的 <strong>12 条坑</strong>在 <a href="#p8-6">8.6</a>。</p>
+</div>
+
+<h3 id="p8-1">8.1 一个 ROS2 节点比"一个程序"多了什么</h3>
+
+<p>一个 <code>main()</code> 里 <code>while(true)</code> 读图、推理、画框的程序，和"一个 ROS2 节点"，
+<strong>计算部分完全一样</strong>。多出来的只有四件东西，但每一件都属于<strong>"错了不报错、只是行为不对"</strong>的类型：</p>
+
+<table>
+  <tr><th style="width:110px">多出来的</th><th style="width:190px">是什么</th><th>错了会怎样（这才是重点）</th></tr>
+  <tr class="hi"><td><strong>话题 + 消息</strong></td><td>用类型化的通道代替函数调用</td>
+    <td>消息字段漏填不会编译报错，下游读出 0</td></tr>
+  <tr><td><strong>QoS</strong></td><td>传输质量：可靠性 / 队列深度 / 持久性</td>
+    <td><strong>两边不兼容时一帧都收不到，但节点正常启动、正常打印</strong></td></tr>
+  <tr class="hi"><td><strong>参数</strong></td><td>运行时可改的配置，带类型</td>
+    <td>YAML 里写 <code>true</code>，传进来是字符串 <code>"true"</code>，直接抛类型错</td></tr>
+  <tr><td><strong>启动文件 + 依赖声明</strong></td><td><code>launch.py</code> 与 <code>package.xml</code></td>
+    <td>本地能跑，换机器 <code>rosdep install</code> 装的依赖不全，编译失败</td></tr>
+</table>
+
+<div class="box note">
+  <span class="t">为什么 QoS 不兼容会"静默失败"</span>
+  <p>ROS2 底层是 DDS。发布者说"我 best_effort"（尽力而为，可能丢），订阅者说"我 reliable"（必须一帧不丢）——
+  <strong>这两种请求无法匹配</strong>，DDS 会拒绝建立连接。但拒绝的方式是<strong>打一条 warning 到日志</strong>，
+  节点本身照常活着。</p>
+  <p>于是你看到的是：<code>ros2 node list</code> 看得见节点、<code>ros2 topic list</code> 看得见话题，
+  但 <code>ros2 topic echo</code> 一片空白。<strong>这是 ROS2 调试里最费时间的症状之一。</strong></p>
+  <p><strong>规矩：相机类高频话题，一边用 best_effort，另一边必须也是 best_effort。</strong>
+  本项目输入用 <code>rclcpp::SensorDataQoS()</code>（内部就是 best_effort + 深度 5），
+  再 <code>.keep_last(1)</code> 把深度压到 1。</p>
+</div>
+
+<h4>为什么队列深度 1 是"背压"，不是"少收几帧"</h4>
+
+<p>假设相机 10 fps（每 100 ms 一帧），推理要 39 ms。如果队列深度是 10，
+那么节点慢下来的时候，<strong>队列里会攒 10 帧旧图</strong>，处理它们要 390 ms，
+期间又进来 3 帧新的……<strong>延迟越滚越大，而且 <code>infer_ms</code> 这个指标一点都不会变</strong>。</p>
+
+<ol class="steps">
+  <li><strong>深度 1</strong>：新帧到达时，如果队列里已有一帧没被取走，<strong>旧的那帧被丢掉</strong>。</li>
+  <li>节点永远处理<strong>最新的一帧</strong>，延迟不会累积——这就是背压（back pressure）的字面意思：
+  <strong>用丢帧换取不排队</strong>。</li>
+  <li>代价是<strong>丢帧不可见</strong>：DDS 层丢的帧不会进你的回调，你连计数都拿不到。
+  能看到的只有"帧率掉下来了"。</li>
+</ol>
+
+<div class="box warn">
+  <span class="t">⚠️ 所以"节点自己丢"和"DDS 帮你丢"要分开记</span>
+  <p>本项目有两套丢帧计数，语义完全不同：</p>
+  <p><strong>① <code>dropped_stale</code>——代码主动丢。</strong>
+  当 <code>transport_ms &gt; max_transport_ms</code>（默认 200 ms）时直接 <code>return</code>，
+  意思是"这帧已经过期了，处理它只会让延迟雪上加霜"。</p>
+  <p><strong>② DDS 丢的——深度 1 覆盖式丢弃，外部无感。</strong></p>
+  <p>这就是为什么实测里会出现<strong>"<code>dropped_stale = 0</code> 但帧率只有 1~6 Hz"</strong>：
+  <strong>不是丢帧，是节点自己慢</strong>。先入为主认为"丢帧了"，就会去查 QoS、查队列、查 DDS 配置——方向全错。</p>
+</div>
+
+<div class="analogy">
+  <span class="t">💡 打比方：电梯 vs 排长队</span>
+  <p>队列深度 10 像"电梯排队"：人一多就排队，你等了 10 趟才上去，但你登记的时间还是"到达时间"——
+  <strong>看起来你只等了 1 趟，其实等了 10 趟</strong>。这就是延迟累积而指标不变。</p>
+  <p>深度 1 像"只留最后一个人"：每次只接最新到的那个人，前面的人自动放弃。<strong>等待时间永远是 0</strong>，
+  代价是有人被跳过了、而且没人记账。</p>
+</div>
+
+<h3 id="p8-2">8.2 这个包长什么样：三层，谁也不认识谁</h3>
+
+<pre><code><span class="cmt"># ros2/src/yolo_trt_ros/   （20 个文件）</span>
+<span class="cmt">├── CMakeLists.txt                126  构建：ORT 可选、gtest、消息生成</span>
+<span class="cmt">├── package.xml                    33  依赖声明（opencv / gtest 两处是补的）</span>
+<span class="cmt">├── config/params.yaml             40  18 个默认参数 + 12 个类名</span>
+<span class="cmt">├── launch/yolo_trt.launch.py      77  7 个 launch 参数</span>
+<span class="cmt">├── msg/Detection.msg               8  单框：类名/类 id/分数/四坐标</span>
+<span class="cmt">├── msg/DetectionArray.msg         15  一帧：header + model_id + ep + 尺寸 + 推理耗时</span>
+<span class="cmt">├── msg/LatencyReport.msg          34  五段延迟 × 分位数 + 四个异常计数 + fps + vram</span>
+<span class="cmt">├── include/yolo_trt_ros/          4 个头 219 行</span>
+<span class="cmt">├── src/yolo_node.cpp             458  ← 唯一知道 ROS 存在的文件</span>
+<span class="cmt">├── src/yolo_detector.cpp         362  ← 唯一知道 ONNX Runtime 存在的文件</span>
+<span class="cmt">├── src/letterbox.cpp              54  缩放+填充+CHW（无 ROS、无 ORT）</span>
+<span class="cmt">├── test/test_letterbox.cpp       106  7 个用例</span>
+<span class="cmt">├── test/test_latency_stats.cpp    53  5 个用例</span>
+<span class="cmt">└── scripts/fake_camera.py        170  发假图（替代 Gazebo，省 3 GB 依赖）</span></code></pre>
+
+<figure>
+<svg viewBox="0 0 680 292" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="layerC" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#9aa3b2"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="680" height="292" rx="10" fill="#ffffff"/>
+  <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1d21">三层结构：箭头只能单向指下去，不能反向 include</text>
+
+  <rect x="34" y="46" width="612" height="60" rx="9" fill="#eef3ff" stroke="#c7d8ff"/>
+  <text x="50" y="68" font-size="12" font-weight="700" fill="#1d4ed8">ROS 层 · yolo_node.cpp（458 行）</text>
+  <text x="50" y="88" font-size="10.5" fill="#334155">订阅图像 → 调检测器 → 发布三个话题。不 include 任何 ONNX Runtime 头文件</text>
+  <text x="600" y="76" text-anchor="end" font-size="10" fill="#3b5bdb">话题 / QoS / 参数 / 时钟</text>
+
+  <rect x="34" y="120" width="612" height="60" rx="9" fill="#f0f9eb" stroke="#c9e9b0"/>
+  <text x="50" y="142" font-size="12" font-weight="700" fill="#15803d">推理层 · yolo_detector.cpp（362 行）</text>
+  <text x="50" y="162" font-size="10.5" fill="#334155">建 Session、跑 Run()、解码 + NMS + 反 letterbox。不 include 任何 ROS 头文件</text>
+  <text x="600" y="150" text-anchor="end" font-size="10" fill="#15803d">能脱离 ROS 单独压测</text>
+
+  <rect x="34" y="194" width="612" height="60" rx="9" fill="#f8f9fb" stroke="#d8dde6"/>
+  <text x="50" y="216" font-size="12" font-weight="700" fill="#334155">几何与统计层 · letterbox.cpp（54 行）+ latency_stats.hpp（71 行）</text>
+  <text x="50" y="236" font-size="10.5" fill="#334155">缩放/填充/坐标反变换、环形缓冲与分位数。两边都不依赖，用 gtest 单独盯</text>
+  <text x="600" y="224" text-anchor="end" font-size="10" fill="#64748b">12 个单测用例</text>
+
+  <line x1="340" y1="106" x2="340" y2="118" stroke="#9aa3b2" stroke-width="1.6" marker-end="url(#layerC)"/>
+  <line x1="340" y1="180" x2="340" y2="192" stroke="#9aa3b2" stroke-width="1.6" marker-end="url(#layerC)"/>
+
+  <text x="352" y="116" font-size="9.5" fill="#7a8290">调用</text>
+  <text x="352" y="190" font-size="9.5" fill="#7a8290">调用</text>
+
+  <rect x="34" y="264" width="612" height="18" rx="4" fill="#fffdf5"/>
+  <text x="340" y="277" text-anchor="middle" font-size="10" fill="#92400e">分层的目的是"可测"：能单独验的，就不要混在一起验</text>
+</svg>
+<figcaption>图 19 · 三层结构：ROS 层、推理层、几何与统计层，箭头单向，谁也不反向依赖</figcaption>
+</figure>
+
+<div class="box ok">
+  <span class="t">✅ 这张图是这一节最重要的一张</span>
+  <p><code>yolo_node.cpp</code> <strong>不 include 任何 ONNX Runtime 头</strong>；
+  <code>yolo_detector.cpp</code> <strong>不 include 任何 ROS 头</strong>
+  （源码注释原话："本文件不 include 任何 ROS 头 —— 可以脱离 ROS 单独编译与 benchmark"）。</p>
+  <p>这个分层不是为了"好看"，是为了<strong>可测</strong>：letterbox 和张量布局能用 gtest 盯住（12 个用例），
+  推理层能用 <code>bench_latency.py</code> 脱离 ROS 压，
+  <strong>剩下唯一可能出错的就是"接线"</strong>——接错了，假检测器一跑就露。</p>
+</div>
+
+<h4>对外接口：四个话题</h4>
+
+<table>
+  <tr><th style="width:200px">话题（相对节点名）</th><th style="width:140px">类型</th><th style="width:150px">QoS</th><th>内容</th></tr>
+  <tr class="hi"><td><code>~/detections</code></td><td><code>DetectionArray</code></td><td>QoS(10)</td>
+    <td>每帧的框 + <strong>实际生效的执行后端</strong> + 本帧推理耗时</td></tr>
+  <tr><td><code>~/latency</code></td><td><code>LatencyReport</code></td><td>SensorData, 深度 1</td>
+    <td>每秒一次，五段分位数 + 四个异常计数</td></tr>
+  <tr class="hi"><td><code>~/debug_image</code></td><td><code>sensor_msgs/Image</code></td><td>SensorData, 深度 1</td>
+    <td>画好框的图，左下角烧了 <code>ep=</code> 和 <code>infer=</code></td></tr>
+  <tr><td><code>/camera/image_raw</code></td><td><code>sensor_msgs/Image</code></td><td>SensorData, 深度 1</td>
+    <td>订阅（话题名可用参数 <code>image_topic</code> 改）</td></tr>
+</table>
+
+<p>注意 <code>~/</code> 前缀：实际名字是 <code>/yolo_trt_node/detections</code>，<strong>带节点名</strong>。
+这不是随手写的——同一台机器上可能跑两个检测节点，用 <code>/yolo/detections</code> 会撞名。
+这也是实测 A1 那关的一条判据。</p>
+
+<h3 id="p8-3">8.3 延迟为什么必须拆成五段</h3>
+
+<p>只报一个"端到端 100 ms"，无法定位瓶颈在哪里：
+到底是相机慢、传输慢、预处理慢、推理慢，还是画框慢？<strong>拆开之后，每一段都能被单独归因。</strong></p>
+
+<figure>
+<svg viewBox="0 0 680 268" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="latD" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#9aa3b2"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="680" height="268" rx="10" fill="#ffffff"/>
+  <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1d21">五段延迟：一条时间线，两个时钟</text>
+
+  <!-- 时间轴 -->
+  <line x1="40" y1="96" x2="644" y2="96" stroke="#c9d1dc" stroke-width="2" marker-end="url(#latD)"/>
+  <text x="40" y="82" font-size="10" fill="#7a8290">图像时间戳</text>
+  <text x="644" y="82" text-anchor="end" font-size="10" fill="#7a8290">结果发完</text>
+
+  <!-- 段 1: transport -->
+  <rect x="40" y="60" width="196" height="36" rx="5" fill="#eef3ff" stroke="#c7d8ff"/>
+  <text x="138" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">transport</text>
+  <text x="138" y="112" text-anchor="middle" font-size="9.5" fill="#3b5bdb">p50 66–73 ms</text>
+
+  <!-- 段 2: pre -->
+  <rect x="240" y="60" width="76" height="36" rx="5" fill="#f0f9eb" stroke="#c9e9b0"/>
+  <text x="278" y="82" text-anchor="middle" font-size="10.5" font-weight="700" fill="#15803d">pre</text>
+  <text x="278" y="112" text-anchor="middle" font-size="9.5" fill="#15803d">1.05 ms</text>
+
+  <!-- 段 3: infer -->
+  <rect x="320" y="60" width="150" height="36" rx="5" fill="#fef3f2" stroke="#f7c9c4"/>
+  <text x="395" y="82" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b91c1c">infer</text>
+  <text x="395" y="112" text-anchor="middle" font-size="9.5" fill="#b91c1c">35.05 ms（CPU 档）</text>
+
+  <!-- 段 4: post -->
+  <rect x="474" y="60" width="66" height="36" rx="5" fill="#f0f9eb" stroke="#c9e9b0"/>
+  <text x="507" y="82" text-anchor="middle" font-size="10.5" font-weight="700" fill="#15803d">post</text>
+  <text x="507" y="112" text-anchor="middle" font-size="9.5" fill="#15803d">0.073 ms</text>
+
+  <!-- serve 括号 -->
+  <path d="M240,132 L240,140 L540,140 L540,132" fill="none" stroke="#7c3aed" stroke-width="1.6"/>
+  <text x="390" y="158" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7c3aed">serve（回调入口 → 发完结果）p50 36.16 ms</text>
+
+  <!-- 时钟说明 -->
+  <rect x="34" y="176" width="298" height="72" rx="9" fill="#fffdf5" stroke="#f0dfa8"/>
+  <text x="50" y="196" font-size="11" font-weight="700" fill="#92400e">transport 用仿真时钟 now()</text>
+  <text x="50" y="214" font-size="10" fill="#713f12">因为要和"图像上的时间戳"比，只能同一套时间</text>
+  <text x="50" y="231" font-size="10" fill="#713f12">use_sim_time:=true 时读 /clock</text>
+
+  <rect x="348" y="176" width="298" height="72" rx="9" fill="#f0f9eb" stroke="#c9e9b0"/>
+  <text x="364" y="196" font-size="11" font-weight="700" fill="#15803d">其余四段用 steady_clock</text>
+  <text x="364" y="214" font-size="10" fill="#14532d">不受 NTP 校时跳变影响（时间往前跳不会变成负数）</text>
+  <text x="364" y="231" font-size="10" fill="#14532d">不会被仿真暂停拉长（Gazebo 暂停时 CPU 还在跑）</text>
+</svg>
+<figcaption>图 20 · 五段延迟：transport 用仿真时钟对齐时间戳，其余四段用 steady_clock 只量本进程开销</figcaption>
+</figure>
+
+<table>
+  <tr><th style="width:96px">段名</th><th style="width:190px">从哪到哪</th><th style="width:150px">用什么钟</th><th>典型值（CPU 档）</th></tr>
+  <tr class="hi"><td><code>transport</code></td><td>图像时间戳 → 回调被调用</td><td><strong>仿真时钟</strong> <code>now()</code></td>
+    <td>p50 66.4 ms / p99 143.5 ms</td></tr>
+  <tr><td><code>pre</code></td><td>letterbox + 转 CHW float</td><td>steady_clock</td><td>p50 1.05 ms</td></tr>
+  <tr class="hi"><td><code>infer</code></td><td>只有 <code>session-&gt;Run()</code></td><td>steady_clock</td><td>p50 35.05 ms</td></tr>
+  <tr><td><code>post</code></td><td>解码 + NMS + 反 letterbox</td><td>steady_clock</td><td>p50 0.073 ms</td></tr>
+  <tr class="hi"><td><code>serve</code></td><td>回调入口 → 发完结果</td><td>steady_clock</td><td>p50 36.16 ms / p99 59.91 ms</td></tr>
+</table>
+
+<div class="box note">
+  <span class="t">代价：这五段不能直接相加得到"端到端"</span>
+  <p>因为 <code>transport</code> 和 <code>serve</code> <strong>用的是两套钟</strong>，相加在数学上不严谨。
+  要真的端到端，得在订阅端再取一次 <code>now()</code> 减 <code>header.stamp</code>，
+  一个数包住全链路。</p>
+  <p><strong>本项目没有做这个字段，这是有意的</strong>——因为补了也解决不了最大的那一块：
+  <code>transport</code> 有 66~73 ms，占全链路一半以上，而它<strong>主要由相机采集和消息传递决定，
+  不是这个节点能优化的</strong>。要压它得换传输方式（共享内存 / 零拷贝），那是另一个课题。</p>
+  <p>所以这里先记住一句：<strong>"serve 这一段（节点内部的端到端）"和"相机到结果的端到端"是两件事。</strong>
+  本项目报的是前者的分量，后者明确没做。</p>
+</div>
+
+<div class="box warn">
+  <span class="t">⚠️ 为什么必须报 p99，而不能只报均值</span>
+  <p>实时系统怕的是<strong>抖动</strong>，不是平均慢。
+  一个"均值 6 ms、p99 30 ms"的系统，在 30 fps 下会周期性丢帧，但均值看起来很漂亮。</p>
+  <p>本项目视频测试就是这个形态：<strong>纯推理均值 3.63 ms，但端到端中位 9.90 ms、p99 13.25 ms</strong>。
+  只看均值会以为"稳定 270 fps"，实际上每 100 帧有 1 帧要 13 ms。</p>
+</div>
+
+<h4>一个必须知道的口径坑：<code>infer_ms_p50 = 0.0</code> 不是"很快"</h4>
+
+<pre><code><span class="cmt"># 实测中抓到的一份 LatencyReport（原文节选）</span>
+ep: CUDA
+<span class="kw">window: 0</span>
+<span class="kw">frames_total: 0</span>
+infer_ms_p50: 0.0
+serve_ms_p50: 0.0
+vram_mib: 3059
+empty_streak_max: 0</code></pre>
+
+<div class="box warn">
+  <span class="t">⚠️ 这份报告一个数都不能用，而它看起来"完美"</span>
+  <p><code>infer_ms_p50: 0.0</code> 会被读成"推理 0 毫秒，快到飞起"。
+  真相是 <code>window: 0</code>——<strong>滑窗里一帧都没有</strong>，节点刚启动，相机还没发第一帧。</p>
+  <p><strong>规矩：拿到一份延迟报告，先看 <code>window</code> 和 <code>frames_total</code>，
+  两个都是 0 就整份丢掉。</strong></p>
+  <p>这三个字段（<code>window</code> / <code>frames_total</code> / <code>ep</code>）就是为了这件事加的——
+  <strong>让读者能自己判断这份数据可不可信，而不是靠作者口头保证。</strong></p>
+</div>
+
+<div class="box tip">
+  <span class="t">💡 分位数用"最近秩"而不是线性插值</span>
+  <p>NumPy 的 <code>percentile</code> 默认做线性插值，结果可能是<strong>样本里根本没出现过</strong>的数。
+  这里用最近秩（<code>rank + 0.5</code> 取整）：<strong>返回值一定是真实测到过的一帧的耗时</strong>。</p>
+  <p>好处是：说 <code>p99 = 47.34</code>，就<strong>确实有一帧是 47.34 ms</strong>，可以在日志里找到它。
+  坏处是：样本少（比如 44 个）时 <code>p99</code> 和 <code>p95</code> 可能落在同一个秩上，<strong>看起来一样</strong>。</p>
+  <p><strong>所以报分位数必须同时报样本量。</strong></p>
+</div>
+
+<h3 id="p8-4">8.4 代码里五个值得看的位置</h3>
+
+<h4>① 构造顺序：参数必须先声明</h4>
+
+<pre><code><span class="cmt">// src/yolo_node.cpp  L94</span>
+<span class="kw">class</span> YoloNode : <span class="kw">public</span> rclcpp::Node {
+ <span class="kw">public</span>:
+  YoloNode() : rclcpp::Node(<span class="st">"yolo_trt_node"</span>) {
+    declare_params();        <span class="cmt">// ① 先把 18 个参数读进来（含 ep 字符串 → 枚举）</span>
+    init_detector();         <span class="cmt">// ② 再按参数建检测器（可能降级，降级原因写 err）</span>
+
+    <span class="kw">const</span> <span class="kw">auto</span> qos_in = rclcpp::SensorDataQoS().keep_last(<span class="num">1</span>);
+    sub_ = create_subscription&lt;sensor_msgs::msg::Image&gt;(
+        image_topic_, qos_in,
+        [<span class="kw">this</span>](sensor_msgs::msg::Image::ConstSharedPtr m) { on_image(std::move(m)); });
+
+    pub_det_ = create_publisher&lt;msg::DetectionArray&gt;(<span class="st">"~/detections"</span>, rclcpp::QoS(<span class="num">10</span>));
+    pub_lat_ = create_publisher&lt;msg::LatencyReport&gt;(
+        <span class="st">"~/latency"</span>, rclcpp::SensorDataQoS().keep_last(<span class="num">1</span>));
+    <span class="cmt">// ... worker 线程、1 Hz 定时器、ready 日志、sanity_check</span>
+  }</code></pre>
+
+<p>顺序是<strong>被迫的</strong>：<code>image_topic_</code>、<code>publish_debug_image_</code> 这些成员要先被
+<code>declare_params()</code> 填好，订阅和发布才能建；<code>detector_</code> 要先被 <code>init_detector()</code> 建好，
+后面的"实际生效后端"才有东西可查。</p>
+<p><strong>把"读配置"和"用配置"分成两个函数</strong>，是为了让降级、异常、日志都集中在一处。</p>
+
+<h4>② 十八个参数里，六个值得讲</h4>
+
+<table>
+  <tr><th style="width:150px">参数</th><th style="width:92px">默认</th><th>为什么是这个默认值</th></tr>
+  <tr class="hi"><td><code>detector</code></td><td><code>"ort"</code></td>
+    <td>但 <code>params.yaml</code> 里是 <code>"dummy"</code>——<strong>默认走假检测器</strong>，先证通信层。
+    这是刻意的：用 <code>ort</code> 失败时你会同时怀疑代码和模型，<code>dummy</code> 能先把范围砍一半</td></tr>
+  <tr><td><code>ep</code></td><td><code>"cpu"</code></td>
+    <td>字符串 <code>cpu/cuda/trt</code>，由 <code>parse_ep()</code> 转枚举。<strong>写错直接抛异常并列出可选项</strong>，
+    不留"猜"的余地</td></tr>
+  <tr class="hi"><td><code>stats_window</code></td><td><code>200</code></td>
+    <td>滑窗 200 帧 ≈ 10 fps 下 20 秒。太小分位数抖，太大跟不上状态变化</td></tr>
+  <tr><td><code>max_transport_ms</code></td><td><code>200.0</code></td>
+    <td>过期帧阈值。设为 <code>0</code> 可关闭</td></tr>
+  <tr class="hi"><td><code>use_worker_thread</code></td><td><code>false</code></td>
+    <td><strong>默认关</strong>——因为实测证明它没用（见 8.7 决策三）。留着是因为它是可对比的实验开关</td></tr>
+  <tr><td><code>read_vram</code></td><td><code>true</code></td>
+    <td>每秒 <code>popen("nvidia-smi ...")</code> 一次。<strong>追求极简可关</strong>，
+    而且它读到的是<strong>整卡总量</strong>，不是本进程占用</td></tr>
+</table>
+
+<div class="box warn">
+  <span class="t">⚠️ 参数写错时"抛异常"比"回落默认值"好，但代价要说清楚</span>
+  <p><code>ep</code> 写错 → <code>throw</code> → <code>main()</code> 里 catch → <code>RCLCPP_FATAL</code> 并返回 1。
+  <strong>节点直接起不来。</strong>这是对的：如果 <code>ep=bogus</code> 静默变成 CPU，
+  你会以为是"GPU 没生效"，查半天才发现是自己拼错了。</p>
+  <p>反例是 <code>detector</code> 写错——这个没做校验，会走到"创建 ORT 检测器"然后加载失败抛异常。
+  <strong>结果一样（起不来），但错误信息是"检测器加载失败"，不是"detector 参数不认识"。</strong>
+  这是项目里一个已知的小粗糙，没改。</p>
+</div>
+
+<h4>③ 数据通路：<code>on_image</code> 只有一个 if，<code>process</code> 有五个计时点</h4>
+
+<pre><code><span class="cmt">// src/yolo_node.cpp  L228 附近：过期帧保护</span>
+<span class="kw">const</span> <span class="kw">auto</span>&amp; stamp = msg-&gt;header.stamp;
+<span class="kw">if</span> (stamp.sec != <span class="num">0</span> || stamp.nanosec != <span class="num">0</span>) {
+  <span class="kw">const</span> <span class="kw">double</span> dt = (now() - rclcpp::Time(stamp)).seconds() * <span class="num">1000.0</span>;
+  transport_ms = dt &gt;= <span class="num">0.0</span> ? <span class="kw">static_cast</span>&lt;<span class="kw">float</span>&gt;(dt) : <span class="num">0.f</span>;
+  <span class="kw">if</span> (max_transport_ms_ &gt; <span class="num">0.f</span> &amp;&amp; transport_ms &gt; max_transport_ms_) {
+    ++dropped_stale_;
+    <span class="kw">return</span>;   <span class="cmt">// 过期帧不处理：处理它只会让延迟雪上加霜</span>
+  }
+}</code></pre>
+
+<div class="box note">
+  <span class="t">为什么第一行要先判 <code>stamp</code> 是否为零</span>
+  <p>因为假相机早期版本没填 <code>header.stamp</code>，那 <code>now() - 0</code> 就是
+  <strong>从 1970 年到现在</strong>的秒数，<code>transport_ms</code> 会是一个天文数字，
+  然后所有帧都被判为过期——<strong>节点一帧都不处理，但完全不报错</strong>。</p>
+  <p>这就是"时间戳链路只要有一环没填对，症状就是<strong>静默零输出</strong>或<strong>静默全丢</strong>"的实例。
+  所以代码里加了这个哨兵判断，并且把 <code>transport_ms = -1</code> 作为"没有有效时间戳"的标记
+  （<code>-1</code> 的那一帧不进统计）。</p>
+</div>
+
+<h4>④ letterbox：三行公式，三个"改一个字就全错、但一个错都不报"的地方</h4>
+
+<pre><code><span class="cmt">// src/letterbox.cpp  L14</span>
+lb.scale = std::min(<span class="kw">static_cast</span>&lt;<span class="kw">float</span>&gt;(size) / <span class="kw">static_cast</span>&lt;<span class="kw">float</span>&gt;(w),
+                    <span class="kw">static_cast</span>&lt;<span class="kw">float</span>&gt;(size) / <span class="kw">static_cast</span>&lt;<span class="kw">float</span>&gt;(h));
+<span class="kw">const</span> <span class="kw">int</span> new_w = <span class="kw">static_cast</span>&lt;<span class="kw">int</span>&gt;(std::lround(w * lb.scale));
+<span class="kw">const</span> <span class="kw">int</span> new_h = <span class="kw">static_cast</span>&lt;<span class="kw">int</span>&gt;(std::lround(h * lb.scale));
+lb.pad_x = <span class="num">0.5f</span> * <span class="kw">static_cast</span>&lt;<span class="kw">float</span>&gt;(size - new_w);
+lb.pad_y = <span class="num">0.5f</span> * <span class="kw">static_cast</span>&lt;<span class="kw">float</span>&gt;(size - new_h);
+
+lb.canvas = cv::Mat(size, size, CV_8UC3, cv::Scalar(<span class="num">114</span>, <span class="num">114</span>, <span class="num">114</span>));   <span class="cmt">// 灰边必须是 114</span></code></pre>
+
+<div class="box warn">
+  <span class="t">⚠️ 三个必须记住的细节</span>
+  <p><strong>① <code>min</code> 不能改成 <code>max</code></strong>：改成 max 会把图裁掉，
+  框的位置全对不上（因为在原图上是错的）。</p>
+  <p><strong>② <code>pad_x</code> 是 <code>0.5 *</code> 而不是整个差值</strong>：填充是<strong>两边各一半</strong>（居中）。
+  写成整个差值就是"左对齐填充"，反变换时所有框横向偏一个 <code>pad_x</code>。</p>
+  <p><strong>③ 灰边值必须是 114</strong>：这是 Ultralytics 训练时的 <code>fill_value</code>。
+  写成 0（黑边）不报错，只是 mAP 悄悄掉几个点。
+  <strong>所以单测里专门有一条用例去读像素 <code>at&lt;cv::Vec3b&gt;(0, 320)</code> 验证它是 114。</strong></p>
+</div>
+
+<p>还有一个"故意不做"的契约：<strong>反变换 <code>unletterbox</code> 不裁剪</strong>。
+落在填充区的框会算出负数，调用方必须自己 clamp。
+为什么不在这里裁剪？因为<strong>裁剪属于"策略"，不属于"几何"</strong>——
+检测器需要知道"这个框有多少落在图外"（完全在图外的框会被整条丢掉）。
+如果先钳到 0，一个完全在灰边里的假框会被钳成面积为 0 的框，
+<strong>结果对，但过程看不出来</strong>。单测里有一条专门验这个：
+给一条完全在灰边里的框 <code>(100,10)-(200,60)</code>，反变换后 <code>y1 = -260</code>。</p>
+
+<h4>⑤ 后处理索引：<code>d[(4+c)*na + a]</code> 这个式子从哪来</h4>
+
+<pre><code><span class="cmt">// src/yolo_detector.cpp  L268 附近</span>
+<span class="kw">const</span> <span class="kw">int</span> ch = <span class="kw">static_cast</span>&lt;<span class="kw">int</span>&gt;(os[<span class="num">1</span>]);   <span class="cmt">// 4 + nc</span>
+<span class="kw">const</span> <span class="kw">int</span> na = <span class="kw">static_cast</span>&lt;<span class="kw">int</span>&gt;(os[<span class="num">2</span>]);   <span class="cmt">// 8400</span>
+<span class="kw">const</span> <span class="kw">int</span> nc = ch - <span class="num">4</span>;
+<span class="kw">const</span> <span class="kw">float</span>* d = outs[<span class="num">0</span>].GetTensorMutableData&lt;<span class="kw">float</span>&gt;();
+
+<span class="kw">for</span> (<span class="kw">int</span> a = <span class="num">0</span>; a &lt; na; ++a) {                       <span class="cmt">// a = anchor（8400 个候选）</span>
+  <span class="kw">float</span> best = -<span class="num">1.f</span>; <span class="kw">int</span> best_c = -<span class="num">1</span>;
+  <span class="kw">for</span> (<span class="kw">int</span> c = <span class="num">0</span>; c &lt; nc; ++c) {
+    <span class="kw">const</span> <span class="kw">float</span> s = d[<span class="kw">static_cast</span>&lt;std::size_t&gt;(<span class="num">4</span> + c) * na + a];   <span class="cmt">// ← 通道优先</span>
+    <span class="kw">if</span> (s &gt; best) { best = s; best_c = c; }
+  }
+  <span class="kw">if</span> (best &lt; conf_thres || best_c &lt; <span class="num">0</span>) <span class="kw">continue</span>;
+}</code></pre>
+
+<table>
+  <tr><th style="width:140px">输出形状</th><th style="width:170px">索引约定</th><th>含义</th></tr>
+  <tr class="hi"><td><code>[1, 16, 8400]</code></td><td><strong>通道优先</strong>（channel-major）</td>
+    <td>第 <code>c</code> 个通道的<strong>整条向量</strong>在内存里连续：<code>d[c*8400 ... c*8400+8399]</code></td></tr>
+  <tr><td><code>[1, 8400, 16]</code></td><td>anchor 优先（anchor-major）</td>
+    <td>第 <code>a</code> 个候选的 16 个数连续：<code>d[a*16 ... a*16+15]</code>——
+    <strong>这是很多人第一版写错的形状</strong></td></tr>
+</table>
+
+<p>Ultralytics 导出 ONNX 时<strong>不转置</strong>，输出就是 <code>[1, 4+nc, 8400]</code>，所以索引必须是
+<code>(4+c)*na + a</code>。<strong>写成 <code>a*(4+nc)+c</code> 不会崩、不会报错，只会输出一堆乱框</strong>
+——因为读到的是别人的数。</p>
+
+<div class="box tip">
+  <span class="t">💡 顺带一个容易漏的细节：这里没有 objectness</span>
+  <p>YOLOv5 有 <code>obj_conf</code>，要算 <code>score = obj × cls</code>；
+  YOLOv8 之后（含 YOLO26）<strong>取消了 objectness</strong>，
+  16 个通道里后 12 个直接就是类别分数，而且<strong>已经在模型里做过 sigmoid</strong>。</p>
+  <p>所以代码里没有任何 <code>sigmoid()</code> 调用——<strong>不是漏了，是不需要</strong>。</p>
+</div>
+
+<h3 id="p8-5">8.5 五关实测：每关只改一个变量</h3>
+
+<p>把 ROS2 节点第一次跑起来，可能的失败点至少有七个：能不能编译、能不能找到 ONNX Runtime、
+能不能建 Session、能不能收到图、QoS 通不通、推理对不对、坐标变换对不对。
+<strong>一次性全开，等于同时掷七个骰子</strong>——失败了你不知道该查哪个。</p>
+
+<div class="box note">
+  <span class="t">分关的本质是控制变量，不是"由易到难"</span>
+  <p>每一关<strong>只引入一个新变量</strong>，其余全部保持上一关已验证的状态：</p>
+  <table style="margin:8px 0">
+    <tr><th style="width:56px">关</th><th style="width:180px">新引入的变量</th><th>上一关已验证的（不再怀疑）</th></tr>
+    <tr class="hi"><td><strong>A1</strong></td><td>ROS 通信（话题/QoS/时间戳）</td><td>能编译</td></tr>
+    <tr><td><strong>A2</strong></td><td>ORT CPU 真推理</td><td>能收到图、能发出框、话题名对</td></tr>
+    <tr class="hi"><td><strong>A3</strong></td><td>执行后端换成 CUDA</td><td>同一个 onnx、同一套后处理是对的</td></tr>
+    <tr><td><strong>A4</strong></td><td>执行后端换成 TensorRT</td><td>GPU 链路本身通（CUDA 已跑通）</td></tr>
+    <tr class="hi"><td><strong>A5</strong></td><td>线程模型（回调推理 → worker）</td><td>功能全对，只比性能</td></tr>
+  </table>
+  <p><strong>这个顺序不可交换。</strong>如果先上 TensorRT，一旦失败你会发现同时有三个可能：
+  TensorRT 没装好、CUDA 没装好、后处理写错了——<strong>而 A2/A3 本来就是用来排除后两个的</strong>。</p>
+</div>
+
+<h4>环境</h4>
+
+<table>
+  <tr><th style="width:130px">项</th><th>值</th></tr>
+  <tr class="hi"><td>宿主 / WSL</td><td>Windows 11 / <strong>Ubuntu 22.04（WSL2）</strong></td></tr>
+  <tr><td>ROS2</td><td><strong>Humble</strong>（Ubuntu 22.04 的官方配对版本）</td></tr>
+  <tr class="hi"><td>ONNX Runtime</td><td><strong>1.22.0</strong>，pip 本地 wheel 装的</td></tr>
+  <tr><td>GPU</td><td>RTX 5060 Laptop 8 GB，驱动 591.91（<code>nvidia-smi</code> 显示 CUDA 13.1）</td></tr>
+  <tr class="hi"><td>CUDA 运行库</td><td>CUDA 12.8 + cuDNN 9.9，来自 <strong>6 个 <code>nvidia-*-cu12</code> pip 包（1.65 GB）</strong></td></tr>
+  <tr><td>numpy</td><td><strong>1.24.4</strong>——从 2.2.6 降下来的（ORT 1.22 的 wheel 按 1.x ABI 编译）</td></tr>
+  <tr class="hi"><td>模型</td><td><code>weights/best.onnx</code>（9.41 MB，就是第 7 章导出的那个文件）</td></tr>
+</table>
+
+<h4>五关结果</h4>
+
+<table>
+  <tr><th style="width:50px">关</th><th style="width:120px">做了什么</th><th class="c" style="width:74px">状态</th>
+    <th class="c" style="width:104px">infer p50</th><th>核心证据</th></tr>
+  <tr class="hi"><td><strong>编译</strong></td><td>带 ORT 的干净编译</td><td class="c">✅</td><td class="c">—</td>
+    <td>21.4 s，退出码 0，<strong>零 warning</strong></td></tr>
+  <tr><td><strong>A1</strong></td><td>dummy 假检测器</td><td class="c">✅</td><td class="c">0 ms</td>
+    <td>稳态 <strong>9.6~10.4 Hz</strong>，话题名带节点名，<code>dropped_stale</code> 仅 2</td></tr>
+  <tr class="hi"><td><strong>A2</strong></td><td>ORT CPU 真推理</td><td class="c">✅</td><td class="c"><strong>35.05</strong> ms</td>
+    <td>框是 <code>vehicles 0.8708</code> / <code>traffic lights 0.8308</code>，非固定框</td></tr>
+  <tr><td><strong>A3</strong></td><td>CUDA</td><td class="c">✅</td><td class="c"><strong>7.1</strong> ms</td>
+    <td>首行 <code>ep=CUDA</code> + 报告 <code>ep: CUDA</code> + <strong>5.5×</strong></td></tr>
+  <tr class="hi"><td><strong>A4</strong></td><td>TensorRT</td><td class="c">⚠️</td><td class="c">6.3~6.6</td>
+    <td>降级：缺 <code>libnvinfer.so.10</code>；<strong>根因已定位，主动停手</strong></td></tr>
+  <tr><td><strong>A5</strong></td><td>worker 线程对比</td><td class="c">✅ 负结果</td><td class="c">37.7 vs 39.0</td>
+    <td>改善 1.3 ms，<strong>在波动内</strong>；结论"没用"</td></tr>
+</table>
+
+<div class="box ok">
+  <span class="t">✅ 5.5 倍这个数怎么算的，必须说清分母</span>
+  <p>CPU 侧有两个数：汇总报告里的 <code>infer_ms_p50</code> 是 <strong>35.05</strong>，
+  逐秒日志里所有 p50 的<strong>中位数是 39.0</strong>。
+  35.05 / 7.1 = 4.9×；39.0 / 7.1 = <strong>5.5×</strong>。</p>
+  <p><strong>报 5.5 用的是"同口径"</strong>——A3 的 7.1 也是逐秒日志 p50 的中位数，所以分母必须用 39.0。</p>
+  <p>为什么会有两个数？因为统计对象不同：汇总报告是<strong>某一瞬间滑窗内的 p50</strong>（抓到哪一份算哪一份），
+  逐秒中位数是<strong>整段运行里所有 p50 的中位数</strong>。前者受抓取时机影响，后者更稳。
+  <strong>报加速比必须两侧同口径，否则能差 10%。</strong></p>
+</div>
+
+<div class="box warn">
+  <span class="t">⚠️ 一次真实的"静默降级"，也是这次实测最重要的一课</span>
+  <p>实测中间有一轮，日志首行写的是：<br>
+  <code>yolo_trt_node ready | detector=ort <strong>ep=CPU</strong> input=640 classes=12 ...</code><br>
+  而敲的命令里明明是 <code>ep:=cuda</code>。<strong>CUDA 库没装齐，代码静默降级到了 CPU，
+  一共 12 秒完全没有人察觉。</strong></p>
+  <p>如果这一关只记"我跑过 CUDA"，后面所有"5.5 倍加速"的数字就全错了——
+  因为那 12 秒跑的根本是 CPU。</p>
+  <p><strong>所以判据必须写在"实际生效值"上，不是"请求值"上。</strong>
+  这条规矩往大了说：<strong>"我配置了什么"和"实际在跑什么"，永远是两件事。</strong></p>
+</div>
+
+<h4>判据的证据等级</h4>
+
+<table>
+  <tr><th style="width:210px">证据</th><th>例子</th><th style="width:100px">可信吗</th></tr>
+  <tr><td>只看到启动命令里有 <code>ep:=cuda</code></td><td>你敲的命令</td><td class="c"><strong>不可信</strong></td></tr>
+  <tr class="hi"><td>日志首行 <code>ep=CUDA</code></td><td><code>ready | detector=ort ep=CUDA ...</code></td><td class="c">可信</td></tr>
+  <tr><td>消息里的 <code>ep</code> 字段</td><td><code>LatencyReport.ep: CUDA</code></td><td class="c">可信（独立证据）</td></tr>
+  <tr class="hi"><td>延迟量级对得上</td><td>7.1 ms vs CPU 的 39 ms</td><td class="c">可信（物理证据）</td></tr>
+</table>
+
+<h4>每秒一行的延迟汇总怎么读</h4>
+
+<pre><code><span class="cmt"># 实测日志原文（一行）</span>
+1.0 fps ep=CPU | transport p50 73.2 p99 141.3 | pre 1.2 | infer p50 40.5 p95 53.0 p99 59.2
+ | post 0.1 | serve p50 41.7 p99 60.7 | drop stale 0 enc 0 | vram 2479 MiB</code></pre>
+
+<ol class="steps">
+  <li><code>1.0 fps</code> 而相机 10 fps → 差 10 倍，<strong>先别急着归因</strong>。</li>
+  <li><code>drop stale 0 enc 0</code> → <strong>代码一帧都没丢</strong>。所以不是"丢了 9 帧"，是"1 秒只处理完 1 帧"。</li>
+  <li><code>serve p50 41.7</code> ≈ <code>infer 40.5</code> + <code>pre 1.2</code> + <code>post 0.1</code> →
+  <strong>回调里 41.7 ms 是纯计算，没有排队</strong>。</li>
+  <li>那 10 fps 进、1 fps 出，中间那 9 帧去哪了？<strong>在 DDS 队列里被深度 1 覆盖了</strong>——
+  这就是背压，<strong>它不计数，所以看不见</strong>。</li>
+</ol>
+
+<div class="box tip">
+  <span class="t">💡 <code>pre 1.2</code> 只有一个数，而 <code>infer</code> 有三个——这不是笔误</span>
+  <p>消息定义里 <code>pre_ms</code> 和 <code>post_ms</code> 只有 p50/p99，
+  <code>infer_ms</code> 有 p50/p95/p99。理由：<strong>pre/post 是毫秒级的小量，分布窄，p95 和 p99 常年重合；
+  infer 是唯一的毫秒级大头，尾部信息才有价值。</strong></p>
+  <p>这是个可以商量的设计——如果哪天 pre 变成瓶颈（比如换成 4K 输入），就得补上 p95。</p>
+</div>
+
+<h3 id="p8-6">8.6 十二条坑：构建六条、运行五条、观测性一条</h3>
+
+<h4>构建类：六条（编译从失败五次到成功）</h4>
+
+<table>
+  <tr><th style="width:24px">#</th><th style="width:33%">报错原文关键句</th><th style="width:29%">真因</th><th>修法</th></tr>
+  <tr class="hi"><td>1</td><td><code>The keyword signature for target_link_libraries has already been used</code></td>
+    <td><code>ament_target_dependencies</code> 内部用 plain 签名，代码里用了 <code>PRIVATE</code>；CMake 不许同一个 target 混用</td>
+    <td>去掉 <code>PRIVATE</code>，统一 plain</td></tr>
+  <tr><td>2</td><td><code>CMAKE_C_COMPILE_OBJECT</code> 缺失 + <strong>"cmake may not be built correctly"</strong></td>
+    <td><code>project(yolo_trt_ros <strong>CXX</strong>)</code> 只启用了 C++，而消息生成内部需要 <strong>C</strong></td>
+    <td>改成 <code>project(yolo_trt_ros C CXX)</code>，并 <code>rm -rf build install log</code> 清缓存</td></tr>
+  <tr class="hi"><td>3</td><td><code>format '%u' expects unsigned int, but argument has type uint64_t</code></td>
+    <td>计数器是 <code>uint64_t</code>，格式串写 <code>%u</code></td>
+    <td>改 <code>%lu</code></td></tr>
+  <tr><td>4</td><td>设了 <code>ORT_ROOT</code> 仍报"未找到 ONNX Runtime，只编译假检测器"</td>
+    <td><code>find_path</code> <strong>只查 HINTS 第一层，不递归</strong>；真实文件在第三层目录</td>
+    <td><code>NAMES</code> 改成带子路径的完整形式</td></tr>
+  <tr class="hi"><td>5</td><td><code>fatal error: onnxruntime_cxx_api.h: No such file</code></td>
+    <td>源码写扁平 <code>#include</code>，但 include 根指向上一层</td>
+    <td>额外把 <code>onnxruntime/core/session</code> 加进 include 路径</td></tr>
+  <tr><td>6</td><td><code>std::forward is not a member of yolo_trt_ros::std</code>（几十条，指向标准库内部）</td>
+    <td><code>#include "onnxruntime_cxx_api.h"</code> 写在 <code>namespace yolo_trt_ros {</code> <strong>内部</strong>，第三方头里的 <code>std::</code> 被解析成 <code>yolo_trt_ros::std::</code></td>
+    <td>把 ORT include 移到文件顶部、namespace 之外</td></tr>
+</table>
+
+<h4>运行与依赖类：五条</h4>
+
+<table>
+  <tr><th style="width:24px">#</th><th style="width:33%">现象</th><th style="width:29%">真因</th><th>修法 / 状态</th></tr>
+  <tr class="hi"><td>7</td><td><code>Unknown provider name 'CUDA'</code> → 直接退出</td>
+    <td>ORT 1.22 的字符串版接口只认 DML/QNN/OpenVINO 等，<strong>不认 CUDA</strong></td>
+    <td>改用类型化的 V2 接口（<code>CreateCUDAProviderOptions</code> + <code>..._CUDA_V2</code>）✅</td></tr>
+  <tr><td>8</td><td>请求 <code>ep:=cuda</code>，首行却写 <code>ep=CPU</code>（12 秒无人察觉）</td>
+    <td>ORT 的 wheel <strong>不带 CUDA 运行库</strong>；装完 <code>onnxruntime-gpu</code> 仍缺 cublas/cudnn</td>
+    <td><code>ldd</code> 精确查出 7 个 not found → 装 6 个 <code>nvidia-*-cu12</code>（1.65 GB）✅</td></tr>
+  <tr class="hi"><td>9</td><td><code>numpy</code> 相关 ABI 报错</td>
+    <td>ORT 1.22 的 wheel 按 numpy 1.x ABI 编译，环境里是 2.2.6</td>
+    <td>降到 <strong>1.24.4</strong> ✅</td></tr>
+  <tr><td>10</td><td>请求 <code>ep:=trt</code>，静默跑在 CUDA</td>
+    <td>加载时降级把原因写进了 <code>err</code>，<strong>调用方没看</strong></td>
+    <td>加 <code>RCLCPP_WARN</code> 打降级原因 ✅（改完立刻看到真因）</td></tr>
+  <tr class="hi"><td>11</td><td><code>libnvinfer.so.10: cannot open shared object file</code></td>
+    <td>ORT 的 TensorRT 接口要求 TRT 10.x（SONAME <code>.so.10</code>）；PyPI 只有 11.x 的 wheel（<code>.so.11</code>）</td>
+    <td><strong>未修</strong>，主动停手（见 8.7 决策二）</td></tr>
+</table>
+
+<h4>观测性类：一条</h4>
+
+<table>
+  <tr><th style="width:24px">#</th><th style="width:33%">现象</th><th style="width:29%">真因</th><th>修法</th></tr>
+  <tr class="hi"><td>12</td><td>日志"信息在那儿但你看不到"</td>
+    <td>日志工具早期版本把 stdout/stderr 全重定向，异常只在屏幕上有、文件里没有</td>
+    <td>改成双向 tee + 存退出码 ✅</td></tr>
+</table>
+
+<div class="box warn">
+  <span class="t">⚠️ 十二条里最值钱的是这三条（不是因为难，是因为会重复踩）</span>
+  <p><strong>① 同一个坑在两个子系统各踩了一次。</strong>
+  ORT 字符串版 <code>AppendExecutionProvider("CUDA")</code> 不能用，Windows 侧的 C++ 工程注释里
+  <strong>早就写了</strong>；但 ROS2 包是另一套代码，<strong>没同步这条经验</strong>，于是又踩一遍。<br>
+  → 教训：<strong>踩过的坑要写进"会被复用的位置"</strong>（共用的注释、checklist），不是写进当时的日志。</p>
+  <p><strong>② 错误信息会指向错误的地方。</strong>
+  <code>std::forward is not a member of yolo_trt_ros::std</code> 指向标准库，真因是 include 写在 namespace 里；
+  <code>cmake may not be built correctly</code> 指向 CMake 安装，真因是 <code>project()</code> 没启用 C。<br>
+  → 教训：<strong>看第一条错误，不要看最后一条</strong>；最后一行往往是 <code>gmake: *** Error 2</code> 这种废话。</p>
+  <p><strong>③ 观测性本身要花钱建。</strong>加载时吞掉降级原因、日志工具把输出全重定向——
+  两处都是"代码没错，但把原因藏起来了"。修完之后排查速度才真正上来。<br>
+  → 教训：<strong>降级、回落、跳过，这三件事必须留痕</strong>，否则等于没发生。</p>
+</div>
+
+<div class="box tip">
+  <span class="t">💡 换个环境后的快速判障表</span>
+  <table style="margin:6px 0">
+    <tr><th style="width:220px">症状</th><th style="width:210px">最可能的原因</th><th>怎么验证</th></tr>
+    <tr class="hi"><td>节点起来了，<code>topic echo</code> 一片空白</td><td><strong>QoS 不匹配</strong></td>
+      <td><code>ros2 topic info /xxx --verbose</code> 看两端 Reliability</td></tr>
+    <tr><td>有 <code>/detections</code> 但一帧都没有框</td><td>conf 太高 / 模型不匹配 / 后处理索引错</td>
+      <td>先看 <code>empty_streak_max</code>；再用 <code>detector:=dummy</code> 排除后处理</td></tr>
+    <tr class="hi"><td>框的位置整体偏移</td><td><code>pad</code>/<code>scale</code> 错；<code>step</code> 当成 <code>width*3</code></td>
+      <td>跑单测，letterbox 用例全绿就说明几何是对的</td></tr>
+    <tr><td>请求 <code>ep:=trt</code>，日志显示 <code>ep=CUDA</code></td><td><strong>TensorRT 挂载失败并降级</strong></td>
+      <td>搜日志里的"检测器降级:"——这行就是修降级日志换来的</td></tr>
+    <tr class="hi"><td>帧率低但 <code>dropped_stale=0</code></td><td><strong>不是丢帧，是节点自己慢</strong></td>
+      <td>算 <code>infer p50</code> 是否接近帧间隔</td></tr>
+  </table>
+</div>
+
+<h3 id="p8-7">8.7 三个"不做"的决策</h3>
+
+<h4>决策一：不用 Gazebo，手写假相机</h4>
+
+<table>
+  <tr><th style="width:38%">方案</th><th>代价 / 收益</th></tr>
+  <tr class="hi"><td><strong>Gazebo + 仿真场景</strong></td>
+    <td>收益：真实仿真，有物理、有场景。<br>
+    代价：<strong>要装仿真全家桶，依赖上 GB</strong>；WSL2 里跑 Gazebo 还要 GPU 直通或软件渲染；
+    启动一次几十秒；而且<strong>它给的图和测试图分布完全不同</strong>（仿真街道 vs 真实道路），mAP 本来就不能比</td></tr>
+  <tr><td><strong>手写 <code>fake_camera.py</code>（170 行）</strong></td>
+    <td>收益：一个 Python 文件，<code>--fps 10</code> 就发图；<strong>帧率可控</strong>（做延迟对照实验必须有稳定的输入速率）；
+    图像可以是任意尺寸，<strong>正好用来验 letterbox</strong>。<br>
+    代价：不是真相机，测不出相机驱动的延迟</td></tr>
+</table>
+
+<p><strong>关键理由不是"省事"，是"这个实验不需要 Gazebo"</strong>：
+这一轮要验证的是"ROS2 接线 + 推理 + 延迟统计"，<strong>输入源的语义不重要，只要帧率稳定</strong>。
+真要做"仿真场景下的检测效果"，那才需要 Gazebo——<strong>而那是另一个实验</strong>。</p>
+
+<div class="box tip">
+  <span class="t">💡 假相机顺便解决了另一件事</span>
+  <p>它能发任意尺寸的图，所以<strong>可以专门验 letterbox</strong>。
+  这一点值得强调：<strong>640×640 的方形输入验不出 letterbox</strong>——
+  scale 就是 1.0、pad 就是 0，整个变换是恒等操作，写错了也能通过。
+  必须用非方形输入（比如 960×540）才能暴露问题。</p>
+</div>
+
+<h4>决策二：TensorRT 那一关停手</h4>
+
+<ol class="steps">
+  <li><strong>根因已经定位</strong>：ORT 1.22 的 TensorRT 接口依赖 <code>libnvinfer.so.10</code>，
+  而 ORT 的 wheel 只带接口本身，不带 TensorRT 运行库。日志给了完整原因，<strong>不是猜的</strong>。</li>
+  <li><strong>渠道对不上</strong>：PyPI 官方 <code>tensorrt-cu12</code> 的 10.x <strong>只有源码包</strong>；
+  11.x 有 wheel 但 <strong>SONAME 是 <code>.so.11</code></strong>，而接口硬要求 <code>.so.10</code>。
+  TRT 10 要从 NVIDIA 官方索引另下，几百 MB。</li>
+  <li><strong>数字是重复的</strong>：Windows 侧已经完整验证过 TensorRT（第 7 章：FP32/FP16 三层验证、
+  C++ 接 TensorRT 接口 <strong>3.22 ms</strong>），同一张 RTX 5060、同一个 <code>best.onnx</code>、同一个 TRT 10.8。
+  <strong>在 WSL 里再跑一遍，得到的是同一批数字。</strong></li>
+</ol>
+
+<div class="box note">
+  <span class="t">"不做"和"没做"的区别，在于能不能说出理由</span>
+  <p>如果只说"TensorRT 那关没跑通"，听起来的印象是<strong>能力缺口</strong>；
+  如果说"根因是 TRT 10 的 SONAME 是 <code>.so.10</code> 而 PyPI 只给 11.x，要装的库几百 MB，
+  而同一张卡同一个模型在 Windows 侧已经验过 3.22 ms"——印象是<strong>工程判断</strong>。</p>
+  <p><strong>前提是那句日志原文还在</strong>：<code>libnvinfer.so.10: cannot open shared object file</code>。
+  没有它，"根因已定位"就只是自我评价，不是证据。</p>
+</div>
+
+<h4>决策三：worker 线程的负结果照实写</h4>
+
+<table>
+  <tr><th style="width:150px">指标</th><th class="c" style="width:126px">同步（A2）</th>
+    <th class="c" style="width:126px">worker（A5）</th><th class="c">差异</th></tr>
+  <tr class="hi"><td><code>infer p50</code></td><td class="c">39.0 ms</td><td class="c">37.7 ms</td><td class="c">−1.3 ms</td></tr>
+  <tr><td><code>transport p50</code></td><td class="c">69.0 ms</td><td class="c">67.6 ms</td><td class="c">−1.4 ms</td></tr>
+  <tr class="hi"><td><code>infer p95 / p99</code></td><td class="c">46.5 / 47.3</td><td class="c">41.5 / 41.5</td><td class="c">尾部略好</td></tr>
+  <tr><td><code>topic hz</code></td><td class="c">3.32 / 5.76</td><td class="c">3.35 / 3.36</td><td class="c">波动一样大</td></tr>
+</table>
+
+<p>结论是"<strong>在测量波动内，worker 线程没有实质收益</strong>"，所以默认值保持关闭。
+为什么没收益，最硬的一条解释是：</p>
+
+<div class="box note">
+  <span class="t">"把推理挪到另一个线程，只是换了等待的位置"</span>
+  <p>相机 10 fps（每 100 ms 一帧），推理 39 ms。同步模式下，回调占住执行器 39 ms，
+  期间到达的新帧在 DDS 队列里被覆盖；worker 模式下，回调 1 ms 就把帧塞进信箱，
+  然后 worker 花 39 ms 推理，<strong>期间到达的新帧在信箱里被覆盖</strong>。</p>
+  <p><strong>两种模式的丢帧逻辑一模一样</strong>，只是"覆盖"发生的位置从 DDS 队列挪到了自己的
+  <code>pending_</code> 变量。<strong>吞吐上限由"每帧 39 ms"决定，跟谁在等无关。</strong></p>
+  <p>什么时候 worker 才有用？<strong>当回调里还有别的阻塞操作</strong>（比如同步保存图片、等磁盘 IO），
+  或者推理耗时<strong>远大于</strong>帧间隔、需要做流水线时。本项目两个条件都不满足——
+  <strong>这条判断是推断，没有数据证明</strong>，记录里也这么写了。</p>
+</div>
+
+<div class="box ok">
+  <span class="t">✅ 负结果为什么值得写出来</span>
+  <p>如果一开始只写 worker 版本，就永远不知道它有没有用；
+  如果只写同步版本，"为什么不用多线程"这个问题就只能停在"主观判断"上，拿不出数据。</p>
+  <p><strong>做成开关 + 做一次 A/B = 一个可以被证伪的工程判断。</strong>
+  这个决策的价值不在于"选对了"，而在于<strong>有开关、有对比、有结论</strong>。</p>
+  <p>顺带一个观察：这个"负结果"本身也是解释——它说明瓶颈在"每帧多久"，不在"谁来等"。
+  <strong>能把一个优化否掉并说清理由，比多做一个优化更有说服力。</strong></p>
+</div>
+
+<h3 id="p8-8">8.8 这一站的边界</h3>
+
+<table>
+  <tr><th style="width:200px">项</th><th>状态</th></tr>
+  <tr class="hi"><td>编译</td><td>✅ WSL2 + Humble 通过，零 warning，21.4 s</td></tr>
+  <tr><td>通信层（dummy）</td><td>✅ 稳态 10 Hz，话题名带节点名</td></tr>
+  <tr class="hi"><td>真实推理（CPU / CUDA）</td><td>✅ 35.05 ms（汇总）/ 7.1 ms；同口径 39.0 → 7.1 为 5.5×</td></tr>
+  <tr><td>TensorRT</td><td>⚠️ 未跑通，根因已定位（缺 <code>libnvinfer.so.10</code>），主动停手</td></tr>
+  <tr class="hi"><td>worker 线程</td><td>✅ 负结果：无实质收益，默认关闭</td></tr>
+  <tr><td>真实相机</td><td>❌ <strong>没接</strong>。用的是手写假相机；真实相机的驱动延迟、时间戳精度都没验</td></tr>
+  <tr class="hi"><td>真实机器人平台</td><td>❌ <strong>没上</strong>。在笔记本的 WSL2 里跑的，和 Jetson 这类车端算力没有可比性</td></tr>
+  <tr><td>端到端字段</td><td>❌ 没做。五段拆开统计，但没有"相机到结果"的单一数字（原因见 8.3）</td></tr>
+  <tr class="hi"><td>16 位 / Bayer 编码</td><td>❌ 不支持。手写的 <code>wrap_image</code> 只覆盖 bgr8 / rgb8 / mono8</td></tr>
+</table>
+
+<div class="box warn">
+  <span class="t">⚠️ 这四行"❌"必须一起说</span>
+  <p>这一站验证的是<strong>"ROS2 接线通不通、延迟能不能被拆开归因"</strong>，
+  不是"这个系统能上车了"。</p>
+  <p>具体来说：没接真实相机、没上车端平台、没有端到端单一数字、不支持工业相机的编码。
+  <strong>明确写出这四条，才划定了这个结果的适用范围</strong>——
+  否则一个"跑通了 ROS2"的说法会让人误以为它已经可以上车。</p>
+</div>
+
+<div class="say">
+  <span class="t">💬 这一站的一句话总结</span>
+  <p>ROS2 这一层我写了一个包，20 个文件、1800 多行，分三层：ROS 层只关心话题和参数，
+  推理层只关心 ONNX Runtime，中间的几何和统计两边都不依赖、用 12 个单测盯住。
+  实测按五关推进，每关只改一个变量：假检测器验通信（稳态 10 Hz）、CPU 推理 35 毫秒、
+  CUDA 7.1 毫秒（5.5 倍）、TensorRT 那关根因查清了但主动停手、最后 worker 线程是个负结果。
+  一共踩了 12 条坑，每一轮都留了日志原文。
+  边界也要说清：没接真实相机、没上车端平台、没有端到端单一数字。</p>
+</div>
+<!-- ==================== 9 ==================== -->
+<h2 id="p9"><span class="num">9</span>项目边界与已知局限</h2> <div class="lead"> <p>这一节列出这个项目<strong>已知的 9 条局限</strong>，以及后续可以往哪走。</p> <p>列出来不是自我否定——<strong>一个项目的可信度，取决于它的边界是不是清楚的</strong>。 只给一个总分，看不出它在哪里成立，这个总分就没有意义。</p> </div> <h3>9 条已知局限</h3> <table> <tr><th style="width:36px">#</th><th style="width:180px">局限</th><th>具体情况</th></tr> <tr class="hi"> <td>1</td><td><strong>不是车规数据集</strong></td> <td>12 类、814 张，含 bridges / chimneys / stairs 这些非道路目标，规模约为 nuScenes 的百万分之一。 用它跑通完整链路是合适的，但不能据此宣称做了自动驾驶感知；想更贴近道路场景，下一步应换 BDD100K 这类数据集。</td> </tr> <tr> <td>2</td><td><strong>类别严重不均衡</strong></td> <td>训练集 vehicles 有 763 个框，tractors 只有 1 个；测试集里 tractors 干脆没有标注。 这是真实数据的常态，也是<strong>本项目不只报总 mAP、一定同时给逐类结果和样本量</strong>的原因。</td> </tr> <tr class="hi"> <td>3</td><td><strong>测试集不是完全独立</strong></td> <td>三个划分的时间跨度完全重叠，跨划分最近两张只隔 4.9 秒，存在轻度场景重叠。 三层泄漏检查显示<strong>内容层面没有重复</strong>，但时间戳分析说明划分是按图随机切的—— 所以这个测试指标要按<strong>偏乐观</strong>来理解。</td> </tr> <tr> <td>4</td><td><strong>训练存在明显过拟合</strong></td> <td>训练集分类损失一路降到 0.75，验证集从第 20 轮起就卡在 1.08～1.14。 瓶颈判断在<strong>数据量</strong>而不在训练轮数，所以把 50 轮改成 100 轮不是这个项目的改进方向。</td> </tr> <tr class="hi"> <td>5</td><td><strong>定位精度是短板</strong></td> <td>mAP50-95 只有 0.423，比 mAP50 低了 0.26，小目标尤其明显。 这说明模型<strong>能找对位置、但框不够准</strong>，是小目标上的典型问题，不是分类能力的问题。</td> </tr> <tr> <td>6</td><td><strong>ROS2 已实测 · INT8 不划算</strong></td> <td>部署链路已完成（FP16 纯推理 1.97 ms，C++ 端到端 7.94 ms）；INT8 量化已实测，<strong>mAP50 掉 4.41%、延迟只快 1.5%–3%，未采用</strong>； ROS2 已在 WSL2 + Humble 上编译通过（零 warning），五关实测跑完 A1/A2/A3/A5，TensorRT 那关根因已定位后主动停手（详见<a href="#p8">第 8 部分</a>）。</td> </tr> <tr class="hi"> <td>7</td><td><strong>没有动过模型结构</strong></td> <td>用的是现成的 YOLO26n 做迁移学习，没有改网络、没有写损失函数。 本项目的工作重点在<strong>数据与评估方法</strong>上。</td> </tr> <tr> <td>8</td><td><strong>训练集不是视频</strong></td> <td>相邻两张最小间隔 1.09 秒，是快照集不是连续帧。因此跟踪的定量评估做不了——没有 MOTA / IDF1， 只验证了跟踪链路能跑通、以及在什么情况下会失效。</td> </tr> <tr class="hi"> <td>9</td><td><strong>硬件是笔记本</strong></td> <td>RTX 5060 Laptop（8 GB 显存），和车载平台的性能没有可比性。 笔记本上的速度不能当作端侧性能来宣称——这也是为什么每个速度数字都带着硬件型号和测量条件。</td> </tr> </table> <h3>后续可以做的三件事</h3> <table> <tr><th style="width:230px">可以做的事</th><th>为什么值得做</th></tr> <tr class="hi"> <td><strong>按采集批次重新划分数据集</strong></td> <td>用文件名时间戳聚类，同一批次的图只进一个划分，彻底消除场景重叠。 <span class="muted">注意：重划之后现有指标不能直接对比，需要重新评估一次并注明"旧划分下的结果"。</span></td> </tr> <tr> <td><strong>补少数类的数据</strong></td> <td>垫底三类（bridges 7 个框、taxis 14 个、chimneys 19 个）训练样本都不足 20 个。 实验已经证明瓶颈在数据量上，所以这是优先级最高的一步。</td> </tr> <tr class="hi"> <td><strong>边缘设备与真实相机</strong></td> <td>部署链路、INT8 与 ROS2 节点（WSL2 + Humble）都已实测；下一步是到 Jetson 这类算力受限设备上复测（桌面卡上 INT8 没收益，边缘可能反转），以及把手写假相机换成真实相机、接上车端平台。</td> </tr> </table> <div class="box note"> <span class="t">读数字之前，先看四条前提</span> <p>本项目的每个指标都建立在这四条前提上：</p> <ol> <li>这是 12 类的公开数据集，不是车规数据，含桥梁、烟囱这类非道路目标—— <strong>所以定位是检测基线，不是自动驾驶感知系统</strong>。</li> <li>类别严重不均衡，训练集里 tractors 只有 1 个框—— <strong>所以只看总 mAP 不够，逐类结果和样本量必须一起看</strong>。</li> <li>数据泄漏检查显示内容层面干净，但三个划分的时间跨度重叠—— <strong>所以测试指标要按偏乐观理解</strong>。</li> <li>训练存在明显过拟合，但瓶颈在数据量而不在训练轮数—— <strong>所以增加训练轮数不是有效的改进方向</strong>。</li> </ol> <p>部署链路、INT8 量化与 ROS2 节点均已实测（INT8 因精度代价未采用；ROS2 在 WSL2 + Humble 上跑通，未接真实相机、未上车端平台）。</p> </div> <!-- ==================== 附录 A ==================== --> <h2 id="a1"><span class="num">A</span>数字速查表</h2> <p>本项目全部关键数字，每个都能在项目里找到出处，可以直接翻文件核对。</p> <h3>数据集</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td>图片总数</td><td class="c"><strong>814 张</strong></td><td><code>datasets/road-traffic/</code></td></tr> <tr><td>划分</td><td class="c">train 494 / valid 187 / test 133</td><td><code>docs/label_conversion_report.txt</code></td></tr> <tr class="hi"><td>标注框总数</td><td class="c"><strong>3,165 个</strong></td><td>同左</td></tr> <tr><td>类别数</td><td class="c">12 类</td><td><code>datasets/road-traffic-detect/data.yaml</code></td></tr> <tr class="hi"><td>需要转换的多边形</td><td class="c">860 个（train 3 / valid 804 / test 53）</td><td>同左</td></tr> <tr><td>转换异常行数</td><td class="c"><strong>0</strong></td><td>同左</td></tr> <tr class="hi"><td>空标签文件</td><td class="c">1 个（valid 里，判定为漏标）</td><td><code>scripts/visualize_labels.py</code> 输出</td></tr> <tr><td>许可</td><td class="c">CC BY 4.0（须署名）</td><td><code>datasets/road-traffic/README.dataset.txt</code></td></tr> </table> <h3>训练</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td>模型 / 轮数</td><td class="c">yolo26n.pt / 50 epochs</td><td><code>runs/detect/runs/road_baseline/args.yaml</code></td></tr> <tr><td>batch / imgsz</td><td class="c">8 / 640</td><td>同左</td></tr> <tr class="hi"><td>学习率</td><td class="c">0.01 → 0.0001</td><td>同左（<code>lr0</code> / <code>lrf</code>）</td></tr> <tr><td><strong>总耗时</strong></td><td class="c"><strong>660.4 秒（约 11 分钟）</strong></td><td><code>results.csv</code> 末行</td></tr> <tr class="hi"><td>best.pt 对应轮次</td><td class="c">第 48 轮</td><td>按 <code>fitness = 0.1×mAP50 + 0.9×mAP50-95</code> 复算</td></tr> <tr><td>mAP50 最高点</td><td class="c">0.6440 @ 第 <strong>19</strong> 轮</td><td>同左</td></tr> <tr class="hi"><td>mAP50-95 最高点</td><td class="c">0.4160 @ 第 48 轮</td><td>同左</td></tr> <tr><td>过拟合证据</td><td class="c">训练 cls_loss 6.04→0.75，验证卡在 1.08~1.14，末轮差 <strong>0.34</strong></td><td>同左</td></tr> </table> <h3>评估（测试集，133 张）</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td><strong>mAP50</strong></td><td class="c"><strong>0.6797</strong></td><td><code>results/eval_report/metrics_overall.json</code></td></tr> <tr class="hi"><td><strong>mAP50-95</strong></td><td class="c"><strong>0.4228</strong></td><td>同左</td></tr> <tr><td>精确率 P</td><td class="c">0.7865</td><td>同左</td></tr> <tr><td>召回率 R</td><td class="c">0.6267</td><td>同左</td></tr> <tr class="hi"><td>最优置信度阈值</td><td class="c">0.30（平均 F1 = 0.654）</td><td>同左</td></tr> <tr><td>最优 / 最差类</td><td class="c">fire hydrants 0.9493 / bridges 0.0000（仅 1 个框）</td><td><code>metrics_per_class.csv</code></td></tr> <tr class="hi"><td>测试集里没有标注的类</td><td class="c">tractors（"没考"≠"考 0 分"）</td><td>同左</td></tr> <tr><td>验证集 mAP50（对照）</td><td class="c">0.6414</td><td><code>results.csv</code></td></tr> </table> <h3>性能与模型</h3> <table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td><strong>单张端到端（FP32）</strong></td><td class="c"><strong>16.4 ms</strong>（约 61 FPS）</td><td><code>docs/inference_benchmark.json</code></td></tr> <tr><td>批量 8 时每张</td><td class="c">7.8 ~ 8.8 ms</td><td>同左</td></tr> <tr class="hi"><td>纯 GPU 前向（FP32 中位）</td><td class="c">13.76 ~ 15.78 ms</td><td>同左</td></tr> <tr><td>三档测法最大差异</td><td class="c"><strong>1.45 倍</strong></td><td>同左</td></tr> <tr class="hi"><td>FP16 两轮差异</td><td class="c"><strong>57%</strong>（故未采用）</td><td>同左</td></tr> <tr><td>参数量（融合后）</td><td class="c">2.39 M</td><td>同左</td></tr> <tr class="hi"><td>算力消耗 @640</td><td class="c">5.4 GFLOPs</td><td>同左</td></tr> <tr><td>冷启动首次推理</td><td class="c">约 36 秒</td><td>同左</td></tr> </table> <h3>部署（PC 侧，同机实测）</h3>
+<table> <tr><th style="width:230px">数字</th><th class="c" style="width:130px">值</th><th>出处</th></tr> <tr class="hi"><td>ONNX Runtime FP32 纯推理中位</td><td class="c">8.19 ms（基准 1.00×）</td><td><code>docs/deployment/benchmark_pt_vs_onnx.json</code></td></tr> <tr><td>TensorRT FP32 引擎</td><td class="c">2.88 ms（2.84×）</td><td><code>docs/deployment/engine_verify_report.json</code></td></tr> <tr class="hi"><td><strong>TensorRT FP16 引擎</strong></td><td class="c"><strong>1.97 ms（4.16×）</strong></td><td>同左</td></tr> <tr><td>C++ + ORT TensorRT EP</td><td class="c">3.22 ms</td><td><code>docs/deployment/</code> 下 C++ 实测 JSON</td></tr> <tr class="hi"><td>C++ 端到端（TRT+OpenCV）</td><td class="c"><strong>7.94 ms</strong>（纯推理仅占 38%）</td><td>端到端分段计时报告</td></tr> <tr><td>视频流 1280×720</td><td class="c">约 101 FPS，p99 13.3–14.1 ms</td><td>1000 帧稳定性报告 ×2 轮</td></tr> <tr class="hi"><td>精度 valid mAP50</td><td class="c">pt 0.6407 → onnx 0.6329 → FP16 0.6323</td><td><code>docs/deployment/valid_precision_compare.json</code></td></tr> <tr><td>FP32 → FP16 净代价</td><td class="c"><strong>−0.0004</strong>（可忽略）</td><td>同左</td></tr> <tr class="hi"><td>CPU 自包含分发包</td><td class="c">143 文件 / 212.9 MB，干净 PATH 验证通过</td><td><code>cpp/dist/MANIFEST.txt</code></td></tr> <tr><td>TensorRT INT8 引擎（另一场次实测）</td><td class="c">1.83–1.91 ms，但 mAP50 掉 4.41%</td><td><code>docs/deployment/engine_int8_verify_report.json</code></td></tr> <tr class="hi"><td>INT8 卷积覆盖率</td> <td class="c">83 / 102（81.4%，引擎共 230 层）</td> <td>同上</td></tr>
+ <tr><td>C++ 端到端三轮</td> <td class="c">8.12 / 7.73 / 7.98，均值 <strong>7.94 ms</strong></td> <td><code>docs/deployment/cpp_e2e_benchmark.json</code></td></tr>
+ <tr class="hi"><td>ROS2 包规模</td> <td class="c">20 文件 / 1887 行（16 个有逻辑文件共 1688 行）</td> <td><code>ros2/src/yolo_trt_ros/</code></td></tr>
+ <tr><td>ROS2 五关延迟</td> <td class="c">通信 10 Hz；CPU 39.0 / CUDA 7.1 ms（5.5×）；TRT 降级 6.3–6.6</td> <td><code>docs/ros2/A1–A5.json</code></td></tr>
+ <tr class="hi"><td>ROS2 实测素材</td> <td class="c">53 份日志 / 9 次 colcon / 12 条坑</td> <td><code>ros2/runlogs/2026-11-24/</code></td></tr>
+ </table>
+ <p><span class="muted">口径提醒：8.19 / 2.88 / 1.97 ms 出自 <code>engine_verify_report.json</code>；11.70 / 7.10 / 14.96 / 12.71 ms 出自 <code>benchmark_pt_vs_onnx.json</code>。两组 measurement 场次不同，不可交叉相除。</span></p> <h3>数据泄漏检查</h3> <table> <tr><th style="width:230px">检查项</th><th class="c" style="width:130px">结果</th><th>出处</th></tr> <tr class="hi"><td>内容完全相同（md5）</td><td class="c">跨划分 <strong>0 对</strong></td><td><code>docs/data_leakage_report.json</code></td></tr> <tr class="hi"><td>画面近似（dHash 阈值 5）</td><td class="c">跨划分 <strong>0 对</strong></td><td>同左</td></tr> <tr><td>dHash 最接近距离</td><td class="c">15（阈值 3 倍，说明检查有区分度）</td><td>同左</td></tr> <tr class="hi"><td>时间戳邻域</td><td class="c">跨划分最近 <strong>4.9 秒</strong>；1 分钟内 158 对</td><td>同左</td></tr> <tr><td>图片相邻两张最小间隔</td><td class="c"><strong>1.09 秒</strong>（说明不是视频抽帧）</td><td>同左</td></tr> </table> <h3>环境</h3> <div class="chips"> <span class="chip">Python <b>3.11.16</b></span> <span class="chip">PyTorch <b>2.11.0+cu128</b></span> <span class="chip">Ultralytics <b>8.4.176</b></span> <span class="chip">CUDA <b>12.8</b></span> <span class="chip">GPU <b>RTX 5060 Laptop 8GB</b></span> <span class="chip">conda 环境 <b>yolo_road</b></span> </div> <!-- ==================== 附录 B ==================== --> <h2 id="a2"><span class="num">B</span>术语中英对照</h2> <p>下面这张表按出现频率排，中英对照。</p> <table> <tr><th style="width:170px">中文</th><th style="width:220px">英文 / 缩写</th><th>一句话解释</th></tr> <tr class="hi"><td>目标检测</td><td>Object Detection</td><td>找出图里有什么、在哪、有几个，输出矩形框</td></tr> <tr><td>标注 / 标注框</td><td>Annotation / Bounding Box</td><td>人工画的框，是模型学习的标准答案</td></tr> <tr class="hi"><td>迁移学习</td><td>Transfer Learning</td><td>从别人训好的模型继续训，而不是从零开始</td></tr> <tr><td>预训练权重</td><td>Pretrained Weights</td><td>别人在大数据集上训好的参数</td></tr> <tr class="hi"><td>训练轮数</td><td>Epoch</td><td>把全部训练数据过一遍叫 1 个 epoch</td></tr> <tr><td>批量大小</td><td>Batch Size</td><td>一次同时处理多少张图才更新一次参数</td></tr> <tr class="hi"><td>学习率</td><td>Learning Rate</td><td>每次调参数时"步幅"多大</td></tr> <tr><td>损失 / 损失函数</td><td>Loss / Loss Function</td><td>衡量"错得多离谱"的分数，训练就是把它降到最低</td></tr> <tr class="hi"><td>过拟合</td><td>Overfitting</td><td>训练集一直变好、验证集不再变好，说明在背答案</td></tr> <tr><td>数据增强</td><td>Data Augmentation</td><td>人为把训练图变形（翻转、调色、拼接），抗过拟合</td></tr> <tr class="hi"><td>交并比</td><td>IoU (Intersection over Union)</td><td>两个框重叠程度，0 到 1</td></tr> <tr><td>置信度</td><td>Confidence</td><td>模型有多确定这个框是对的，0 到 1</td></tr> <tr class="hi"><td>非极大值抑制</td><td>NMS</td><td>同一个目标被报了多个框时，只留下最好的那个</td></tr> <tr><td>命中 / 误报 / 漏报</td><td>TP / FP / FN</td><td>报对了 / 报了但错 / 该报没报</td></tr> <tr class="hi"><td>精确率</td><td>Precision</td><td>报出来的框里有多少是对的</td></tr> <tr><td>召回率</td><td>Recall</td><td>该报的目标里报出来了多少</td></tr> <tr class="hi"><td>平均精度</td><td>AP (Average Precision)</td><td>单个类的综合成绩，PR 曲线下面积</td></tr> <tr><td>平均精度均值</td><td>mAP (mean AP)</td><td>所有类的 AP 再取平均</td></tr> <tr class="hi"><td>精确率与召回率的调和平均</td><td>F1 Score</td><td>把 P 和 R 合成一个数，用来找最优阈值</td></tr> <tr><td>混淆矩阵</td><td>Confusion Matrix</td><td>模型的"错题本"：错成了什么</td></tr> <tr class="hi"><td>多目标跟踪</td><td>MOT (Multi-Object Tracking)</td><td>给跨帧的同一目标分配固定编号</td></tr> <tr><td>身份切换</td><td>ID Switch</td><td>同一目标被跟踪器当成两个不同编号</td></tr> <tr><td>数据泄漏</td><td>Data Leakage</td><td>测试数据混进了训练集，导致分数虚高</td></tr> <tr class="hi"><td>长尾分布</td><td>Long-tail Distribution</td><td>少数类样本极多、多数类样本极少</td></tr> </table> <!-- ==================== 附录 C ==================== --> <h2 id="a3"><span class="num">C</span>文件地图</h2> <p>项目里有 23 个脚本，分三组。<strong>下面是完整的脚本清单。</strong></p> <h3>第一组 · 数据准备与核查（7 个）</h3> <table> <tr><th style="width:250px">脚本</th><th>干什么</th></tr> <tr><td><code>dataset_config.py</code></td><td><strong>共享配置模块</strong>：自动定位项目根目录、读 data.yaml 拿类别和路径。所有脚本都从这里取，改数据集只需改一处</td></tr> <tr class="hi"><td><code>01_check_dataset.py</code></td><td>结构检查：图片与标签是否一一对应、字段数、类别越界、坐标范围</td></tr> <tr><td><code>02_inspect_label_formats.py</code></td><td>格式普查：按字段数分类，发现有 860 行是另一种格式</td></tr> <tr class="hi"><td><code>03_find_bad_coordinates.py</code></td><td>多边形数值专项排查，确认那些多边形本身没坏</td></tr> <tr><td><code>04_convert_labels_to_detection.py</code></td><td><strong>核心</strong>：多边形 → 最小外接矩形，生成新数据集 + 审计日志</td></tr> <tr class="hi"><td><code>05_validate_detection_dataset.py</code></td><td>转换后验收：六道校验 + 打印每类框数（长尾的直接证据）</td></tr> <tr><td><code>visualize_labels.py</code></td><td>把人工标注画回原图做抽检，<strong>抓到了那处漏标</strong></td></tr> </table> <h3>第二组 · 交付层（6 个）</h3> <table> <tr><th style="width:250px">脚本</th><th>干什么</th></tr> <tr class="hi"><td><code>06_predict.py</code></td><td>统一推理入口：单图 / 目录 / 视频 / 摄像头</td></tr> <tr><td><code>07_make_demo_figure.py</code></td><td>按规则自动挑图，生成"人工标注 vs 模型预测"对照拼图</td></tr> <tr class="hi"><td><code>08_track.py</code></td><td>视频多目标跟踪（ByteTrack），输出带轨迹 ID 的视频与统计</td></tr> <tr><td><code>09_evaluate.py</code></td><td><strong>正式评估</strong>：逐类指标 + 最优阈值 + 混淆矩阵，并自动生成评估报告</td></tr> <tr class="hi"><td><code>benchmark_inference.py</code></td><td>推理性能测试：三档计时口径 + 6 项测量条件</td></tr> <tr><td><code>check_data_leakage.py</code></td><td>数据泄漏三重检查：md5 + 感知哈希 + 时间戳邻域</td></tr> </table> <h3>第三组 · 部署层（10 个）</h3>
 <table> <tr><th style="width:250px">脚本</th><th>干什么</th></tr> <tr class="hi"><td><code>10_export_onnx.py</code></td><td>导出 ONNX 并留痕（环境快照 / sha256 / 读回结构），产物 9.4 MB</td></tr> <tr><td><code>11_verify_onnx.py</code></td><td>ONNX 三层验证：结构 / 数值 / 结果（16 图 70 对 70，最小 IoU ≥ 0.99）</td></tr> <tr class="hi"><td><code>12_benchmark_pt_vs_onnx.py</code></td><td>PyTorch 与 ONNX Runtime 同条件性能对比</td></tr> <tr><td><code>13_compare_cpp_backends.py</code></td><td>C++ 两种图像后端对比（手写双线性 vs OpenCV）</td></tr> <tr class="hi"><td><code>14_export_engine.py</code></td><td>构建 TensorRT FP32 / FP16 引擎</td></tr> <tr><td><code>15_verify_engine.py</code></td><td>引擎四层验证（结构/数值/结果/精度）+ 性能</td></tr> <tr class="hi"><td><code>16_eval_valid_split.py</code></td><td>valid 上对比五种格式精度（含 INT8，刻意不碰 test）</td></tr> <tr><td><code>17_make_test_video.py</code></td><td>合成测试视频（仅验证链路，报延迟不用它）</td></tr> <tr class="hi"><td><code>18_export_engine_int8.py</code></td><td>构建 INT8 引擎（PTQ，校准集用 train 不用 valid）</td></tr> <tr><td><code>19_verify_int8.py</code></td><td>INT8 四层验证 + 量化覆盖率（81% 卷积）+ 延迟对照</td></tr> </table> <h3>其余关键文件</h3> <table> <tr><th style="width:330px">路径</th><th>里面是什么</th></tr> <tr class="hi"><td><code>README.md</code></td><td>项目主页：环境安装、数据来源与许可、12 步运行顺序、部署结论（第 7 节）、训练命令、已知的坑</td></tr> <tr><td><code>requirements.txt</code></td><td>固定版本的依赖清单（含"先装 PyTorch 再装其余"的顺序）</td></tr> <tr class="hi"><td><code>LICENSE</code></td><td>代码 MIT；<strong>数据集 CC BY 4.0（须署名）</strong>；权重另有其许可——三者分开写清</td></tr> <tr class="hi"><td><code>docs/label_conversion_report.txt</code></td><td>数据转换审计日志</td></tr> <tr><td><code>docs/inference_benchmark.json</code></td><td>性能实测的原始统计量 + 完整测量条件</td></tr> <tr class="hi"><td><code>docs/data_leakage_report.json</code></td><td>泄漏检查的完整结果</td></tr>
  <tr><td><code>docs/deployment/</code></td><td><strong>部署实施记录</strong>：12 份实测 JSON + 两份分包清单，每个数字都有出处</td></tr>
  <tr class="hi"><td><code>cpp/</code></td><td>C++ 推理工程（单图 / 端到端 / 视频流三种模式），用法见 <code>cpp/README.md</code></td></tr>
- <tr><td><code>ros2/</code></td><td>ROS2 封装包（节点 + 自定义消息 + launch + 模拟相机脚本），尚未在 Linux 上编译验证</td></tr> <tr><td><code>results/eval_report/evaluation_report.md</code></td><td><strong>评估报告</strong>：结论 + 逐类表 + 能说明什么 / 不能说明什么</td></tr> <tr class="hi"><td><code>results/demo/demo_grid.png</code></td><td>对照拼图（检测完整 / 典型漏检 / 典型误检 三档示例）</td></tr> <tr><td><code>runs/detect/runs/road_baseline/</code></td><td>训练产物：参数快照、逐轮指标、曲线、混淆矩阵、权重</td></tr> </table> <div class="box tip">
+ <tr><td><code>ros2/</code></td><td>ROS2 封装包（节点 + 自定义消息 + launch + 手写假相机脚本），已在 WSL2 + Humble 上编译通过并完成五关实测，详见<a href="#p8">第 8 部分</a></td></tr> <tr><td><code>results/eval_report/evaluation_report.md</code></td><td><strong>评估报告</strong>：结论 + 逐类表 + 能说明什么 / 不能说明什么</td></tr> <tr class="hi"><td><code>results/demo/demo_grid.png</code></td><td>对照拼图（检测完整 / 典型漏检 / 典型误检 三档示例）</td></tr> <tr><td><code>runs/detect/runs/road_baseline/</code></td><td>训练产物：参数快照、逐轮指标、曲线、混淆矩阵、权重</td></tr> </table> <div class="box tip">
   <span class="t">💡 这张地图的用途</span>
   <p>23 个脚本分三组：<strong>8 个处理数据</strong>（dataset_config、01–05、visualize_labels 及核查相关）、
   <strong>6 个做交付与核查</strong>（06_predict、07_make_demo_figure、08_track、09_evaluate、
@@ -2091,7 +3333,7 @@ python scripts/06_predict.py --source 0</code></pre>
     · 数据泄漏检查 → <code>docs/data_leakage_report.json</code>
   </p>
   <p style="margin-top:16px">
-    <strong>关于"未做"的部分：</strong>凡是无法核实的内容（如 ROS2 节点的实测延迟——它尚未在 Linux 上编译验证；
+    <strong>关于"未做"的部分：</strong>凡是无法核实的内容（如 ROS2 接真实相机的表现——实测用的是手写假相机；
     Jetson 上的 INT8 收益——只在桌面显卡上测过），文中均已明确标注为"未做"，不作任何断言。
     这样做是为了让写出来的每一条结论都能经得起核对——一处不成立，会连带削弱其余结论的可信度。
   </p>
